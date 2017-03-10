@@ -1,7 +1,7 @@
 # Sunray
 
 ## Description
-The next Ardumower Firmware
+The next Ardumower Firmware (experimental)
 
 ## License
 Ardumower (www.ardumower.de)

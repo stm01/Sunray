@@ -1,5 +1,6 @@
 /*
-map and particle filter
+map and particle filter  (modelled after this course: https://www.udacity.com/course/artificial-intelligence-for-robotics--cs373 )
+
 example usage:
   1) start:                  Map.begin();
   2) start mapping:          Map.clearOutline();

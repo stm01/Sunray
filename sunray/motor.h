@@ -60,21 +60,21 @@ class MotorClass {
     float speedDpsCurr;
     float distanceCmCurr;
 	  float distanceCmAvg;
-    int distanceCmSet;
-    float angleRadCurr;
-    float angleRadSet;    
+    int distanceCmSet;  // set line distance (cm)
+    float angleRadCurr; // current (absolute) robot angle
+    float angleRadSet;  // set (absolute) start line angle
     float angleRadSetStartX;
     float angleRadSetStartY;
     float speedRpmSet;
     float mowerPWMSet;
-    float mowerPWMCurr;
+    float mowerPWMCurr; // current mower motor pwm
     int speedDpsSet;
 
-    float motorLeftPWMCurr;  // left motor pwm
-    float motorRightPWMCurr; // right motor pwm
+    float motorLeftPWMCurr;  // current left motor pwm
+    float motorRightPWMCurr; // current right motor pwm
 
-    float motorLeftRpmCurr;  // left motor rpm
-    float motorRightRpmCurr; // right motor rpm
+    float motorLeftRpmCurr;  // current left motor rpm
+    float motorRightRpmCurr; // current right motor rpm
 
     bool motorLeftSwapDir;
     bool motorRightSwapDir;

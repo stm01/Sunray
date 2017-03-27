@@ -1,3 +1,15 @@
+
+/* 
+Particle filter:
+The robot mower uses odometry, an IMU (gyro+compass) and a perimeter to localize itself on the perimeter 
+and within the perimeter. A particle filter estimates the robot position based on moved distance 
+and absolute angle. 
+
+Gyro correction by compass:
+During normal operation only the gyro is used for heading estimation - because a gyro drifts, every 3 minutes 
+all motors are turned off and the gyro is corrected by the compass.
+*/
+
 #ifndef ROBOT_H
 #define ROBOT_H
 

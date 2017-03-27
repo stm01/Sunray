@@ -1,4 +1,9 @@
 /*
+
+The robot mower uses odometry, an IMU (gyro+compass) and a perimeter to localize itself on the perimeter 
+and within the perimeter. A particle filter estimates the robot position based on moved distance 
+and absolute angle.
+
 map and particle filter  (modelled after this course: https://www.udacity.com/course/artificial-intelligence-for-robotics--cs373 )
 
 example usage:

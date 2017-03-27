@@ -19,7 +19,7 @@ typedef enum MotorMotion MotorMotion;
 	 
 	 Motor.begin();	 
 	 Motor.travelLineDistance(distanceCm, absoluteAngle, speedPercent);
-	 while (true){}
+	 while ( Motor.motion != MOT_STOP ){
 	   Motor.run();		 
 	 }	
 

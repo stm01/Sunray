@@ -5,6 +5,9 @@ The next Ardumower Firmware (experimental)
 
 The robot mower uses odometry, an IMU (gyro+compass) and a perimeter to localize itself on the perimeter and within the perimeter. A particle filter estimates the robot position based on moved distance and absolute angle.
 
+## Demo video
+https://www.youtube.com/watch?v=Ewqkd6leQjc
+
 ## License
 Ardumower (www.ardumower.de)
 <br>Copyright (c) 2015 by Uwe Zimprich

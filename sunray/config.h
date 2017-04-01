@@ -77,13 +77,13 @@
 #define PFODAPP_BAUDRATE  19200 
 #define BLUETOOTH_PIN       1234
 
-#define IMU_USE 0
+#define IMU_USE 1
 
-#define ROBOTMSG Serial
-#define PFODAPP Serial2
-#define BLUETOOTH Serial2
-#define RANGING Serial3
-#define DEBUG(x) Serial.print(x)
-#define DEBUGLN(x) Serial.println(x)
+#define ROBOTMSG Serial3
+#define PFODAPP Serial3
+#define BLUETOOTH Serial3
+#define RANGING Serial2
+#define DEBUG(x) Serial3.print(x)
+#define DEBUGLN(x) Serial3.println(x)
 
 

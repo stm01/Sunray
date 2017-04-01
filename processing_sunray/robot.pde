@@ -116,6 +116,9 @@ FloatList dataComMag = new FloatList();
 FloatList dataRanging1 = new FloatList();
 FloatList dataRanging2 = new FloatList();
 FloatList dataRanging3 = new FloatList();
+FloatList dataPIDimuError = new FloatList();
+FloatList dataPIDleftError = new FloatList();
+FloatList dataPIDrightError = new FloatList();
   
   
   // rescale to -PI..+PI
@@ -212,7 +215,7 @@ void drawMainMenu(){
   menu += "mn2~mapping is ";
   if (map.stateMapping) menu += "ON";
     else menu += "OFF";    
-  menu += "|mn3~lane mow|mn19~line +90deg|mn20~angle +90deg";
+  menu += "|mn3~lane mow|mn19~line|mn20~angle +90deg";
   //mn4~request map|mn5~request outline|mn12~request particles|mn13~reset particles";
   menu += "|mn6~ADC cal|mn16~MPU selftest|mn17~IMU start cal|mn18~IMU stop cal|mn8~IMU verbose|mn9~mow 50% ON|mn11~mow ON|mn10~mow OFF|mn15~rotate +20deg}";
   drawMenu(330, 200, menu);
@@ -334,9 +337,12 @@ void drawPlots(int px, int py){
   plot(0, -0.1, 0.3, dataEffL,   "effL",   x, y+5*ploth, 255, 0, 0);
   plot(1, -0.1, 0.3, dataEffR,   "effR",   x, y+5*ploth, 0, 127, 0);   
   plot(0, -0.1, 1.1, dataProb,   "prob",   x, y+6*ploth, 255, 0, 0);
-  plot(0, -0.2, 5, dataRanging1,   "rang1",   x, y+7*ploth, 255, 0, 0);
+  /*plot(0, -0.2, 5, dataRanging1,   "rang1",   x, y+7*ploth, 255, 0, 0);
   plot(1, -0.2, 5, dataRanging2,   "rang2",   x, y+7*ploth, 0, 127 , 0);
-  plot(2, -0.2, 5, dataRanging3,   "rang3",   x, y+7*ploth, 0, 0, 255);
+  plot(2, -0.2, 5, dataRanging3,   "rang3",   x, y+7*ploth, 0, 0, 255);*/
+  plot(0, -5, 5, dataPIDimuError,   "imuE",   x, y+7*ploth, 255, 0, 0);
+  plot(1, -100, 100, dataPIDleftError,   "leftE",   x, y+7*ploth, 0, 127 , 0);
+  plot(2, -100, 100, dataPIDrightError,   "rightE",   x, y+7*ploth, 0, 0, 255);
 }
 
 void drawJoystick(int px, int py){
@@ -443,7 +449,8 @@ void processMenu(){
   if (menuResponse.equals("mn16")) sendPort("?79\n");
   if (menuResponse.equals("mn17")) sendPort("?80\n");
   if (menuResponse.equals("mn18")) sendPort("?81\n");
-  if (menuResponse.equals("mn19")) sendPort("?06,10000," + scalePI(yaw+PI/180.0*90.0) + ",1.0\n");
+  //if (menuResponse.equals("mn19")) sendPort("?06,10000," + scalePI(yaw+PI/180.0*90.0) + ",1.0\n");
+  if (menuResponse.equals("mn19")) sendPort("?06,10000," + scalePI(yaw) + ",0.2\n");
   if (menuResponse.equals("mn20")) sendPort("?85,10000," + scalePI(PI/180.0*90.0) + ",1.0\n");
   if (menuResponse.equals("mn13")) {
     // reset particles
@@ -692,6 +699,16 @@ void processDataReceived(String data) {
         if (addr == 3) addPlotData(dataRanging3, distance);
       }
     }
+    if (data.startsWith("!86")){
+      // motor controller data
+      String[] list = splitTokens(data, ",");
+      //println(data);      
+      if (list.length >= 7){
+        addPlotData(dataPIDimuError, Float.parseFloat(list[1]));        
+        addPlotData(dataPIDleftError, Float.parseFloat(list[5]));
+        addPlotData(dataPIDrightError, Float.parseFloat(list[6]));        
+      }
+    }    
     if (data.startsWith("!76")){
       // eeprom data
       String[] list = splitTokens(data, ",");

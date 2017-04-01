@@ -217,6 +217,19 @@ void MotorClass::speedControlLine() {
   if (speedRpmSet < 0) motorRightPWMCurr = max(-pwmMax, min(0, (int)motorRightPWMCurr));   // -pwmMax..0
   //  if ( (abs(motorLeftPID.x)  < 2) && (motorLeftPID.w  == 0) ) leftSpeed = 0; // ensures PWM is really zero
   // if ( (abs(motorRightPID.x) < 2) && (motorRightPID.w == 0) ) rightSpeed = 0; // ensures PWM is really zero
+	ROBOTMSG.print(F("!86,"));
+  ROBOTMSG.print(imuPID.eold, 4);
+	ROBOTMSG.print(F(","));
+	ROBOTMSG.print(motorLeftPID.eold, 4);
+	ROBOTMSG.print(F(","));
+	ROBOTMSG.print(motorRightPID.eold, 4);    
+	ROBOTMSG.print(F(","));
+	ROBOTMSG.print(imuPID.esum, 4);
+	ROBOTMSG.print(F(","));
+	ROBOTMSG.print(motorLeftPID.esum, 4);
+	ROBOTMSG.print(F(","));
+	ROBOTMSG.print(motorRightPID.esum, 4);    
+	ROBOTMSG.println();      
   /*DEBUG(" w=");
     DEBUG(speedRpmSet);
     DEBUG(" x=");

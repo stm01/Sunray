@@ -27,6 +27,7 @@
  *  309 : rotate time (speed) 
  *  374 : set mow motor pwm
  *  383 : motor settings 
+ *  386 : motor controller data
  
  * ADC messages
  *  471 : calibrate ADC

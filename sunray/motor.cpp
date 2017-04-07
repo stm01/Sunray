@@ -217,23 +217,6 @@ void MotorClass::speedControlLine() {
   if (speedRpmSet < 0) motorRightPWMCurr = max(-pwmMax, min(0, (int)motorRightPWMCurr));   // -pwmMax..0
   //  if ( (abs(motorLeftPID.x)  < 2) && (motorLeftPID.w  == 0) ) leftSpeed = 0; // ensures PWM is really zero
   // if ( (abs(motorRightPID.x) < 2) && (motorRightPID.w == 0) ) rightSpeed = 0; // ensures PWM is really zero
-	ROBOTMSG.print(F("!86,"));
-  ROBOTMSG.print(imuPID.eold, 4);
-	ROBOTMSG.print(F(","));
-	ROBOTMSG.print(motorLeftPID.eold, 4);
-	ROBOTMSG.print(F(","));
-	ROBOTMSG.print(motorRightPID.eold, 4);    
-	ROBOTMSG.print(F(","));
-	ROBOTMSG.print(imuPID.esum, 4);
-	ROBOTMSG.print(F(","));
-	ROBOTMSG.print(motorLeftPID.esum, 4);
-	ROBOTMSG.print(F(","));
-	ROBOTMSG.print(motorRightPID.esum, 4);    
-	ROBOTMSG.print(F(","));
-	ROBOTMSG.print(angleRadCurrDeltaOdometry, 4);    	
-	ROBOTMSG.print(F(","));
-	ROBOTMSG.print(angleRadCurrDeltaIMU, 4);    	
-	ROBOTMSG.println();      
   /*DEBUG(" w=");
     DEBUG(speedRpmSet);
     DEBUG(" x=");
@@ -472,12 +455,12 @@ void MotorClass::run() {
   float distRight = ((float)ticksRight) / ((float)ticksPerCm);  
   distanceCmAvg  = (distLeft + distRight) / 2.0;
   distanceCmCurr += fabs(distanceCmAvg);
-	angleRadCurrDeltaOdometry = (distLeft - distRight) / wheelBaseCm;
+	angleRadCurrDeltaOdometry = -(distLeft - distRight) / wheelBaseCm;
 	angleRadCurrDeltaIMU = IMU.getYaw() - angleRadCurr;
   if (IMU_USE){
     angleRadCurr = IMU.getYaw();    
   } else {
-    angleRadCurr = scalePI(angleRadCurr - angleRadCurrDeltaOdometry);
+    angleRadCurr = scalePI(angleRadCurr + angleRadCurrDeltaOdometry);
   }
   motorPosX += distanceCmAvg * cos(angleRadCurr);
   motorPosY += distanceCmAvg * sin(angleRadCurr);  
@@ -514,6 +497,24 @@ void MotorClass::run() {
       }
     } else overCurrentTimeout = 0;
   }
+
+  ROBOTMSG.print(F("!86,"));
+  ROBOTMSG.print(imuPID.eold, 4);
+  ROBOTMSG.print(F(","));
+  ROBOTMSG.print(motorLeftPID.eold, 4);
+  ROBOTMSG.print(F(","));
+  ROBOTMSG.print(motorRightPID.eold, 4);    
+  ROBOTMSG.print(F(","));
+  ROBOTMSG.print(imuPID.esum, 4);
+  ROBOTMSG.print(F(","));
+  ROBOTMSG.print(motorLeftPID.esum, 4);
+  ROBOTMSG.print(F(","));
+  ROBOTMSG.print(motorRightPID.esum, 4);    
+  ROBOTMSG.print(F(","));
+  ROBOTMSG.print(angleRadCurrDeltaOdometry, 4);     
+  ROBOTMSG.print(F(","));
+  ROBOTMSG.print(angleRadCurrDeltaIMU, 4);      
+  ROBOTMSG.println();        
 }
 
 void MotorClass::setIsStucked() {

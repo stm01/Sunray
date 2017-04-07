@@ -3,7 +3,8 @@ import java.io.*;
 
 class Robot {
   
- 
+
+static final float manualSpeed = 0.2f;
 boolean verboseOutput = false;
   
   
@@ -119,8 +120,8 @@ FloatList dataRanging3 = new FloatList();
 FloatList dataPIDimuError = new FloatList();
 FloatList dataRadDeltaOdometry = new FloatList();
 FloatList dataRadDeltaIMU = new FloatList();
-//FloatList dataPIDleftError = new FloatList();
-//FloatList dataPIDrightError = new FloatList();
+FloatList dataPIDleftError = new FloatList();
+FloatList dataPIDrightError = new FloatList();
   
   
   // rescale to -PI..+PI
@@ -217,9 +218,9 @@ void drawMainMenu(){
   menu += "mn2~mapping is ";
   if (map.stateMapping) menu += "ON";
     else menu += "OFF";    
-  menu += "|mn3~lane mow|mn19~line|mn20~angle +90deg";
+  menu += "|mn3~lane mow|mn19~line|mn20~line angle +90deg";
   //mn4~request map|mn5~request outline|mn12~request particles|mn13~reset particles";
-  menu += "|mn6~ADC cal|mn16~MPU selftest|mn17~IMU start cal|mn18~IMU stop cal|mn8~IMU verbose|mn9~mow 50% ON|mn11~mow ON|mn10~mow OFF|mn15~rotate +20deg}";
+  menu += "|mn6~ADC cal|mn16~MPU selftest|mn17~IMU start cal|mn18~IMU stop cal|mn8~IMU verbose|mn9~mow 50% ON|mn11~mow ON|mn10~mow OFF|mn15~rotate +90deg}";
   drawMenu(330, 200, menu);
 }
 
@@ -450,12 +451,13 @@ void processMenu(){
   if (menuResponse.equals("mn10")) sendPort("?74,0\n");
   if (menuResponse.equals("mn11")) sendPort("?74,1.0\n");  
   if (menuResponse.equals("mn14")) sendPort("?75\n");
-  if (menuResponse.equals("mn15")) sendPort("?08," + scalePI(PI/180.0*20.0) + ",0.1\n");
+  //if (menuResponse.equals("mn15")) sendPort("?08," + scalePI(PI/180.0*20.0) + ",0.1\n");
+  if (menuResponse.equals("mn15")) sendRotateAngle(scalePI(PI/180.0*90.0), manualSpeed);  
   if (menuResponse.equals("mn16")) sendPort("?79\n");
   if (menuResponse.equals("mn17")) sendPort("?80\n");
   if (menuResponse.equals("mn18")) sendPort("?81\n");
   //if (menuResponse.equals("mn19")) sendPort("?06,10000," + scalePI(yaw+PI/180.0*90.0) + ",1.0\n");
-  if (menuResponse.equals("mn19")) sendPort("?06,10000," + scalePI(yaw) + ",1.0\n");
+  if (menuResponse.equals("mn19")) sendTravelLineDistance(10000, scalePI(yaw), manualSpeed);  
   if (menuResponse.equals("mn20")) sendPort("?85,10000," + scalePI(PI/180.0*90.0) + ",1.0\n");
   if (menuResponse.equals("mn13")) {
     // reset particles

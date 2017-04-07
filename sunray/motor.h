@@ -63,6 +63,8 @@ class MotorClass {
 	  float distanceCmAvg;
     int distanceCmSet;  // set line distance (cm)
     float angleRadCurr; // current (absolute) robot angle
+		float angleRadCurrDeltaIMU; // robot angle delta IMU
+		float angleRadCurrDeltaOdometry; // robot angle delta odometry
     float angleRadSet;  // set (absolute) start line angle
     float angleRadSetStartX;
     float angleRadSetStartY;

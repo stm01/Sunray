@@ -117,8 +117,10 @@ FloatList dataRanging1 = new FloatList();
 FloatList dataRanging2 = new FloatList();
 FloatList dataRanging3 = new FloatList();
 FloatList dataPIDimuError = new FloatList();
-FloatList dataPIDleftError = new FloatList();
-FloatList dataPIDrightError = new FloatList();
+FloatList dataRadDeltaOdometry = new FloatList();
+FloatList dataRadDeltaIMU = new FloatList();
+//FloatList dataPIDleftError = new FloatList();
+//FloatList dataPIDrightError = new FloatList();
   
   
   // rescale to -PI..+PI
@@ -341,8 +343,11 @@ void drawPlots(int px, int py){
   plot(1, -0.2, 5, dataRanging2,   "rang2",   x, y+7*ploth, 0, 127 , 0);
   plot(2, -0.2, 5, dataRanging3,   "rang3",   x, y+7*ploth, 0, 0, 255);*/
   plot(0, -5, 5, dataPIDimuError,   "imuE",   x, y+7*ploth, 255, 0, 0);
-  plot(1, -100, 100, dataPIDleftError,   "leftE",   x, y+7*ploth, 0, 127 , 0);
-  plot(2, -100, 100, dataPIDrightError,   "rightE",   x, y+7*ploth, 0, 0, 255);
+  //plot(1, -500, 500, dataPIDleftError,   "leftE",   x, y+7*ploth, 0, 127 , 0);
+  //plot(2, -500, 500, dataPIDrightError,   "rightE",   x, y+7*ploth, 0, 0, 255);
+  plot(1, -0.1, 0.1, dataRadDeltaOdometry,   "delOdo",   x, y+7*ploth, 0, 127, 0);  
+  plot(2, -0.1, 0.1, dataRadDeltaIMU,   "delIMU",   x, y+7*ploth, 0, 0, 255);
+  
 }
 
 void drawJoystick(int px, int py){
@@ -450,7 +455,7 @@ void processMenu(){
   if (menuResponse.equals("mn17")) sendPort("?80\n");
   if (menuResponse.equals("mn18")) sendPort("?81\n");
   //if (menuResponse.equals("mn19")) sendPort("?06,10000," + scalePI(yaw+PI/180.0*90.0) + ",1.0\n");
-  if (menuResponse.equals("mn19")) sendPort("?06,10000," + scalePI(yaw) + ",0.2\n");
+  if (menuResponse.equals("mn19")) sendPort("?06,10000," + scalePI(yaw) + ",1.0\n");
   if (menuResponse.equals("mn20")) sendPort("?85,10000," + scalePI(PI/180.0*90.0) + ",1.0\n");
   if (menuResponse.equals("mn13")) {
     // reset particles
@@ -703,10 +708,12 @@ void processDataReceived(String data) {
       // motor controller data
       String[] list = splitTokens(data, ",");
       //println(data);      
-      if (list.length >= 7){
+      if (list.length >= 9){
         addPlotData(dataPIDimuError, Float.parseFloat(list[1]));        
-        addPlotData(dataPIDleftError, Float.parseFloat(list[5]));
-        addPlotData(dataPIDrightError, Float.parseFloat(list[6]));        
+        //  addPlotData(dataPIDleftError, Float.parseFloat(list[5]));
+        //  addPlotData(dataPIDrightError, Float.parseFloat(list[6]));
+        addPlotData(dataRadDeltaOdometry, Float.parseFloat(list[7]));        
+        addPlotData(dataRadDeltaIMU, Float.parseFloat(list[8]));        
       }
     }    
     if (data.startsWith("!76")){

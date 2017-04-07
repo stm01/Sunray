@@ -229,6 +229,10 @@ void MotorClass::speedControlLine() {
 	ROBOTMSG.print(motorLeftPID.esum, 4);
 	ROBOTMSG.print(F(","));
 	ROBOTMSG.print(motorRightPID.esum, 4);    
+	ROBOTMSG.print(F(","));
+	ROBOTMSG.print(angleRadCurrDeltaOdometry, 4);    	
+	ROBOTMSG.print(F(","));
+	ROBOTMSG.print(angleRadCurrDeltaIMU, 4);    	
 	ROBOTMSG.println();      
   /*DEBUG(" w=");
     DEBUG(speedRpmSet);
@@ -468,10 +472,12 @@ void MotorClass::run() {
   float distRight = ((float)ticksRight) / ((float)ticksPerCm);  
   distanceCmAvg  = (distLeft + distRight) / 2.0;
   distanceCmCurr += fabs(distanceCmAvg);
+	angleRadCurrDeltaOdometry = (distLeft - distRight) / wheelBaseCm;
+	angleRadCurrDeltaIMU = IMU.getYaw() - angleRadCurr;
   if (IMU_USE){
     angleRadCurr = IMU.getYaw();    
   } else {
-    angleRadCurr = scalePI(angleRadCurr - (distLeft - distRight) / wheelBaseCm);
+    angleRadCurr = scalePI(angleRadCurr - angleRadCurrDeltaOdometry);
   }
   motorPosX += distanceCmAvg * cos(angleRadCurr);
   motorPosY += distanceCmAvg * sin(angleRadCurr);  

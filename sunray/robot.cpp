@@ -300,7 +300,8 @@ void RobotClass::readRobotMessages(){
                    IMU.mode = ((IMUMode)ROBOTMSG.parseInt());
                    DEBUGLN(F("received IMU settings"));
                    break;
-          case 83: Motor.imuPID.Kp = ROBOTMSG.parseFloat();
+          case 83: Motor.rpmMax = ROBOTMSG.parseFloat();
+									 Motor.imuPID.Kp = ROBOTMSG.parseFloat();
                    Motor.imuPID.Ki = ROBOTMSG.parseFloat();
                    Motor.imuPID.Kd = ROBOTMSG.parseFloat();
                    Motor.motorLeftPID.Kp = ROBOTMSG.parseFloat();
@@ -308,7 +309,7 @@ void RobotClass::readRobotMessages(){
                    Motor.motorLeftPID.Kd = ROBOTMSG.parseFloat();
                    Motor.motorRightPID.Kp = Motor.motorLeftPID.Kp;
                    Motor.motorRightPID.Ki = Motor.motorLeftPID.Ki;
-                   Motor.motorRightPID.Kd = Motor.motorLeftPID.Kd;
+                   Motor.motorRightPID.Kd = Motor.motorLeftPID.Kd;									 
                    DEBUGLN(F("received motor settings"));
                    break;          
 		  case 84: Perimeter.timedOutIfBelowSmag = ROBOTMSG.parseInt();
@@ -351,7 +352,14 @@ void RobotClass::run(){
       lastState = state;
 	    IMU.startGyroCalibration();
       state = STAT_CAL_GYRO;
-    }
+    }		
+		if (Motor.paused){
+			if (IMU.state != IMU_CAL_GYRO){
+		      state = lastState;
+          Motor.setPaused(false);
+          Perimeter.resetTimedOut();
+		    }
+		}
   }
   if (millis() >= nextIMUTime){    
     nextIMUTime = millis() + 10; // 100 Hz
@@ -378,7 +386,7 @@ void RobotClass::run(){
     Battery.run();    
 
     stateMachine();
-
+				
     if ( (!RC.enable) && ((state != STAT_IDLE) && (state != STAT_CAL_GYRO)) && (state != STAT_CHG) ) 
     {
 	    if (Perimeter.signalTimedOut()){
@@ -467,7 +475,7 @@ void RobotClass::startRandomMowing(){
   mowState = MOW_LINE;
   mowingAngle = IMU.getYaw();
   mowingDirection = mowingAngle-PI/2;
-  Motor.travelLineDistance(10000, mowingAngle, 0.5);
+  Motor.travelLineDistance(10000, mowingAngle, 1.0);
 }
 
 void RobotClass::startTrackingForEver(){  
@@ -618,14 +626,9 @@ void RobotClass::mow(){
 }
 
 
-void RobotClass::stateMachine(){
-    switch (state){
-      case STAT_CAL_GYRO:
-	      if (IMU.state != IMU_CAL_GYRO){
-		      state = lastState;
-          Motor.setPaused(false);
-          Perimeter.resetTimedOut();
-		    }
+void RobotClass::stateMachine(){    
+		switch (state){
+      case STAT_CAL_GYRO:	      
 	      break;
       case STAT_IDLE:
         break;

@@ -263,7 +263,10 @@ void MotorClass::speedControl() {
   mowerPWMCurr = 0.9 * mowerPWMCurr + 0.1 * goalpwm;
   speedPWM ( MOTOR_MOW, mowerPWMCurr );
 
-  if (paused) return;  // no gear control
+  if (paused) {
+		resetPID();
+		return;  // no gear control
+	}
 
   // gear motors
   if (Ta > 0.5) Ta = 0.001;
@@ -323,6 +326,12 @@ void MotorClass::stopMowerImmediately(){
   speedPWM ( MOTOR_MOW, mowerPWMCurr );
 }
 
+void MotorClass::resetPID(){
+	motorLeftPID.reset();
+  motorRightPID.reset();
+  imuPID.reset();
+}
+
 
 void MotorClass::stopImmediately() {
   if (motion == MOT_STOP) return;
@@ -336,9 +345,7 @@ void MotorClass::stopImmediately() {
   motorLeftPWMCurr = motorLeftPWMSet;
   motorRightPWMCurr = motorRightPWMSet;
   speedControl();
-  motorLeftPID.reset();
-  motorRightPID.reset();
-  imuPID.reset();
+	resetPID();  
 }
 
 void MotorClass::stopSlowly() {
@@ -349,7 +356,8 @@ void MotorClass::stopSlowly() {
 }
 
 void MotorClass::travelAngleDistance(int distanceCm, float angleRad, float speedRpmPerc){
-  distanceCmSet = distanceCm;
+  resetPID();  
+	distanceCmSet = distanceCm;
   distanceCmCurr = 0;
   speedRpmSet = speedRpmPerc * rpmMax;
   angleRadSet = angleRad;
@@ -361,7 +369,8 @@ void MotorClass::travelAngleDistance(int distanceCm, float angleRad, float speed
 
 // rpm: 1.0 is max
 void MotorClass::travelLineDistance(int distanceCm, float angleRad, float speedRpmPerc) {
-  distanceCmSet = distanceCm;
+  resetPID();  
+	distanceCmSet = distanceCm;
   distanceCmCurr = 0;
   speedRpmSet = speedRpmPerc * rpmMax;
   angleRadSet = angleRad;
@@ -373,7 +382,8 @@ void MotorClass::travelLineDistance(int distanceCm, float angleRad, float speedR
 
 // rpm: 1.0 is max
 void MotorClass::travelLineTime(int durationMS, float angleRad, float speedRpmPerc) {
-  distanceCmSet = 0;
+  resetPID();  
+	distanceCmSet = 0;
   speedRpmSet = speedRpmPerc * rpmMax;
   angleRadSet = angleRad;
   angleRadSetStartX = motorPosX;
@@ -383,7 +393,8 @@ void MotorClass::travelLineTime(int durationMS, float angleRad, float speedRpmPe
 }
 
 void MotorClass::rotateTime(int durationMS, float speedRpmPerc) {
-  distanceCmSet = 0;
+  resetPID();  
+	distanceCmSet = 0;
   angleRadSet = 0;
   speedRpmSet = speedRpmPerc * rpmMax;
   motorStopTime = millis() + durationMS;
@@ -393,7 +404,8 @@ void MotorClass::rotateTime(int durationMS, float speedRpmPerc) {
 }
 
 void MotorClass::rotateAngle(float angleRad, float speedRpmPerc) {
-  distanceCmSet = 0;
+  resetPID();  
+	distanceCmSet = 0;
   angleRadSet = angleRad;
   speedRpmSet = speedRpmPerc * rpmMax;
   //motorStopTime = millis() + 60000;
@@ -558,6 +570,7 @@ void MotorClass::setPaused(bool flag) {
   if (paused) {
     speedPWM(MOTOR_LEFT, 0);
     speedPWM(MOTOR_RIGHT, 0);
+		resetPID();  
     //speedPWM(MOTOR_MOW, 0);            
   } 
 }

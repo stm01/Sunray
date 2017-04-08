@@ -132,6 +132,7 @@ class MotorClass {
 	  void setMC33926(int pinDir, int pinPWM, int speed);    
     void checkFault();
     void resetFault();    
+		void resetPID();
 };
 
 extern MotorClass Motor;

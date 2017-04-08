@@ -4,7 +4,7 @@ import java.io.*;
 class Robot {
   
 
-static final float manualSpeed = 0.2f;
+static final float motorRpm = 10;
 boolean verboseOutput = false;
   
   
@@ -169,6 +169,10 @@ void sendRotateTime(float duration, float speed){
   sendPort("?09,"+ float2String(duration) + "," + float2String(speed) + "\n");
 }
 
+void sendStartRandomMowing(){
+   sendPort("?14\n");
+}
+
 
 void sendPort(String s){
   if (demo) return;
@@ -196,8 +200,8 @@ void setup(PApplet parent){
       mySerial.clear();      
       delay(1000);
     }
-    loadEEPROM();
-    sendPort("?83,0.7,0.1,3.0,2.0,0.03,0.03\n"); // motor settings
+    //loadEEPROM();
+    sendPort("?83," + float2String(motorRpm) + ",0.7,0.1,3.0,2.0,0.03,0.03\n"); // motor settings
     sendPort("?84,10,15,0\n"); // perimeter settings
     sendPort("?82,1,0.01,0\n"); // IMU settings
     
@@ -218,7 +222,7 @@ void drawMainMenu(){
   menu += "mn2~mapping is ";
   if (map.stateMapping) menu += "ON";
     else menu += "OFF";    
-  menu += "|mn3~lane mow|mn19~line|mn20~line angle +90deg";
+  menu += "|mn21~rand mow|mn3~lane mow|mn19~line|mn22~line rev|mn20~line angle +90deg";
   //mn4~request map|mn5~request outline|mn12~request particles|mn13~reset particles";
   menu += "|mn6~ADC cal|mn16~MPU selftest|mn17~IMU start cal|mn18~IMU stop cal|mn8~IMU verbose|mn9~mow 50% ON|mn11~mow ON|mn10~mow OFF|mn15~rotate +90deg}";
   drawMenu(330, 200, menu);
@@ -452,13 +456,15 @@ void processMenu(){
   if (menuResponse.equals("mn11")) sendPort("?74,1.0\n");  
   if (menuResponse.equals("mn14")) sendPort("?75\n");
   //if (menuResponse.equals("mn15")) sendPort("?08," + scalePI(PI/180.0*20.0) + ",0.1\n");
-  if (menuResponse.equals("mn15")) sendRotateAngle(scalePI(PI/180.0*90.0), manualSpeed);  
+  if (menuResponse.equals("mn15")) sendRotateAngle(scalePI(PI/180.0*90.0), 0.2);  
   if (menuResponse.equals("mn16")) sendPort("?79\n");
   if (menuResponse.equals("mn17")) sendPort("?80\n");
   if (menuResponse.equals("mn18")) sendPort("?81\n");
   //if (menuResponse.equals("mn19")) sendPort("?06,10000," + scalePI(yaw+PI/180.0*90.0) + ",1.0\n");
-  if (menuResponse.equals("mn19")) sendTravelLineDistance(10000, scalePI(yaw), manualSpeed);  
+  if (menuResponse.equals("mn19")) sendTravelLineDistance(10000, scalePI(yaw), 1.0);  
+  if (menuResponse.equals("mn22")) sendTravelLineDistance(20, scalePI(yaw), -1.0);  
   if (menuResponse.equals("mn20")) sendPort("?85,10000," + scalePI(PI/180.0*90.0) + ",1.0\n");
+  if (menuResponse.equals("mn21")) sendStartRandomMowing();  
   if (menuResponse.equals("mn13")) {
     // reset particles
     map.distributeParticlesOutline();

@@ -31,6 +31,7 @@ class BatteryClass {
     unsigned long switchOffTime;
     unsigned long chargingStartTime;
 	  unsigned long nextCheckTime;	  
+		unsigned long nextPrintTime;	  
 };
 
 extern BatteryClass Battery;

@@ -113,25 +113,28 @@ void BatteryClass::run(){
         DEBUGLN(F("CHARGER DISCONNECTED"));              
         enableCharging(false);
       }
-    }    
-    DEBUG(F("charger conn="));
-    DEBUG(chargerConnected());
-    DEBUG(F(" chgEnabled="));
-    DEBUG(chargingEnabled);
-    DEBUG(F(" chgTime="));      
-    DEBUG(timeMinutes);
-    DEBUG(F(" charger: "));      
-    DEBUG(chargingVoltage);
-    DEBUG(F(" V  "));    
-    DEBUG(chargingCurrent);   
-    DEBUG(F(" A "));         
-    DEBUG(F(" bat: "));
-    DEBUG(batteryVoltage);
-    DEBUG(F(" V  "));    
-    DEBUG(F("switchOffAllowed="));   
-    DEBUG(switchOffAllowed);      
-    DEBUGLN();      
-  }
+    }      		
+		if (millis() >= nextPrintTime){
+			nextPrintTime = millis() + 60000;  	   	   	
+			DEBUG(F("charger conn="));
+			DEBUG(chargerConnected());
+			DEBUG(F(" chgEnabled="));
+			DEBUG(chargingEnabled);
+			DEBUG(F(" chgTime="));      
+			DEBUG(timeMinutes);
+			DEBUG(F(" charger: "));      
+			DEBUG(chargingVoltage);
+			DEBUG(F(" V  "));    
+			DEBUG(chargingCurrent);   
+			DEBUG(F(" A "));         
+			DEBUG(F(" bat: "));
+			DEBUG(batteryVoltage);
+			DEBUG(F(" V  "));    
+			DEBUG(F("switchOffAllowed="));   
+			DEBUG(switchOffAllowed);      
+			DEBUGLN();      
+		} 
+  }	
 }
 
 

@@ -510,7 +510,7 @@ void MotorClass::run() {
     } else overCurrentTimeout = 0;
   }
 
-  ROBOTMSG.print(F("!86,"));
+  /*ROBOTMSG.print(F("!86,"));
   ROBOTMSG.print(imuPID.eold, 4);
   ROBOTMSG.print(F(","));
   ROBOTMSG.print(motorLeftPID.eold, 4);
@@ -526,7 +526,7 @@ void MotorClass::run() {
   ROBOTMSG.print(angleRadCurrDeltaOdometry, 4);     
   ROBOTMSG.print(F(","));
   ROBOTMSG.print(angleRadCurrDeltaIMU, 4);      
-  ROBOTMSG.println();        
+  ROBOTMSG.println();        */
 }
 
 void MotorClass::setIsStucked() {

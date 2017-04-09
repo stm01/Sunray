@@ -323,6 +323,8 @@ void RobotClass::readRobotMessages(){
                    Motor.motorRightPID.Kp = Motor.motorLeftPID.Kp;
                    Motor.motorRightPID.Ki = Motor.motorLeftPID.Ki;
                    Motor.motorRightPID.Kd = Motor.motorLeftPID.Kd;									 
+									 Motor.stuckMaxDiffOdometryIMU = ROBOTMSG.parseFloat();
+									 Motor.stuckMaxIMUerror = ROBOTMSG.parseFloat();
                    DEBUGLN(F("received motor settings"));
                    break;          
 		  case 84: Perimeter.timedOutIfBelowSmag = ROBOTMSG.parseInt();

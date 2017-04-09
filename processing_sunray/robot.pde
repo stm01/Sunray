@@ -17,6 +17,8 @@ static final float imuPID_Kd = 3.0;
 static final float motorPID_Kp = 2.0;
 static final float motorPID_Ki = 0.03;
 static final float motorPID_Kd = 0.03;
+static final float stuckMaxDiffOdometryIMU = 0.07;
+static final float stuckMaxIMUerror = 2;
 // perimeter
 static final int timedOutIfBelowSmag = 10;
 static final int timeOutSecIfNotInside = 15;
@@ -236,7 +238,8 @@ void setup(PApplet parent){
     sendPort("?83," + float2String(rpmMax) + "," + float2String(reverseSpeedPerc) + "," + float2String(rotationSpeedPerc) + "," 
        + float2String(trackSpeedPerc) + "," + float2String(trackRotationSpeedPerc) + "," + float2String(motorSenseMax) + ","
        + float2String(mowSenseMax) + "," + float2String(imuPID_Kp) + "," + float2String(imuPID_Ki) + "," + float2String(imuPID_Kd) + ","
-       + float2String(motorPID_Kp) + "," + float2String(motorPID_Ki) + "," + float2String(motorPID_Kd) + "\n");
+       + float2String(motorPID_Kp) + "," + float2String(motorPID_Ki) + "," + float2String(motorPID_Kd) + "," 
+       + float2String(stuckMaxDiffOdometryIMU) + "," + float2String(stuckMaxIMUerror) + "\n");
     // perimeter settings
     sendPort("?84," + str(timedOutIfBelowSmag) + "," + str(timeOutSecIfNotInside) + "," + str(swapCoilPolarity) + "\n"); 
     // IMU settings

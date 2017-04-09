@@ -84,6 +84,8 @@ void MotorClass::begin() {
   ticksPerCm = 13.49 * 2;
   ticksPerRevolution = 1060 * 2;
   wheelBaseCm = 36;    // wheel-to-wheel distance (cm)
+	stuckMaxDiffOdometryIMU = 0.5;
+	stuckMaxIMUerror = 4;
 
   motorLeftPID.Kp       = 2.0;  
   motorLeftPID.Ki       = 0.03; 
@@ -511,6 +513,11 @@ void MotorClass::run() {
       }
     } else overCurrentTimeout = 0;
   }
+	
+	// stuck detection
+	float diffOdoIMU = angleRadCurrDeltaOdometry - angleRadCurrDeltaIMU;
+	if (abs(diffOdoIMU) > stuckMaxDiffOdometryIMU) setIsStucked();
+	if (abs(imuPID.eold) > stuckMaxIMUerror) setIsStucked();	
 
 	if (verboseOutput){
 		ROBOTMSG.print(F("!86,"));

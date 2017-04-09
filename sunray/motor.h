@@ -91,6 +91,9 @@ class MotorClass {
     float motorMowSense;  // mower motor current 
     float motorSenseMax;
     float mowSenseMax;
+		
+		float stuckMaxIMUerror;
+		float stuckMaxDiffOdometryIMU;
     
     void begin();
     void run();

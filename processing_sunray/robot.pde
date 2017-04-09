@@ -10,12 +10,14 @@ boolean verboseOutput = false;
   
 static final String EEPROM_FILENAME = "eeprom.bin";
 
-String[] states = {"IDLE", "GYRO", "TRAK", "MAP", "MOW"};
+String[] states = {"IDLE", "GYRO", "TRAK", "MAP", "MOW", "R/C", "CHG"};
 static final int STAT_IDLE       = 0;
 static final int STAT_CAL_GYRO   = 1;
 static final int STAT_TRACK      = 2;
 static final int STAT_CREATE_MAP = 3;
 static final int STAT_MOW        = 4;
+static final int STAT_RC         = 5;
+static final int STAT_CHG        = 6;
 
 String[] trackStates = {"TRK_RUN", "TRK_FIND", "TRK_ROTATE"};
 static final int TRK_RUN         = 0;

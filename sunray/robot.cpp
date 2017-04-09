@@ -371,7 +371,7 @@ void RobotClass::run(){
   if (millis() >= nextControlTime){    
     nextControlTime = millis() + 200; // 5 Hz
 
-    if (Battery.chargerConnected()){
+    if ( (state != STAT_CHG) && (Battery.chargerConnected()) ){
       Motor.stopImmediately();
       state = STAT_CHG;      
     }

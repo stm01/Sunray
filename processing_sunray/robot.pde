@@ -4,7 +4,7 @@ import java.io.*;
 class Robot {
   
 
-static final float motorRpm = 10;
+static final float motorRpm = 25;
 boolean verboseOutput = false;
   
   

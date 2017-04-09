@@ -367,6 +367,7 @@ void RobotClass::run(){
   }
 
   Buzzer.run();
+	ADCMan.run();
 
   if (millis() >= nextControlTime){    
     nextControlTime = millis() + 200; // 5 Hz
@@ -377,8 +378,7 @@ void RobotClass::run(){
     }
     Bumper.run();
     RC.run();
-    Motor.run();    
-    ADCMan.run();
+    Motor.run();        
     Perimeter.run();
     if (IMU_USE) IMU.run();
 	  Map.run();

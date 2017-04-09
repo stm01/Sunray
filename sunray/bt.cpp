@@ -146,19 +146,23 @@ void BluetoothConfig::setBaudrate(long rate){
   DEBUG(F("setting baudrate "));
   DEBUG(rate);
   DEBUGLN(F("..."));
-  byte n=4;
+  String n="4";
   boolean res = false;
   switch (btType){
     case BT_LINVOR_HC06:
       switch (rate){
-        case 1200: n=1; break;
-        case 2400: n=2; break;
-        case 4800: n=3; break;
-        case 9600: n=4; break;
-        case 19200: n=5; break;
-        case 38400: n=6; break;
-        case 57600: n=7; break;
-        case 115200: n=8; break;
+        case 1200: n="1"; break;
+        case 2400: n="2"; break;
+        case 4800: n="3"; break;
+        case 9600: n="4"; break;
+        case 19200: n="5"; break;
+        case 38400: n="6"; break;
+        case 57600: n="7"; break;
+        case 115200: n="8"; break;
+				case 230400: n="9"; break;
+				case 460800: n="A"; break;
+				case 921600: n="B"; break;
+				case 1382400: n="C"; break;
       }      
       writeReadBT(F("AT+PN")); // no parity
       writeReadBT("AT+BAUD"+String(n));     
@@ -170,14 +174,18 @@ void BluetoothConfig::setBaudrate(long rate){
       break;
     case BT_FBT06_MBTV4:
       switch (rate){
-        case 1200: n=1; break;
-        case 2400: n=2; break;
-        case 4800: n=3; break;
-        case 9600: n=4; break;
-        case 19200: n=5; break;
-        case 38400: n=6; break;
-        case 57600: n=7; break;
-        case 115200: n=8; break;
+        case 1200: n="1"; break;
+        case 2400: n="2"; break;
+        case 4800: n="3"; break;
+        case 9600: n="4"; break;
+        case 19200: n="5"; break;
+        case 38400: n="6"; break;
+        case 57600: n="7"; break;
+        case 115200: n="8"; break;
+				case 230400: n="9"; break;
+				case 460800: n="10"; break;
+				case 921600: n="11"; break;
+				case 1382400: n="12"; break;
       }          
       writeReadBT("AT+BAUD"+String(n)+"\r\n");     
       res = (btResult.indexOf(F("OK")) != -1);

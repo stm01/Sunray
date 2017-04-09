@@ -72,6 +72,21 @@ void BatteryClass::run(){
   if (batteryVoltage < 5) w = 0;
   batteryVoltage = w * batteryVoltage + (1-w) * ((float)ADCMan.getVoltage(pinBatteryVoltage)) * batteryFactor;  
   chargingCurrent = 0.9 * chargingCurrent + 0.1 * ((float)ADCMan.getVoltage(pinChargeCurrent)) * currentFactor;    
+	
+	if (chargerConnected()){           
+      if (!chargerConnectedState){
+	      chargerConnectedState = true;		    
+		    DEBUGLN(F("CHARGER CONNECTED"));      	              
+        Buzzer.sound(SND_OVERCURRENT, false);
+        enableCharging(true);        
+	    }
+  } else {
+      if (chargerConnectedState){        
+        chargerConnectedState = false;
+        DEBUGLN(F("CHARGER DISCONNECTED"));              
+        enableCharging(false);
+      }
+  }      		
   
   if (millis() >= nextCheckTime){    
     nextCheckTime = millis() + 5000;  	   	   	
@@ -85,14 +100,7 @@ void BatteryClass::run(){
     }
     	  
     if (chargerConnected()){           
-      if (!chargerConnectedState){
-	      chargerConnectedState = true;		    
-		    DEBUGLN(F("CHARGER CONNECTED"));      	      
-        //Motor.stopMowerImmediately();
-        //Motor.stopImmediately();
-        Buzzer.sound(SND_OVERCURRENT, false);
-        enableCharging(true);        
-	    } else {	      
+      if (chargerConnectedState){	      
         // charger in connected state
         if (chargingEnabled){
           if ((timeMinutes > 180) || (chargingCurrent < batFullCurrent)) {        
@@ -100,20 +108,15 @@ void BatteryClass::run(){
             enableCharging(false);
           }          
         } else {
-          if (batteryVoltage < startChargingIfBelow) {
-            // start charging
-            enableCharging(true);
-            chargingStartTime = millis();  
+           if (batteryVoltage < startChargingIfBelow) {
+              // start charging
+              enableCharging(true);
+              chargingStartTime = millis();  
           }        
         }
       }      
-    } else {
-      if (chargerConnectedState){        
-        chargerConnectedState = false;
-        DEBUGLN(F("CHARGER DISCONNECTED"));              
-        enableCharging(false);
-      }
-    }      		
+    } 
+		
 		if (millis() >= nextPrintTime){
 			nextPrintTime = millis() + 60000;  	   	   	
 			DEBUG(F("charger conn="));

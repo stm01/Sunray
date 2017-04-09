@@ -47,6 +47,10 @@ class RobotClass
     float mowingAngle;
     float rotateAngle;
     float trackAngle;
+		float reverseSpeedPerc;
+		float trackSpeedPerc;
+		float trackRotationSpeedPerc;
+		float rotationSpeedPerc;
     float mowingDirection;      
 	  unsigned long lastStartLineTime;
     unsigned long loopCounter;

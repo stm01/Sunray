@@ -126,6 +126,10 @@ void RobotClass::begin(){
   mowingDirection = 0;
   lastStartLineTime;
   hdrLen=0;
+	trackSpeedPerc = 0.5;
+	trackRotationSpeedPerc = 0.3;
+	rotationSpeedPerc = 0.3;
+	reverseSpeedPerc = 0.3;
 
   ADCMan.printInfo();
   Buzzer.sound(SND_READY, false);   
@@ -301,6 +305,12 @@ void RobotClass::readRobotMessages(){
                    DEBUGLN(F("received IMU settings"));
                    break;
           case 83: Motor.rpmMax = ROBOTMSG.parseFloat();
+									 Robot.reverseSpeedPerc = ROBOTMSG.parseFloat();
+									 Robot.rotationSpeedPerc = ROBOTMSG.parseFloat();
+									 Robot.trackSpeedPerc = ROBOTMSG.parseFloat();
+									 Robot.trackRotationSpeedPerc = ROBOTMSG.parseFloat();
+									 Motor.motorSenseMax = ROBOTMSG.parseFloat();
+									 Motor.mowSenseMax = ROBOTMSG.parseFloat();
 									 Motor.imuPID.Kp = ROBOTMSG.parseFloat();
                    Motor.imuPID.Ki = ROBOTMSG.parseFloat();
                    Motor.imuPID.Kd = ROBOTMSG.parseFloat();
@@ -457,7 +467,7 @@ void RobotClass::startMapping(){
   state = STAT_CREATE_MAP;
   trackState = TRK_FIND;  
   mowState = MOW_LINE;  
-  Motor.travelLineDistance(10000, IMU.getYaw(), 0.5);
+  Motor.travelLineDistance(10000, IMU.getYaw(), trackSpeedPerc);
 }
 
 void RobotClass::startLaneMowing(){
@@ -482,7 +492,7 @@ void RobotClass::startTrackingForEver(){
   mowPattern = PATTERN_NONE;
   state = STAT_TRACK;  
   trackState = TRK_FIND;  
-  Motor.travelLineDistance(10000, IMU.getYaw(), 0.5);
+  Motor.travelLineDistance(10000, IMU.getYaw(), trackSpeedPerc);
 }
 
 void RobotClass::track(){
@@ -490,9 +500,7 @@ void RobotClass::track(){
   float rightMag = Perimeter.getMagnitude(IDX_RIGHT);
   boolean leftIn = (leftMag < 0);
   boolean rightIn = (rightMag < 0);  
-  float startDist;     
-  float speed = 0.5;
-  float speedRot = 0.1;  
+  float startDist;       
   switch (trackState){
     case TRK_FIND:      
 	    if  ((!leftIn) || (!rightIn)){
@@ -504,7 +512,7 @@ void RobotClass::track(){
       break;
     case TRK_RUN:	    
 	    if ((leftIn) && (!rightIn)){        
-        Motor.travelLineTime(300, trackAngle, speed);
+        Motor.travelLineTime(300, trackAngle, trackSpeedPerc);
         //Motor.travelLineDistance(5, IMU.getYaw(), speed);
         //Motor.setSpeedPWM(speed, speed);
       }
@@ -512,12 +520,12 @@ void RobotClass::track(){
        if (!leftIn) {          
           //Motor.setSpeedPWM(-speedRot, speedRot);
           //Motor.rotateAngle(IMU.getYaw()+PI/180.0*3, speedRot);          
-          Motor.rotateTime(300, speedRot);
+          Motor.rotateTime(300, trackRotationSpeedPerc);
           trackAngle = IMU.getYaw();
         } else {          
           //Motor.setSpeedPWM(speedRot, -speedRot);
           //Motor.rotateAngle(IMU.getYaw()-PI/180.0*3, speedRot);          
-          Motor.rotateTime(300, -speedRot);
+          Motor.rotateTime(300, -trackRotationSpeedPerc);
           trackAngle = IMU.getYaw();
         }                    
       }      
@@ -535,7 +543,7 @@ void RobotClass::track(){
 		      Map.saveMap();
           if (mowPattern != PATTERN_NONE){
             trackState = TRK_ROTATE;
-            Motor.rotateAngle(IMU.getYaw()+PI/180.0*90, fabs(speed));
+            Motor.rotateAngle(IMU.getYaw()+PI/180.0*90, fabs(trackRotationSpeedPerc));
           }
         }
       }	  
@@ -559,21 +567,17 @@ void RobotClass::track(){
 }
 
 
-void RobotClass::mow(){
-  float speed = 1.0; // 1.0 is max
-  float speedRot = 0.3;
-  float speedRev = 0.3;
-
+void RobotClass::mow(){  
   switch (mowState){
     case MOW_ROTATE:
       if (Motor.motion == MOT_STOP){
         if (mowPattern == PATTERN_LANES){
-          Motor.travelLineDistance(15, rotateAngle, speed);
+          Motor.travelLineDistance(15, rotateAngle, 1.0);
           mowState = MOW_ENTER_LINE;
           //DEBUGLN(F("MOW_ENTER_LINE"));
         } else {
           mowState = MOW_LINE;
-          Motor.travelLineDistance(300, mowingAngle, speed);
+          Motor.travelLineDistance(300, mowingAngle, 1.0);
           //DEBUGLN(F("MOW_LINE"));
         }
       }
@@ -600,14 +604,14 @@ void RobotClass::mow(){
           mowingAngle = scalePI( mowingAngle + PI + ((float)random(-90, 90)/180.0*PI ));
           rotateAngle = mowingAngle;
         }
-        Motor.rotateAngle(rotateAngle, speedRot);
+        Motor.rotateAngle(rotateAngle, rotationSpeedPerc);
         mowState = MOW_ROTATE;
         //DEBUGLN(F("MOW_ROTATE"));
       }
       break;
     case MOW_ENTER_LINE:
       if (Motor.motion == MOT_STOP){
-        Motor.travelLineDistance(3000, mowingAngle, speed);
+        Motor.travelLineDistance(3000, mowingAngle, 1.0);
         mowState = MOW_LINE;
         //DEBUGLN(F("MOW_LINE"));
         lastStartLineTime = millis();
@@ -617,7 +621,7 @@ void RobotClass::mow(){
       //if (!Perimeter.isInside()) Motor.stopSlowly();
       if ( (!Perimeter.isInside()) || (Motor.motion == MOT_STOP)  ){      
         Motor.stopImmediately();
-        Motor.travelLineDistance(15, mowingAngle, -speedRev);
+        Motor.travelLineDistance(15, mowingAngle, -reverseSpeedPerc);
         mowState = MOW_REV;
         //DEBUGLN(F("MOW_REV"));
       }

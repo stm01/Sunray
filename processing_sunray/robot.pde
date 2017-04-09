@@ -3,8 +3,30 @@ import java.io.*;
 
 class Robot {
   
+// motor
+static final float rpmMax = 25;
+static final float reverseSpeedPerc = 0.3;
+static final float rotationSpeedPerc = 0.3;
+static final float trackSpeedPerc = 0.3;
+static final float trackRotationSpeedPerc = 0.1;
+static final float motorSenseMax = 0.7;
+static final float mowSenseMax = 1.0;
+static final float imuPID_Kp = 0.7;
+static final float imuPID_Ki = 0.1;
+static final float imuPID_Kd = 3.0;
+static final float motorPID_Kp = 2.0;
+static final float motorPID_Ki = 0.03;
+static final float motorPID_Kd = 0.03;
+// perimeter
+static final int timedOutIfBelowSmag = 10;
+static final int timeOutSecIfNotInside = 15;
+static final byte swapCoilPolarity = 0;
+// IMU
+static final byte useGyro = 1;
+static final float gyroBiasDpsMax = 0.01;
+static final float imuMode = 0;
 
-static final float motorRpm = 25;
+
 boolean verboseOutput = false;
   
   
@@ -203,9 +225,15 @@ void setup(PApplet parent){
       delay(1000);
     }
     //loadEEPROM();
-    sendPort("?83," + float2String(motorRpm) + ",0.7,0.1,3.0,2.0,0.03,0.03\n"); // motor settings
-    sendPort("?84,10,15,0\n"); // perimeter settings
-    sendPort("?82,1,0.01,0\n"); // IMU settings
+    // motor settings
+    sendPort("?83," + float2String(rpmMax) + "," + float2String(reverseSpeedPerc) + "," + float2String(rotationSpeedPerc) + "," 
+       + float2String(trackSpeedPerc) + "," + float2String(trackRotationSpeedPerc) + "," + float2String(motorSenseMax) + ","
+       + float2String(mowSenseMax) + "," + float2String(imuPID_Kp) + "," + float2String(imuPID_Ki) + "," + float2String(imuPID_Kd) + ","
+       + float2String(motorPID_Kp) + "," + float2String(motorPID_Ki) + "," + float2String(motorPID_Kd) + "\n");
+    // perimeter settings
+    sendPort("?84," + str(timedOutIfBelowSmag) + "," + str(timeOutSecIfNotInside) + "," + str(swapCoilPolarity) + "\n"); 
+    // IMU settings
+    sendPort("?82," + str(useGyro) +  "," + float2String(gyroBiasDpsMax) + "," + str(imuMode) + "\n"); 
     
     //if (mySerial != null) mySerial.buffer(32);    
   }  

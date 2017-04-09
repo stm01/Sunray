@@ -84,6 +84,7 @@ typedef struct robot_state_t robot_state_t;
 
 class MapClass {
     public:
+		  bool verboseOutput;
       bool mapValid;
       robot_state_t robotState; // current robot position estimation (meter)
       float steeringNoise; // robot steering noise sigma (rad units)

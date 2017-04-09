@@ -38,6 +38,7 @@ class MotorClass {
     PID imuPID;
     MotorMotion motion;  // curren robot motion
 
+		bool verboseOutput; 
     bool lowPass;
     bool isStucked;
     bool paused;      // is paused?

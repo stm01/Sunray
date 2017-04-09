@@ -41,6 +41,7 @@ void MapClass::begin()
   perimeterOutlineSize = 0;
   distAvgSum = 0;
   overallProb = 0;
+	verboseOutput = false;
 
   clearOutline();
   //exampleOutline();
@@ -121,12 +122,12 @@ void MapClass::run() {
   distAvgSum += Motor.distanceCmAvg / 100.0;
   //if (fabs(distAvgSum) < 0.001) return;
   float yaw = IMU.getYaw();
-  /*
-	ROBOTMSG.print(F("!17,"));
-  ROBOTMSG.print(distAvgSum, 4);
-  ROBOTMSG.print(F(","));
-  ROBOTMSG.println(yaw, 4);
-	*/
+  if (verboseOutput){
+	  ROBOTMSG.print(F("!17,"));
+    ROBOTMSG.print(distAvgSum, 4);
+    ROBOTMSG.print(F(","));
+		ROBOTMSG.println(yaw, 4);	
+	}
 	
   /*
     robotMotion(yaw, distAvgSum);

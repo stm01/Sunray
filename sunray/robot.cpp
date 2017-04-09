@@ -262,7 +262,10 @@ void RobotClass::readRobotMessages(){
           case 12: startMapping(); break;
           case 13: startLaneMowing(); break;
           case 14: startRandomMowing(); break;
-          case 73: IMU.verboseOutput = !IMU.verboseOutput; break;      
+          case 73: IMU.verboseOutput = ROBOTMSG.parseInt(); 
+									 Motor.verboseOutput = ROBOTMSG.parseInt(); 
+									 Map.verboseOutput = ROBOTMSG.parseInt(); 
+					         break;      
           case 74: Motor.setMowerPWM(ROBOTMSG.parseFloat()); break;
           case 0: setIdle(); break;
           case 2: pwmLeft = ROBOTMSG.parseFloat();

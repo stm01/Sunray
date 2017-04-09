@@ -73,6 +73,9 @@ static final int MOT_CAL_RAMP       = 6;
 
 
 //Variables
+int mapVerbose = 0;
+int imuVerbose = 0;
+int motorVerbose = 0;
 Map map = new Map();
 HashMap<Integer, Integer> eeprom = new HashMap<Integer, Integer>();
 String menu;
@@ -197,6 +200,10 @@ void sendStartRandomMowing(){
    sendPort("?14\n");
 }
 
+void sendVerbose(){
+  sendPort("?73," + str(imuVerbose) + "," + str(motorVerbose) + "," + str(mapVerbose) + "\n");
+}
+
 
 void sendPort(String s){
   if (demo) return;
@@ -247,16 +254,6 @@ void setup(PApplet parent){
   //frameRate(30);
 }
 
-void drawMainMenu(){
-  String menu = "{.main menu|mn0~stop|mn1~track|";
-  menu += "mn2~mapping is ";
-  if (map.stateMapping) menu += "ON";
-    else menu += "OFF";    
-  menu += "|mn21~rand mow|mn3~lane mow|mn19~line|mn22~line rev|mn20~line angle +90deg";
-  //mn4~request map|mn5~request outline|mn12~request particles|mn13~reset particles";
-  menu += "|mn6~ADC cal|mn16~MPU selftest|mn17~IMU start cal|mn18~IMU stop cal|mn8~IMU verbose|mn9~mow 50% ON|mn11~mow ON|mn10~mow OFF|mn15~rotate +90deg}";
-  drawMenu(330, 200, menu);
-}
 
 void drawMenu(int px, int py, String data){
   int w = 200;
@@ -437,6 +434,17 @@ void drawJoystick(int px, int py){
   popMatrix();
 }
 
+void drawMainMenu(){
+  String menu = "{.main menu|mn0~stop|mn1~track|";
+  menu += "mn2~mapping is ";
+  if (map.stateMapping) menu += "ON";
+    else menu += "OFF";    
+  menu += "|mn21~rand mow|mn3~lane mow|mn19~line|mn22~line rev|mn20~line angle +90deg";
+  //mn4~request map|mn5~request outline|mn12~request particles|mn13~reset particles";
+  menu += "|mn6~ADC cal|mn16~MPU selftest|mn17~IMU start cal|mn18~IMU stop cal|mn24~map verbose|mn23~motor verbose|mn8~IMU verbose|mn9~mow 50% ON|mn11~mow ON|mn10~mow OFF|mn15~rotate +90deg}";
+  drawMenu(330, 200, menu);
+}
+
 void processMenu(){
   if (menuResponse == null) return;
   println("menu: "+menuResponse);
@@ -480,7 +488,9 @@ void processMenu(){
   if (menuResponse.equals("mn4")) sendPort("?03\n");
   if (menuResponse.equals("mn5")) sendPort("?05\n");
   if (menuResponse.equals("mn6")) sendPort("?71\n");  
-  if (menuResponse.equals("mn8")) sendPort("?73\n");
+  if (menuResponse.equals("mn8")) { imuVerbose = (1-imuVerbose); sendVerbose(); }
+  if (menuResponse.equals("mn23")) { motorVerbose = (1-motorVerbose); sendVerbose(); }
+  if (menuResponse.equals("mn24")) { mapVerbose = (1-mapVerbose); sendVerbose(); }  
   if (menuResponse.equals("mn9")) sendPort("?74,0.5\n");  
   if (menuResponse.equals("mn10")) sendPort("?74,0\n");
   if (menuResponse.equals("mn11")) sendPort("?74,1.0\n");  

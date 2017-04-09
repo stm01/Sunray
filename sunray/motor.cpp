@@ -73,6 +73,7 @@ void MotorClass::begin() {
   attachInterrupt(pinOdometryRight, PCINT2_vect, CHANGE);
   //attachInterrupt(pinOdometryRight2, PCINT2_vect, CHANGE);
 
+	verboseOutput = false;
   lowPass = true;
   paused = false;
   pwmMax = 255;
@@ -510,23 +511,25 @@ void MotorClass::run() {
     } else overCurrentTimeout = 0;
   }
 
-  /*ROBOTMSG.print(F("!86,"));
-  ROBOTMSG.print(imuPID.eold, 4);
-  ROBOTMSG.print(F(","));
-  ROBOTMSG.print(motorLeftPID.eold, 4);
-  ROBOTMSG.print(F(","));
-  ROBOTMSG.print(motorRightPID.eold, 4);    
-  ROBOTMSG.print(F(","));
-  ROBOTMSG.print(imuPID.esum, 4);
-  ROBOTMSG.print(F(","));
-  ROBOTMSG.print(motorLeftPID.esum, 4);
-  ROBOTMSG.print(F(","));
-  ROBOTMSG.print(motorRightPID.esum, 4);    
-  ROBOTMSG.print(F(","));
-  ROBOTMSG.print(angleRadCurrDeltaOdometry, 4);     
-  ROBOTMSG.print(F(","));
-  ROBOTMSG.print(angleRadCurrDeltaIMU, 4);      
-  ROBOTMSG.println();        */
+	if (verboseOutput){
+		ROBOTMSG.print(F("!86,"));
+		ROBOTMSG.print(imuPID.eold, 4);
+		ROBOTMSG.print(F(","));
+		ROBOTMSG.print(motorLeftPID.eold, 4);
+		ROBOTMSG.print(F(","));
+		ROBOTMSG.print(motorRightPID.eold, 4);    
+		ROBOTMSG.print(F(","));
+		ROBOTMSG.print(imuPID.esum, 4);
+		ROBOTMSG.print(F(","));
+		ROBOTMSG.print(motorLeftPID.esum, 4);
+		ROBOTMSG.print(F(","));
+		ROBOTMSG.print(motorRightPID.esum, 4);    
+		ROBOTMSG.print(F(","));
+		ROBOTMSG.print(angleRadCurrDeltaOdometry, 4);     
+		ROBOTMSG.print(F(","));
+		ROBOTMSG.print(angleRadCurrDeltaIMU, 4);      
+		ROBOTMSG.println();        
+	}  
 }
 
 void MotorClass::setIsStucked() {

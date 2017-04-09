@@ -347,7 +347,8 @@ void plot(int idx, float minY, float maxY, FloatList list, String label, int pos
   }
 }
 
-void addPlotData(FloatList list, float value){
+
+void addPlotData(FloatList list, float value){  
   list.append( value );
   if (list.size() > 300) list.remove(0);
 }

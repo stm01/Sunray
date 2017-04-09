@@ -469,7 +469,8 @@ void MotorClass::run() {
   distanceCmAvg  = (distLeft + distRight) / 2.0;
   distanceCmCurr += fabs(distanceCmAvg);
 	angleRadCurrDeltaOdometry = -(distLeft - distRight) / wheelBaseCm;
-	angleRadCurrDeltaIMU = IMU.getYaw() - angleRadCurr;
+	//angleRadCurrDeltaIMU = IMU.getYaw() - angleRadCurr;
+	angleRadCurrDeltaIMU = speedDpsCurr * deltaControlTimeSec / 180.0 * PI;
   if (IMU_USE){
     angleRadCurr = IMU.getYaw();    
   } else {

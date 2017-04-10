@@ -57,6 +57,17 @@ void BuzzerClass::run(){
         case 4:                                nextToneTime = 0;       break;
       }
       break;
+    case SND_STUCK:
+      switch (toneIdx){
+        case 0: digitalWrite(pinBuzzer, HIGH); nextToneTime = m + 50;  break;
+        case 1: digitalWrite(pinBuzzer, LOW);  nextToneTime = m + 200; break;
+        case 2: digitalWrite(pinBuzzer, HIGH); nextToneTime = m + 50;  break;
+        case 3: digitalWrite(pinBuzzer, LOW);  nextToneTime = m + 200; break;
+				case 4: digitalWrite(pinBuzzer, HIGH); nextToneTime = m + 50;  break;
+				case 5: digitalWrite(pinBuzzer, LOW);  nextToneTime = m + 200; break;
+        case 6:                                nextToneTime = 0;       break;
+      }
+      break;			
     case SND_TILT:
       switch (toneIdx){
         case 0: digitalWrite(pinBuzzer, HIGH); nextToneTime = m + 100; break;

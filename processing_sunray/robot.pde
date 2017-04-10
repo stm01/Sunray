@@ -19,8 +19,8 @@ static final float imuPID_Kd = 3.0;
 static final float motorPID_Kp = 2.0;
 static final float motorPID_Ki = 0.03;
 static final float motorPID_Kd = 0.03;
-static final float stuckMaxDiffOdometryIMU = 999; // 0.07
-static final float stuckMaxIMUerror = 999;  // 2.0
+static final float stuckMaxDiffOdometryIMU = 0.1;
+static final float stuckMaxIMUerror = 2.0;
 // perimeter
 static final int timedOutIfBelowSmag = 10;
 static final int timeOutSecIfNotInside = 15;
@@ -149,10 +149,7 @@ FloatList dataRanging1 = new FloatList();
 FloatList dataRanging2 = new FloatList();
 FloatList dataRanging3 = new FloatList();
 FloatList dataPIDimuError = new FloatList();
-FloatList dataRadDeltaOdometry = new FloatList();
-FloatList dataRadDeltaIMU = new FloatList();
-FloatList dataPIDleftError = new FloatList();
-FloatList dataPIDrightError = new FloatList();
+FloatList dataDiffOdoIMU = new FloatList();
   
   
   // rescale to -PI..+PI
@@ -381,11 +378,9 @@ void drawPlots(int px, int py){
   /*plot(0, -0.2, 5, dataRanging1,   "rang1",   x, y+7*ploth, 255, 0, 0);
   plot(1, -0.2, 5, dataRanging2,   "rang2",   x, y+7*ploth, 0, 127 , 0);
   plot(2, -0.2, 5, dataRanging3,   "rang3",   x, y+7*ploth, 0, 0, 255);*/
-  plot(0, -5, 5, dataPIDimuError,   "imuE",   x, y+7*ploth, 255, 0, 0);
-  //plot(1, -500, 500, dataPIDleftError,   "leftE",   x, y+7*ploth, 0, 127 , 0);
-  //plot(2, -500, 500, dataPIDrightError,   "rightE",   x, y+7*ploth, 0, 0, 255);
-  plot(1, -0.1, 0.1, dataRadDeltaOdometry,   "delOdo",   x, y+7*ploth, 0, 127, 0);  
-  plot(2, -0.1, 0.1, dataRadDeltaIMU,   "delIMU",   x, y+7*ploth, 0, 0, 255);
+  plot(0, -5, 5, dataPIDimuError,   "imuE",   x, y+7*ploth, 255, 0, 0);  
+  plot(1, -0.3, 0.3, dataDiffOdoIMU,   "diffOdoIMU",   x, y+7*ploth, 0, 127, 0);  
+  //plot(2, -0.1, 0.1, dataRadDeltaIMU,   "delIMU",   x, y+7*ploth, 0, 0, 255);
   
 }
 
@@ -763,12 +758,9 @@ void processDataReceived(String data) {
       // motor controller data
       String[] list = splitTokens(data, ",");
       //println(data);      
-      if (list.length >= 9){
-        addPlotData(dataPIDimuError, Float.parseFloat(list[1]));        
-        //  addPlotData(dataPIDleftError, Float.parseFloat(list[5]));
-        //  addPlotData(dataPIDrightError, Float.parseFloat(list[6]));
-        addPlotData(dataRadDeltaOdometry, Float.parseFloat(list[7]));        
-        addPlotData(dataRadDeltaIMU, Float.parseFloat(list[8]));        
+      if (list.length >= 3){
+        addPlotData(dataDiffOdoIMU, Float.parseFloat(list[1]));
+        addPlotData(dataPIDimuError, Float.parseFloat(list[2]));                                             
       }
     }    
     if (data.startsWith("!76")){

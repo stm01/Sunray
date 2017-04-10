@@ -131,6 +131,7 @@ void MotorClass::begin() {
   mowerPWMCurr = 0;
   speedDpsCurr = 0;
   distanceCmCurr = 0;
+	diffOdoIMU = 0;
   isStucked = false;
   motorPosX = 0;
   motorPosY = 0;  
@@ -536,35 +537,23 @@ void MotorClass::run() {
   }
 	
 	// stuck detection
-	float diffOdoIMU = angleRadCurrDeltaOdometry - angleRadCurrDeltaIMU;
-	if (abs(diffOdoIMU) > stuckMaxDiffOdometryIMU) setIsStucked();
-	if (abs(imuPID.eold) > stuckMaxIMUerror) setIsStucked();	
+	diffOdoIMU = angleRadCurrDeltaOdometry - angleRadCurrDeltaIMU;
+	if ((abs(diffOdoIMU) > stuckMaxDiffOdometryIMU) || (abs(imuPID.eold) > stuckMaxIMUerror)){		
+    DEBUGLN(F("STUCKED "));		
+		DEBUG(diffOdoIMU);
+    DEBUG(F(","));		
+		DEBUGLN(imuPID.eold);
+		stopImmediately();
+		Buzzer.sound(SND_STUCK, false);
+	} 
 
 	if (verboseOutput){
 		ROBOTMSG.print(F("!86,"));
-		ROBOTMSG.print(imuPID.eold, 4);
+		ROBOTMSG.print(diffOdoIMU, 4);		
 		ROBOTMSG.print(F(","));
-		ROBOTMSG.print(motorLeftPID.eold, 4);
-		ROBOTMSG.print(F(","));
-		ROBOTMSG.print(motorRightPID.eold, 4);    
-		ROBOTMSG.print(F(","));
-		ROBOTMSG.print(imuPID.esum, 4);
-		ROBOTMSG.print(F(","));
-		ROBOTMSG.print(motorLeftPID.esum, 4);
-		ROBOTMSG.print(F(","));
-		ROBOTMSG.print(motorRightPID.esum, 4);    
-		ROBOTMSG.print(F(","));
-		ROBOTMSG.print(angleRadCurrDeltaOdometry, 4);     
-		ROBOTMSG.print(F(","));
-		ROBOTMSG.print(angleRadCurrDeltaIMU, 4);      
+		ROBOTMSG.print(imuPID.eold, 4);				
 		ROBOTMSG.println();        
 	}  
-}
-
-void MotorClass::setIsStucked() {
-  isStucked = true;
-  DEBUGLN(F("STUCKED"));
-  stopImmediately();
 }
 
 

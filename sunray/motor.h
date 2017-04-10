@@ -65,7 +65,7 @@ class MotorClass {
     int distanceCmSet;  // set line distance (cm)
     float angleRadCurr; // current (absolute) robot angle
 		float angleRadCurrDeltaIMU; // robot angle delta IMU
-		float angleRadCurrDeltaOdometry; // robot angle delta odometry
+		float angleRadCurrDeltaOdometry; // robot angle delta odometry		
     float angleRadSet;  // set (absolute) start line angle
     float angleRadSetStartX;
     float angleRadSetStartY;
@@ -98,6 +98,7 @@ class MotorClass {
 		float motorFrictionMax; // max. allowed gear motor friction
     float mowPowerMax;    // max. allowed mower power
 		
+		float diffOdoIMU;
 		float stuckMaxIMUerror;
 		float stuckMaxDiffOdometryIMU;
     
@@ -125,9 +126,7 @@ class MotorClass {
   	void stopSlowly();
     void calibrateRamp();
 		/* pause current motion (robot will stop and continue with action after unpause) */
-    void setPaused(bool flag);
-		/* not used */
-	  void setIsStucked();
+    void setPaused(bool flag);		
 		/* set mower motor speed in percent */
     void setMowerPWM(float pwmPerc);
   protected:     

@@ -4,7 +4,7 @@
 
 #include <inttypes.h>
 
-enum SoundSelect {SND_READY, SND_PROGRESS, SND_OVERCURRENT, SND_TILT, SND_PERIMETER_TIMEOUT} ;
+enum SoundSelect {SND_READY, SND_PROGRESS, SND_OVERCURRENT, SND_TILT, SND_PERIMETER_TIMEOUT, SND_STUCK} ;
 
 class BuzzerClass {
     public:

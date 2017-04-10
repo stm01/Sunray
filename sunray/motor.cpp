@@ -76,12 +76,14 @@ void MotorClass::begin() {
 
 	verboseOutput = false;
   lowPass = true;
-  paused = false;
+  paused = false;	
   pwmMax = 255;
   pwmMaxMow = 255;
   rpmMax = 25;
-  mowSenseMax = 50.0;
-  motorForceMax = 10.0;
+  mowPowerMax = 50.0;
+  motorFrictionMax = 10.0;
+	motorFrictionMin = 10.0;
+	robotMass = 10;
   ticksPerCm = 13.49 * 2;
   ticksPerRevolution = 1060 * 2;
   wheelBaseCm = 36;    // wheel-to-wheel distance (cm)
@@ -98,9 +100,9 @@ void MotorClass::begin() {
   imuPID.Ki       = 0.1; 
   imuPID.Kd       = 3.0;  */
 
-  motorLeftSense = 0;
-  motorRightSense = 0;
-  motorMowSense = 0;
+  motorLeftPower = 0;
+  motorRightPower = 0;
+  motorMowPower = 0;
   overCurrentTimeout = 0;
 
   lastControlTime = 0;
@@ -121,6 +123,10 @@ void MotorClass::begin() {
 
   motorLeftRpmCurr = 0;
   motorRightRpmCurr = 0;
+	motorLeftRpmLast = 0;
+	motorRightRpmLast = 0;
+	motorLeftRpmAcceleration = 0;
+	motorRightRpmAcceleration = 0;
   mowerPWMSet = 0;
   mowerPWMCurr = 0;
   speedDpsCurr = 0;
@@ -342,8 +348,8 @@ void MotorClass::stopImmediately() {
   DEBUGLN(F("stopImmediately"));
   motion = MOT_STOP;
   motorStopTime = 0;
-  motorLeftForce = 0;
-  motorRightForce = 0;
+  motorLeftFriction = 0;
+  motorRightFriction = 0;
   motorLeftPWMSet = 0;
   motorRightPWMSet = 0;
   motorLeftPWMCurr = motorLeftPWMSet;
@@ -438,6 +444,11 @@ void MotorClass::run() {
   // 20 ticksPerRevolution: @ 30 rpm => 0.5 rps => 10 ticksPerSec
   motorLeftRpmCurr = 60.0 * ( ((float)ticksLeft) / ((float)ticksPerRevolution) ) / deltaControlTimeSec;
   motorRightRpmCurr = 60.0 * ( ((float)ticksRight) / ((float)ticksPerRevolution) ) / deltaControlTimeSec;
+	motorLeftRpmAcceleration = motorLeftRpmCurr - motorLeftRpmLast;
+	motorRightRpmAcceleration = motorRightRpmCurr - motorRightRpmLast; 
+	motorLeftRpmLast = motorLeftRpmCurr;
+	motorRightRpmLast = motorRightRpmCurr;
+	
 
   // calculate speed via tick time
   /*//motorLeftRpmCurr = 60.0 / ((float)ticksPerRevolution) / (((float)odoTriggerTimeLeft)/1000.0/1000.0);
@@ -488,33 +499,34 @@ void MotorClass::run() {
   checkFault();
   	
 	// power in watt (P = I * V)
-  motorRightSense = ((float)ADCMan.getVoltage(pinMotorRightSense)) / 0.525 * Battery.batteryVoltage * motorRightPWMCurr/((float)pwmMax) ;
-  motorLeftSense = ((float)ADCMan.getVoltage(pinMotorLeftSense)) / 0.525 * Battery.batteryVoltage * motorLeftPWMCurr/((float)pwmMax) ;
-  motorMowSense = ((float)ADCMan.getVoltage(pinMotorMowSense)) / 0.525 * Battery.batteryVoltage * mowerPWMCurr/((float)pwmMaxMow) ;	
+	float scale       = 1.905;   // ADC voltage to amp
+  motorRightPower = ((float)ADCMan.getVoltage(pinMotorRightSense)) *scale * Battery.batteryVoltage * motorRightPWMCurr/((float)pwmMax) ;
+  motorLeftPower = ((float)ADCMan.getVoltage(pinMotorLeftSense)) *scale * Battery.batteryVoltage * motorLeftPWMCurr/((float)pwmMax) ;
+  motorMowPower = ((float)ADCMan.getVoltage(pinMotorMowSense)) *scale * Battery.batteryVoltage * mowerPWMCurr/((float)pwmMaxMow) ;	
 
   /*if (abs(motorLeftPWMCurr) < 70) motorLeftEff = 1;
   else motorLeftEff  = min(1.0, abs(motorLeftRpmCurr / motorLeftSense));
   if (abs(motorRightPWMCurr) < 70) motorRightEff = 1;
   else motorRightEff  = min(1.0, abs(motorRightRpmCurr / motorRightSense));*/
 	
-	// forward force = power / velocity * forwardForceFraction	
-	float forwardForceFraction = cos(IMU.ypr.pitch);  // force fraction put into forward motion (without force fraction put into gravity)	
-	float rpmLeft = max(1, abs(motorLeftRpmCurr));
-	float rpmRight = max(1, abs(motorRightRpmCurr));	
-	motorLeftForce  = abs(motorLeftSense/rpmLeft) * forwardForceFraction;
-  motorRightForce = abs(motorRightSense/rpmRight) * forwardForceFraction;
+	// friction = power / rpm * mass * cos(pitch)	
+	float cosPitch = cos(IMU.ypr.pitch);
+	float leftRpm = max(0.1, abs(motorLeftRpmCurr));
+	float rightRpm = max(0.1, abs(motorRightRpmCurr));	
+	motorLeftFriction = abs(motorLeftPower) / leftRpm * robotMass * cosPitch;  
+  motorRightFriction = abs(motorRightPower) / rightRpm  * robotMass * cosPitch;  
 
   //if (  (motorMowSense > mowSenseMax) || (motorLeftSense > motorSenseMax) || (motorRightSense > motorSenseMax)  ) {  
   if ( (!paused) && (motion != MOT_STOP) ){
-    if ( (motorMowSense > mowSenseMax) || ((motorLeftForce > motorForceMax) || (motorRightForce > motorForceMax))  ) {  
+    if ( (motorMowPower > mowPowerMax) || ((motorLeftFriction > motorFrictionMax) || (motorRightFriction > motorFrictionMax))  ) {  
       if (overCurrentTimeout == 0) overCurrentTimeout = millis() + 1000;
       if (millis() > overCurrentTimeout) {
         DEBUG(F("OVERCURRENT "));
-        DEBUG(motorLeftForce);
+        DEBUG(motorLeftFriction);
         DEBUG(F(","));
-        DEBUG(motorRightForce);
+        DEBUG(motorRightFriction);
         DEBUG(F(","));
-        DEBUGLN(motorMowSense);
+        DEBUGLN(motorMowPower);
         stopMowerImmediately();       
         stopImmediately();
         Buzzer.sound(SND_OVERCURRENT, false);

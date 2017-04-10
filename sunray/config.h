@@ -1,3 +1,6 @@
+#define IOREF 3.3   // I/O reference voltage 
+
+
 // ------ pins---------------------------------------
 #define pinMotorEnable  37         // EN motors enable
 #define pinMotorLeftPWM 5          // M1_IN1 left motor PWM pin

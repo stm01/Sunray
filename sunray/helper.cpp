@@ -178,4 +178,15 @@ float gaussian(float mu, float sigma, float x)
 }
 
 
+// Spannungsteiler Gesamtspannung ermitteln (Reihenschaltung R1-R2, U2 bekannt, U_GES zu ermitteln)
+float voltageDividerUges(float R1, float R2, float U2){
+	return (U2/R2 * (R1+R2));  // Uges 
+}
+
+// ADC-value to voltage
+float ADC2voltage(float ADCvalue){
+  return (ADCvalue /1023.0 * IOREF);   // ADCman works @ 10 bit
+}  
+
+
   

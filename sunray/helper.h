@@ -51,6 +51,11 @@ float gauss(float mean, float std_dev);
 float gaussian(float mu, float sigma, float x);
 
 
+// Spannungsteiler Gesamtspannung ermitteln (Reihenschaltung R1-R2, U2 bekannt, U_GES zu ermitteln)
+float voltageDividerUges(float R1, float R2, float U2);
+
+// ADC-value to voltage
+float ADC2voltage(float ADCvalue);
 
 
 

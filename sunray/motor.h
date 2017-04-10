@@ -78,19 +78,25 @@ class MotorClass {
     float motorRightPWMCurr; // current right motor pwm
 
     float motorLeftRpmCurr;  // current left motor rpm
-    float motorRightRpmCurr; // current right motor rpm
+    float motorRightRpmCurr; // current right motor rpm		
+		float motorLeftRpmLast;
+		float motorRightRpmLast;
+		float motorLeftRpmAcceleration;  // left motor acceleration
+		float motorRightRpmAcceleration;  // right motor acceleration
 
     bool motorLeftSwapDir;
     bool motorRightSwapDir;
+		
+    float robotMass;
+		float motorLeftFriction; // wheel friction
+    float motorRightFriction;
 
-    float motorLeftForce;
-    float motorRightForce;
-
-    float motorLeftSense; // left motor current 
-    float motorRightSense; // right  motor current 
-    float motorMowSense;  // mower motor current 
-    float motorForceMax;
-    float mowSenseMax;
+    float motorLeftPower; // left motor power 
+    float motorRightPower; // right  motor power 
+    float motorMowPower;  // mower motor power
+    float motorFrictionMin; // min. allowed gear motor friction
+		float motorFrictionMax; // max. allowed gear motor friction
+    float mowPowerMax;    // max. allowed mower power
 		
 		float stuckMaxIMUerror;
 		float stuckMaxDiffOdometryIMU;

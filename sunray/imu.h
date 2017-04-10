@@ -1,6 +1,21 @@
+/*
 // IMU (GY-88)
 //  Gyro:    MPU6050
 //  Compass: HMC5883L 
+
+How to use:
+  
+	IMU.begin();    
+	while (true){
+	  if (IMU.needGyroCal())) {     	    
+	    IMU.startGyroCalibration();      
+    }		
+	  IMU.run();	
+		float yaw = IMU.getYaw();
+	}
+		
+*/
+
 
 #ifndef IMU_H
 #define IMU_H

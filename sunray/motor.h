@@ -83,13 +83,13 @@ class MotorClass {
     bool motorLeftSwapDir;
     bool motorRightSwapDir;
 
-    float motorLeftEff;
-    float motorRightEff;
+    float motorLeftForce;
+    float motorRightForce;
 
     float motorLeftSense; // left motor current 
     float motorRightSense; // right  motor current 
     float motorMowSense;  // mower motor current 
-    float motorSenseMax;
+    float motorForceMax;
     float mowSenseMax;
 		
 		float stuckMaxIMUerror;

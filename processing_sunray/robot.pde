@@ -9,16 +9,16 @@ static final float reverseSpeedPerc = 0.3;
 static final float rotationSpeedPerc = 0.3;
 static final float trackSpeedPerc = 0.3;
 static final float trackRotationSpeedPerc = 0.1;
-static final float motorSenseMax = 0.7;
-static final float mowSenseMax = 1.0;
+static final float motorForceMax = 1;
+static final float mowSenseMax = 5.0;
 static final float imuPID_Kp = 0.7;
 static final float imuPID_Ki = 0.1;
 static final float imuPID_Kd = 3.0;
 static final float motorPID_Kp = 2.0;
 static final float motorPID_Ki = 0.03;
 static final float motorPID_Kd = 0.03;
-static final float stuckMaxDiffOdometryIMU = 0.07;
-static final float stuckMaxIMUerror = 2;
+static final float stuckMaxDiffOdometryIMU = 999; // 0.07
+static final float stuckMaxIMUerror = 999;  // 2.0
 // perimeter
 static final int timedOutIfBelowSmag = 10;
 static final int timeOutSecIfNotInside = 15;
@@ -125,8 +125,8 @@ float periRight = 0;
 float distanceCmSet = 0;
 float angleRadSet = 0;
 FloatList dataProb = new FloatList();
-FloatList dataEffL = new FloatList();
-FloatList dataEffR = new FloatList();
+FloatList dataForceL = new FloatList();
+FloatList dataForceR = new FloatList();
 FloatList dataSenseL = new FloatList();
 FloatList dataSenseR = new FloatList();
 FloatList dataSenseMow = new FloatList();
@@ -236,7 +236,7 @@ void setup(PApplet parent){
     //loadEEPROM();
     // motor settings
     sendPort("?83," + float2String(rpmMax) + "," + float2String(reverseSpeedPerc) + "," + float2String(rotationSpeedPerc) + "," 
-       + float2String(trackSpeedPerc) + "," + float2String(trackRotationSpeedPerc) + "," + float2String(motorSenseMax) + ","
+       + float2String(trackSpeedPerc) + "," + float2String(trackRotationSpeedPerc) + "," + float2String(motorForceMax) + ","
        + float2String(mowSenseMax) + "," + float2String(imuPID_Kp) + "," + float2String(imuPID_Ki) + "," + float2String(imuPID_Kd) + ","
        + float2String(motorPID_Kp) + "," + float2String(motorPID_Ki) + "," + float2String(motorPID_Kd) + "," 
        + float2String(stuckMaxDiffOdometryIMU) + "," + float2String(stuckMaxIMUerror) + "\n");
@@ -369,11 +369,11 @@ void drawPlots(int px, int py){
   plot(1, -900, 900, dataComX,   "comX",   x, y+3*ploth, 120, 120, 0);
   plot(2, -900, 900, dataComY,   "comY",   x, y+3*ploth, 0, 127, 0);  
   plot(3, -900, 900, dataComMag,   "comMag",   x, y+3*ploth, 255, 0, 0);
-  plot(0, -0.1, 1, dataSenseL,   "senL",   x, y+4*ploth, 255, 0, 0);
-  plot(1, -0.1, 1, dataSenseR,   "senR",   x, y+4*ploth, 0, 127, 0);
-  plot(2, -0.1, 1, dataSenseMow,   "senMow",   x, y+4*ploth, 0, 0, 255);
-  plot(0, -0.1, 0.3, dataEffL,   "effL",   x, y+5*ploth, 255, 0, 0);
-  plot(1, -0.1, 0.3, dataEffR,   "effR",   x, y+5*ploth, 0, 127, 0);   
+  plot(0, -0.1, 5, dataSenseL,   "senL",   x, y+4*ploth, 255, 0, 0);
+  plot(1, -0.1, 5, dataSenseR,   "senR",   x, y+4*ploth, 0, 127, 0);
+  plot(2, -0.1, 10, dataSenseMow,   "senMow",   x, y+4*ploth, 0, 0, 255);
+  plot(0, -0.1, 1, dataForceL,   "forceL",   x, y+5*ploth, 255, 0, 0);
+  plot(1, -0.1, 1, dataForceR,   "forceR",   x, y+5*ploth, 0, 127, 0);   
   plot(0, -0.1, 1.1, dataProb,   "prob",   x, y+6*ploth, 255, 0, 0);
   /*plot(0, -0.2, 5, dataRanging1,   "rang1",   x, y+7*ploth, 255, 0, 0);
   plot(1, -0.2, 5, dataRanging2,   "rang2",   x, y+7*ploth, 0, 127 , 0);
@@ -727,8 +727,8 @@ void processDataReceived(String data) {
         addPlotData(dataSenseL, Float.parseFloat(list[22]));
         addPlotData(dataSenseR, Float.parseFloat(list[23]));
         addPlotData(dataSenseMow, Float.parseFloat(list[24]));
-        addPlotData(dataEffL, Float.parseFloat(list[25]));        
-        addPlotData(dataEffR, Float.parseFloat(list[26]));        
+        addPlotData(dataForceL, Float.parseFloat(list[25]));        
+        addPlotData(dataForceR, Float.parseFloat(list[26]));        
         //addPlotData(dataProb, Float.parseFloat(list[27]));
         addPlotData(dataProb, map.overallProb);
         batteryVoltage = Float.parseFloat(list[28]);

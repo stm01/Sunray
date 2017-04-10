@@ -2,6 +2,7 @@
 #include "config.h"
 #include "imu.h"
 #include "buzzer.h"
+#include "battery.h"
 #include "Arduino.h"
 #include "helper.h"
 #include "adcman.h"
@@ -79,8 +80,8 @@ void MotorClass::begin() {
   pwmMax = 255;
   pwmMaxMow = 255;
   rpmMax = 25;
-  mowSenseMax = 1.0;
-  motorSenseMax = 0.7;
+  mowSenseMax = 50.0;
+  motorForceMax = 10.0;
   ticksPerCm = 13.49 * 2;
   ticksPerRevolution = 1060 * 2;
   wheelBaseCm = 36;    // wheel-to-wheel distance (cm)
@@ -341,8 +342,8 @@ void MotorClass::stopImmediately() {
   DEBUGLN(F("stopImmediately"));
   motion = MOT_STOP;
   motorStopTime = 0;
-  motorLeftEff = 1;
-  motorRightEff = 1;
+  motorLeftForce = 0;
+  motorRightForce = 0;
   motorLeftPWMSet = 0;
   motorRightPWMSet = 0;
   motorLeftPWMCurr = motorLeftPWMSet;
@@ -485,25 +486,33 @@ void MotorClass::run() {
   if ((motorStopTime != 0) && (millis() >= motorStopTime)) stopImmediately();
 
   checkFault();
-  // sense in ampere
-  motorRightSense = ((float)ADCMan.getVoltage(pinMotorRightSense)) / 0.525;
-  motorLeftSense = ((float)ADCMan.getVoltage(pinMotorLeftSense)) / 0.525;
-  motorMowSense = ((float)ADCMan.getVoltage(pinMotorMowSense)) / 0.525;
+  	
+	// power in watt (P = I * V)
+  motorRightSense = ((float)ADCMan.getVoltage(pinMotorRightSense)) / 0.525 * Battery.batteryVoltage * motorRightPWMCurr/((float)pwmMax) ;
+  motorLeftSense = ((float)ADCMan.getVoltage(pinMotorLeftSense)) / 0.525 * Battery.batteryVoltage * motorLeftPWMCurr/((float)pwmMax) ;
+  motorMowSense = ((float)ADCMan.getVoltage(pinMotorMowSense)) / 0.525 * Battery.batteryVoltage * mowerPWMCurr/((float)pwmMaxMow) ;	
 
-  if (abs(motorLeftPWMCurr) < 70) motorLeftEff = 1;
-  else motorLeftEff  = min(1.0, abs(motorLeftRpmCurr / motorLeftPWMCurr));
+  /*if (abs(motorLeftPWMCurr) < 70) motorLeftEff = 1;
+  else motorLeftEff  = min(1.0, abs(motorLeftRpmCurr / motorLeftSense));
   if (abs(motorRightPWMCurr) < 70) motorRightEff = 1;
-  else motorRightEff  = min(1.0, abs(motorRightRpmCurr / motorRightPWMCurr));
+  else motorRightEff  = min(1.0, abs(motorRightRpmCurr / motorRightSense));*/
+	
+	// forward force = power / velocity * forwardForceFraction	
+	float forwardForceFraction = cos(IMU.ypr.pitch);  // force fraction put into forward motion (without force fraction put into gravity)	
+	float rpmLeft = max(1, abs(motorLeftRpmCurr));
+	float rpmRight = max(1, abs(motorRightRpmCurr));	
+	motorLeftForce  = abs(motorLeftSense/rpmLeft) * forwardForceFraction;
+  motorRightForce = abs(motorRightSense/rpmRight) * forwardForceFraction;
 
   //if (  (motorMowSense > mowSenseMax) || (motorLeftSense > motorSenseMax) || (motorRightSense > motorSenseMax)  ) {  
   if ( (!paused) && (motion != MOT_STOP) ){
-    if ( (motorMowSense > mowSenseMax) || ((motorLeftEff < 0.1) && (motorRightEff < 0.1))  ) {  
+    if ( (motorMowSense > mowSenseMax) || ((motorLeftForce > motorForceMax) || (motorRightForce > motorForceMax))  ) {  
       if (overCurrentTimeout == 0) overCurrentTimeout = millis() + 1000;
       if (millis() > overCurrentTimeout) {
         DEBUG(F("OVERCURRENT "));
-        DEBUG(motorLeftEff);
+        DEBUG(motorLeftForce);
         DEBUG(F(","));
-        DEBUG(motorRightEff);
+        DEBUG(motorRightForce);
         DEBUG(F(","));
         DEBUGLN(motorMowSense);
         stopMowerImmediately();       

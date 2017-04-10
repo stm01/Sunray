@@ -202,9 +202,9 @@ void RobotClass::printSensorData(){
     ROBOTMSG.print(F(","));       
     ROBOTMSG.print(Motor.motorMowSense);
     ROBOTMSG.print(F(","));           
-    ROBOTMSG.print(Motor.motorLeftEff);
+    ROBOTMSG.print(Motor.motorLeftForce);
     ROBOTMSG.print(F(","));               
-    ROBOTMSG.print(Motor.motorRightEff);
+    ROBOTMSG.print(Motor.motorRightForce);
     ROBOTMSG.print(F(","));               
     ROBOTMSG.print(Map.overallProb);
     ROBOTMSG.print(F(","));               
@@ -312,7 +312,7 @@ void RobotClass::readRobotMessages(){
 									 Robot.rotationSpeedPerc = ROBOTMSG.parseFloat();
 									 Robot.trackSpeedPerc = ROBOTMSG.parseFloat();
 									 Robot.trackRotationSpeedPerc = ROBOTMSG.parseFloat();
-									 Motor.motorSenseMax = ROBOTMSG.parseFloat();
+									 Motor.motorForceMax = ROBOTMSG.parseFloat();
 									 Motor.mowSenseMax = ROBOTMSG.parseFloat();
 									 Motor.imuPID.Kp = ROBOTMSG.parseFloat();
                    Motor.imuPID.Ki = ROBOTMSG.parseFloat();
@@ -848,9 +848,9 @@ void RobotClass::sendInfo(){
   content += ",";
   content += Motor.motorMowSense;
   content += ",";
-  content += Motor.motorLeftEff;
+  content += Motor.motorLeftForce;
   content += ",";
-  content += Motor.motorRightEff;
+  content += Motor.motorRightForce;
   content += ",";
   content += Map.overallProb;
   content += ",";

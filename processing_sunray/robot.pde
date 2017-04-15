@@ -144,6 +144,9 @@ FloatList dataFrq = new FloatList();
 FloatList dataComX = new FloatList();
 FloatList dataComY = new FloatList();
 FloatList dataComZ = new FloatList();
+FloatList dataAccX = new FloatList();
+FloatList dataAccY = new FloatList();
+FloatList dataAccZ = new FloatList();
 FloatList dataComMag = new FloatList();
 FloatList dataRanging1 = new FloatList();
 FloatList dataRanging2 = new FloatList();
@@ -373,15 +376,17 @@ void drawPlots(int px, int py){
   plot(1, -30, 30, dataPowerR,   "powerR",   x, y+4*ploth, 0, 127, 0);
   plot(2, -30, 30, dataPowerMow,   "powerMow",   x, y+4*ploth, 0, 0, 255);
   plot(0, -0.1, 40, dataFrictionL,   "frictionL",   x, y+5*ploth, 255, 0, 0);
-  plot(1, -0.1, 40, dataFrictionR,   "frictionR",   x, y+5*ploth, 0, 127, 0);   
-  plot(0, -0.1, 1.1, dataProb,   "prob",   x, y+6*ploth, 255, 0, 0);
+  plot(1, -0.1, 40, dataFrictionR,   "frictionR",   x, y+5*ploth, 0, 127, 0);     
   /*plot(0, -0.2, 5, dataRanging1,   "rang1",   x, y+7*ploth, 255, 0, 0);
   plot(1, -0.2, 5, dataRanging2,   "rang2",   x, y+7*ploth, 0, 127 , 0);
   plot(2, -0.2, 5, dataRanging3,   "rang3",   x, y+7*ploth, 0, 0, 255);*/
-  plot(0, -5, 5, dataPIDimuError,   "imuE",   x, y+7*ploth, 255, 0, 0);  
-  plot(1, -0.3, 0.3, dataDiffOdoIMU,   "diffOdoIMU",   x, y+7*ploth, 0, 127, 0);  
-  //plot(2, -0.1, 0.1, dataRadDeltaIMU,   "delIMU",   x, y+7*ploth, 0, 0, 255);
-  
+  plot(0, -5, 5, dataPIDimuError,   "imuE",   x, y+6*ploth, 255, 0, 0);  
+  plot(1, -0.3, 0.3, dataDiffOdoIMU,   "diffOdoIMU",   x, y+6*ploth, 0, 127, 0);  
+  //plot(2, -0.1, 0.1, dataRadDeltaIMU,   "delIMU",   x, y+6*ploth, 0, 0, 255);  
+  plot(0, -1, 1, dataAccX,   "accX",   x, y+7*ploth, 255, 0, 0);
+  plot(1, -1, 1, dataAccY,   "accY",   x, y+7*ploth, 0, 127, 0);
+  plot(2, -1, 1, dataAccZ,   "accZ",   x, y+7*ploth, 0, 0, 255);
+  //plot(0, -0.1, 1.1, dataProb,   "prob",   x, y+6*ploth, 255, 0, 0);  
 }
 
 void drawJoystick(int px, int py){
@@ -776,20 +781,28 @@ void processDataReceived(String data) {
     if (data.startsWith("!04")){
       // IMU data (verbose)
       String[] list = splitTokens(data, ",");
-      if (list.length >= 13){        
+      if (list.length >= 16){        
         String line =   millis() + "," + list[1] + "," + list[2] + "," + list[3] + ","    
                       + list[4] + "," + list[5] + "," + list[6] + ","
-                      + list[7] + "," + list[8] + "," + list[9] + "," + list[10];
-        //saveMagData(line);        
+                      + list[7] + "," + list[8] + "," + list[9] + "," + list[10] + ","
+                      + list[11] + "," + list[12] + "," 
+                      + list[13] + "," + list[14] + "," + list[15];
+        //saveMagData(line);
+        float accX = Float.parseFloat(list[13]);
+        float accY = Float.parseFloat(list[14]);
+        float accZ = Float.parseFloat(list[15]);
         comX = 0.99 * comX + 0.01 * Float.parseFloat(list[1]);
         comY = 0.99 * comY + 0.01 * Float.parseFloat(list[2]);
         comZ = 0.99 * comZ + 0.01 * Float.parseFloat(list[3]);
         comMag = 0.99 * comMag + 0.01 * sqrt(sq(comX) + sq(comY) + sq(comZ)); 
         if (millis() >= nextComPlotTime){
-          nextComPlotTime = millis() + 1000;
+          //nextComPlotTime = millis() + 1000;
           addPlotData(dataComX, comX);
           addPlotData(dataComY, comY);
           addPlotData(dataComZ, comZ);
+          addPlotData(dataAccX, accX);
+          addPlotData(dataAccY, accY);
+          addPlotData(dataAccZ, accZ);
           addPlotData(dataComMag, comMag);
           //pitch = Float.parseFloat(list[11]);
           //roll = Float.parseFloat(list[12]);

@@ -437,6 +437,12 @@ void IMUClass::printSensors(){
   DEBUG(comPitch);
   DEBUG(F(","));
   DEBUG(comRoll);  
+	DEBUG(F(","));
+	DEBUG(acc.x); 
+	DEBUG(F(","));
+	DEBUG(acc.y); 
+	DEBUG(F(","));
+	DEBUG(acc.z); 
   DEBUGLN(); 
 }
 

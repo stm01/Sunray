@@ -382,10 +382,10 @@ void drawPlots(int px, int py){
   plot(2, -0.2, 5, dataRanging3,   "rang3",   x, y+7*ploth, 0, 0, 255);*/
   plot(0, -5, 5, dataPIDimuError,   "imuE",   x, y+6*ploth, 255, 0, 0);  
   plot(1, -0.3, 0.3, dataDiffOdoIMU,   "diffOdoIMU",   x, y+6*ploth, 0, 127, 0);  
-  //plot(2, -0.1, 0.1, dataRadDeltaIMU,   "delIMU",   x, y+6*ploth, 0, 0, 255);  
-  plot(0, -1, 1, dataAccX,   "accX",   x, y+7*ploth, 255, 0, 0);
-  plot(1, -1, 1, dataAccY,   "accY",   x, y+7*ploth, 0, 127, 0);
-  plot(2, -1, 1, dataAccZ,   "accZ",   x, y+7*ploth, 0, 0, 255);
+  //plot(2, -0.1, 0.1, dataRadDeltaIMU,   "delIMU",   x, y+6*ploth, 0, 0, 255);    
+  plot(0, -1, 1, dataAccY,   "accY",   x, y+7*ploth, 120, 120, 0);
+  plot(1, -1, 1, dataAccZ,   "accZ",   x, y+7*ploth, 0, 0, 127);
+  plot(2, -1, 1, dataAccX,   "accX",   x, y+7*ploth, 255, 0, 0);
   //plot(0, -0.1, 1.1, dataProb,   "prob",   x, y+6*ploth, 255, 0, 0);  
 }
 
@@ -803,10 +803,11 @@ void processDataReceived(String data) {
           addPlotData(dataComX, comX);
           addPlotData(dataComY, comY);
           addPlotData(dataComZ, comZ);
-          if (abs(accXmax) > abs(accXmin))
+          /*if (abs(accXmax) > abs(accXmin))
             addPlotData(dataAccX, accXmax);
           else 
-            addPlotData(dataAccX, accXmin);
+            addPlotData(dataAccX, accXmin);*/
+          addPlotData(dataAccX, accX);
           addPlotData(dataAccY, accY);
           addPlotData(dataAccZ, accZ);
           addPlotData(dataComMag, comMag);

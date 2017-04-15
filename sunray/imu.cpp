@@ -629,8 +629,8 @@ void IMUClass::run(){
       accXmax = max(accXmax, acc.x);
       float diff = accXmax - accXmin;
       //isMoving = (diff > 0.05);
-      accXmax = 0.8 * accXmax;
-      accXmin = 0.8 * accXmin;
+      accXmax = 0.5 * accXmax;
+      accXmin = 0.5 * accXmin;
     }
     if (sensors &  INV_XYZ_GYRO) {
       //DEBUGLN("INV_XYZ_GYRO");

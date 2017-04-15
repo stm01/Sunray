@@ -77,7 +77,7 @@ void BatteryClass::run(){
       if (!chargerConnectedState){
 	      chargerConnectedState = true;		    
 		    DEBUGLN(F("CHARGER CONNECTED"));      	              
-        Buzzer.sound(SND_OVERCURRENT, false);
+        Buzzer.sound(SND_OVERCURRENT, true);
         enableCharging(true);        
 	    }
   } else {
@@ -93,7 +93,7 @@ void BatteryClass::run(){
     unsigned long timeMinutes = (millis()-chargingStartTime) / 1000 /60;
     if (switchOffAllowed){
       if (millis() >= switchOffTime){
-        Buzzer.sound(SND_OVERCURRENT, false);
+        Buzzer.sound(SND_OVERCURRENT, true);
         DEBUGLN(F("SWITCHING OFF"));              
         digitalWrite(pinBatterySwitch, LOW);    
       } else digitalWrite(pinBatterySwitch, HIGH);  

@@ -81,8 +81,8 @@ class IMUClass {
    IMUMode mode;           // IMU mode   
    point_float_t gyroSum;
    int gyroSumCount;
-   float accZmin;
-   float accZmax;
+   float accXmin;
+   float accXmax;
    float gyroZlowpass;
    bool isRotating;
    bool verboseOutput;

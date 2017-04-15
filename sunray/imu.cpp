@@ -443,6 +443,10 @@ void IMUClass::printSensors(){
 	DEBUG(acc.y); 
 	DEBUG(F(","));
 	DEBUG(acc.z); 
+	DEBUG(F(","));
+	DEBUG(accXmin); 	
+	DEBUG(F(","));
+	DEBUG(accXmax); 	
   DEBUGLN(); 
 }
 
@@ -621,12 +625,12 @@ void IMUClass::run(){
       acc.z = accel[2]/ACCEL_SENS;	  
   	  // compute linar acceleration
   	  dmpGetLinearAccel(&acc, &acc, &gravity);
-      accZmin = min(accZmin, acc.z);
-      accZmax = max(accZmax, acc.z);
-      float diff = accZmax - accZmin;
+      accXmin = min(accXmin, acc.x);
+      accXmax = max(accXmax, acc.x);
+      float diff = accXmax - accXmin;
       //isMoving = (diff > 0.05);
-      accZmax -= 0.005;
-      accZmin += 0.005;
+      accXmax = 0.8 * accXmax;
+      accXmin = 0.8 * accXmin;
     }
     if (sensors &  INV_XYZ_GYRO) {
       //DEBUGLN("INV_XYZ_GYRO");

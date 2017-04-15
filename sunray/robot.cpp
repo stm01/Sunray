@@ -132,7 +132,7 @@ void RobotClass::begin(){
 	reverseSpeedPerc = 0.3;
 
   ADCMan.printInfo();
-  Buzzer.sound(SND_READY, false);   
+  Buzzer.sound(SND_READY, true);   
 }
 
 void RobotClass::configureBluetooth(){
@@ -412,13 +412,13 @@ void RobotClass::run(){
         DEBUG(Perimeter.getSmoothMagnitude(IDX_LEFT));            
         DEBUG(F(","));
         DEBUGLN(Perimeter.getSmoothMagnitude(IDX_RIGHT));            
-	      Buzzer.sound(SND_PERIMETER_TIMEOUT, false); 	   
+	      Buzzer.sound(SND_PERIMETER_TIMEOUT, true); 	   
       }
 		
 	    if ( (fabs(IMU.ypr.roll/PI*180)>30) || (fabs(IMU.ypr.pitch/PI*180)>30) ){
   	    setIdle();
 	      DEBUGLN(F("TILT"));
-	      Buzzer.sound(SND_TILT, false); 	   
+	      Buzzer.sound(SND_TILT, true); 	   
 	    }
 	  }		
 
@@ -542,7 +542,7 @@ void RobotClass::track(){
         //DEBUGLN(startDist);
 		    if (startDist < 0.3) {
           Motor.stopImmediately();
-          Buzzer.sound(SND_READY, false);
+          Buzzer.sound(SND_READY, true);
           state = STAT_IDLE;
           Map.correctOutline();
           Map.transferOutlineToMap();

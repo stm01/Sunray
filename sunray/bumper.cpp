@@ -18,7 +18,7 @@ void BumperClass::run(){
       DEBUGLN(F("BUMPER"));      
       //Motor.stopMowerImmediately();
       Motor.stopImmediately();
-      Buzzer.sound(SND_OVERCURRENT, false);
+      Buzzer.sound(SND_OVERCURRENT, true);
     }
   }
 }

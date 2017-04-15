@@ -781,16 +781,19 @@ void processDataReceived(String data) {
     if (data.startsWith("!04")){
       // IMU data (verbose)
       String[] list = splitTokens(data, ",");
-      if (list.length >= 16){        
+      if (list.length >= 18){        
         String line =   millis() + "," + list[1] + "," + list[2] + "," + list[3] + ","    
                       + list[4] + "," + list[5] + "," + list[6] + ","
                       + list[7] + "," + list[8] + "," + list[9] + "," + list[10] + ","
                       + list[11] + "," + list[12] + "," 
-                      + list[13] + "," + list[14] + "," + list[15];
+                      + list[13] + "," + list[14] + "," + list[15] + "," 
+                      + list[16] + "," + list[17];
         //saveMagData(line);
         float accX = Float.parseFloat(list[13]);
         float accY = Float.parseFloat(list[14]);
         float accZ = Float.parseFloat(list[15]);
+        float accXmin = Float.parseFloat(list[16]);
+        float accXmax = Float.parseFloat(list[17]);
         comX = 0.99 * comX + 0.01 * Float.parseFloat(list[1]);
         comY = 0.99 * comY + 0.01 * Float.parseFloat(list[2]);
         comZ = 0.99 * comZ + 0.01 * Float.parseFloat(list[3]);
@@ -800,7 +803,10 @@ void processDataReceived(String data) {
           addPlotData(dataComX, comX);
           addPlotData(dataComY, comY);
           addPlotData(dataComZ, comZ);
-          addPlotData(dataAccX, accX);
+          if (abs(accXmax) > abs(accXmin))
+            addPlotData(dataAccX, accXmax);
+          else 
+            addPlotData(dataAccX, accXmin);
           addPlotData(dataAccY, accY);
           addPlotData(dataAccZ, accZ);
           addPlotData(dataComMag, comMag);

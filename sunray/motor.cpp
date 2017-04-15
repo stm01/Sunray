@@ -530,7 +530,7 @@ void MotorClass::run() {
         DEBUGLN(motorMowPower);
         stopMowerImmediately();       
         stopImmediately();
-        Buzzer.sound(SND_OVERCURRENT, false);
+        Buzzer.sound(SND_OVERCURRENT, true);
         overCurrentTimeout = 0;
       }
     } else overCurrentTimeout = 0;
@@ -544,7 +544,7 @@ void MotorClass::run() {
     DEBUG(F(","));		
 		DEBUGLN(imuPID.eold);
 		stopImmediately();
-		Buzzer.sound(SND_STUCK, false);
+		Buzzer.sound(SND_STUCK, true);
 	} 
 
 	if (verboseOutput){

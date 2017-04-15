@@ -91,7 +91,7 @@ void ModelReceiverControl::run(){
   if (!enable){
     if ( (millis() < 10000) && (abs(remoteSpeed > 20)) && (abs(remoteMow < 20)) ) {
       DEBUGLN(F("R/C ARMED"));
-      Buzzer.sound(SND_READY, false);
+      Buzzer.sound(SND_READY, true);
       enable=true;
     }
   }  

@@ -91,12 +91,12 @@ class MotorClass {
 		float motorLeftFriction; // wheel friction
     float motorRightFriction;
 
-    float motorLeftPower; // left motor power 
-    float motorRightPower; // right  motor power 
-    float motorMowPower;  // mower motor power
+    float motorLeftSense; // left motor sense 
+    float motorRightSense; // right  motor sense 
+    float motorMowSense;  // mower motor sense
     float motorFrictionMin; // min. allowed gear motor friction
 		float motorFrictionMax; // max. allowed gear motor friction
-    float mowPowerMax;    // max. allowed mower power
+    float mowSenseMax;    // max. allowed mower sense
 		
 		float diffOdoIMU;
 		float stuckMaxIMUerror;

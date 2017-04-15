@@ -196,11 +196,11 @@ void RobotClass::printSensorData(){
     ROBOTMSG.print(F(","));       
     ROBOTMSG.print(Map.robotState.y);
     ROBOTMSG.print(F(","));       
-    ROBOTMSG.print(Motor.motorLeftPower);
+    ROBOTMSG.print(Motor.motorLeftSense);
     ROBOTMSG.print(F(","));       
-    ROBOTMSG.print(Motor.motorRightPower);    
+    ROBOTMSG.print(Motor.motorRightSense);    
     ROBOTMSG.print(F(","));       
-    ROBOTMSG.print(Motor.motorMowPower);
+    ROBOTMSG.print(Motor.motorMowSense);
     ROBOTMSG.print(F(","));           
     ROBOTMSG.print(Motor.motorLeftFriction);
     ROBOTMSG.print(F(","));               
@@ -315,7 +315,7 @@ void RobotClass::readRobotMessages(){
 									 Motor.robotMass = ROBOTMSG.parseFloat();
 									 Motor.motorFrictionMin = ROBOTMSG.parseFloat();
 									 Motor.motorFrictionMax = ROBOTMSG.parseFloat();
-									 Motor.mowPowerMax = ROBOTMSG.parseFloat();
+									 Motor.mowSenseMax = ROBOTMSG.parseFloat();
 									 Motor.imuPID.Kp = ROBOTMSG.parseFloat();
                    Motor.imuPID.Ki = ROBOTMSG.parseFloat();
                    Motor.imuPID.Kd = ROBOTMSG.parseFloat();
@@ -844,11 +844,11 @@ void RobotClass::sendInfo(){
   content += ",";     
   content += IMU.acc.z;  
   content += ",";     
-  content += Motor.motorLeftPower;
+  content += Motor.motorLeftSense;
   content += ",";
-  content += Motor.motorRightPower;    
+  content += Motor.motorRightSense;    
   content += ",";
-  content += Motor.motorMowPower;
+  content += Motor.motorMowSense;
   content += ",";
   content += Motor.motorLeftFriction;
   content += ",";

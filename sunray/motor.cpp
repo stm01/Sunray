@@ -510,12 +510,25 @@ void MotorClass::run() {
   if (abs(motorRightPWMCurr) < 70) motorRightEff = 1;
   else motorRightEff  = min(1.0, abs(motorRightRpmCurr / motorRightSense));*/
 	
-	// friction = power / rpm * mass * cos(pitch)	
-	float cosPitch = cos(IMU.ypr.pitch);
-	float leftRpm = max(0.1, abs(motorLeftRpmCurr));
+	// friction = power / rpm * mass * cos(pitch)		
+	// uphill forward/downhill reverse: decrease friction by angle
+	// downhill forward/uphill reverse: increase friction by angle	 			
+	float leftRpm = max(0.1, abs(motorLeftRpmCurr));	
 	float rightRpm = max(0.1, abs(motorRightRpmCurr));	
-	motorLeftFriction = abs(motorLeftPower) / leftRpm * robotMass * cosPitch;  
-  motorRightFriction = abs(motorRightPower) / rightRpm  * robotMass * cosPitch;  
+	float cosPitch = cos(IMU.ypr.pitch); 
+	float pitchfactor;
+	// left wheel friction
+	if (  ((leftRpm >= 0) && (IMU.ypr.pitch <= 0)) || ((leftRpm < 0) && (IMU.ypr.pitch >= 0)) )
+		pitchfactor = cosPitch; // decrease by angle
+	else 
+		pitchfactor = 2.0-cosPitch;  // increase by angle
+	motorLeftFriction = abs(motorLeftPower) / leftRpm * robotMass * pitchfactor;  
+	// right wheel friction
+	if (  ((rightRpm >= 0) && (IMU.ypr.pitch <= 0)) || ((rightRpm < 0) && (IMU.ypr.pitch >= 0)) )
+		pitchfactor = cosPitch;  // decrease by angle
+	else 
+		pitchfactor = 2.0-cosPitch; // increase by angle
+  motorRightFriction = abs(motorRightPower) / rightRpm  * robotMass * pitchfactor;  
 
   //if (  (motorMowSense > mowSenseMax) || (motorLeftSense > motorSenseMax) || (motorRightSense > motorSenseMax)  ) {  
   if ( (!paused) && (motion != MOT_STOP) ){

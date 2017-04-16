@@ -4,14 +4,14 @@ import java.io.*;
 class Robot {
   
 // motor
-static final float robotMass = 500;
+static final float robotMass = 1500;
 static final float rpmMax = 25;
 static final float reverseSpeedPerc = 0.3;
 static final float rotationSpeedPerc = 0.3;
 static final float trackSpeedPerc = 0.3;
 static final float trackRotationSpeedPerc = 0.1;
 static final float motorFrictionMin = 0.2;
-static final float motorFrictionMax = 500.0;
+static final float motorFrictionMax = 1700.0;
 static final float mowSenseMax = 4.0;
 static final float imuPID_Kp = 0.7;
 static final float imuPID_Ki = 0.1;
@@ -19,8 +19,8 @@ static final float imuPID_Kd = 3.0;
 static final float motorPID_Kp = 2.0;
 static final float motorPID_Ki = 0.03;
 static final float motorPID_Kd = 0.03;
-static final float stuckMaxDiffOdometryIMU = 0.1;
-static final float stuckMaxIMUerror = 3.0;
+static final float stuckMaxDiffOdometryIMU = 0.2;
+static final float stuckMaxIMUerror = 5.0;
 // perimeter
 static final int timedOutIfBelowSmag = 10;
 static final int timeOutSecIfNotInside = 15;
@@ -377,8 +377,8 @@ void drawPlots(int px, int py){
   plot(0, -0.15, 2, dataSenseL,   "senL",   x, y+4*ploth, 255, 0, 0);
   plot(1, -0.15, 2, dataSenseR,   "senR",   x, y+4*ploth, 0, 127, 0);
   plot(2, -0.3, 5, dataSenseMow,   "senMow",   x, y+4*ploth, 0, 0, 255);
-  plot(0, -0.15, 1000, dataFrictionL,   "frictionL",   x, y+5*ploth, 255, 0, 0);
-  plot(1, -0.15, 1000, dataFrictionR,   "frictionR",   x, y+5*ploth, 0, 127, 0);     
+  plot(0, -0.15, 4000, dataFrictionL,   "frictionL",   x, y+5*ploth, 255, 0, 0);
+  plot(1, -0.15, 4000, dataFrictionR,   "frictionR",   x, y+5*ploth, 0, 127, 0);     
   /*plot(0, -0.2, 5, dataRanging1,   "rang1",   x, y+7*ploth, 255, 0, 0);
   plot(1, -0.2, 5, dataRanging2,   "rang2",   x, y+7*ploth, 0, 127 , 0);
   plot(2, -0.2, 5, dataRanging3,   "rang3",   x, y+7*ploth, 0, 0, 255);*/

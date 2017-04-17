@@ -12,7 +12,7 @@ int tcpPort = 8083;
 boolean useSatMap = false;
 double centerLat = 52.267312;    
 double centerLon = 8.609331;
-boolean demo = false;
+boolean demo = true;
 
 
 Robot robot = new Robot();

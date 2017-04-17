@@ -77,7 +77,7 @@ static final int MOT_CAL_RAMP       = 6;
 
 
 //Variables
-int mapVerbose = 0;
+int mapVerbose = 1;
 int imuVerbose = 0;
 int motorVerbose = 0;
 Map map = new Map();
@@ -126,35 +126,14 @@ float periLeft = 0;
 float periRight = 0;
 float distanceCmSet = 0;
 float angleRadSet = 0;
-FloatList dataProb = new FloatList();
-FloatList dataFrictionL = new FloatList();
-FloatList dataFrictionR = new FloatList();
-FloatList dataSenseL = new FloatList();
-FloatList dataSenseR = new FloatList();
-FloatList dataSenseMow = new FloatList();
-FloatList dataSpeedL = new FloatList();
-FloatList dataSpeedR = new FloatList();
-FloatList dataOdoL = new FloatList();
-FloatList dataOdoR = new FloatList();
-FloatList dataPeriL = new FloatList();
-FloatList dataPeriR = new FloatList();
-FloatList dataYaw = new FloatList();
-FloatList dataComYaw = new FloatList();
-FloatList dataFrq = new FloatList();
-FloatList dataComX = new FloatList();
-FloatList dataComY = new FloatList();
-FloatList dataComZ = new FloatList();
-FloatList dataAccX = new FloatList();
-FloatList dataAccY = new FloatList();
-FloatList dataAccZ = new FloatList();
-FloatList dataComMag = new FloatList();
-FloatList dataRanging1 = new FloatList();
-FloatList dataRanging2 = new FloatList();
-FloatList dataRanging3 = new FloatList();
-FloatList dataPIDimuError = new FloatList();
-FloatList dataDiffOdoIMU = new FloatList();
-FloatList dataPIDleftError = new FloatList();
-FloatList dataPIDrightError = new FloatList();
+Button btnMapping,btnStop,btnResetParticles,btnTrack,btnMowRand,btnMowLane,btnADCcal,btnMPUselftest;
+Button btnIMUstartCal,btnIMUstopCal,btnMow50,btnMowON,btnMowOFF,btnLine,btnLineRev,btnLine90,btnRotate90;
+Tabsheet tabPlot, tabMenu;
+Sheet sheetPlotMain,sheetPlotMisc,sheetMenuMain,sheetMenuMisc;
+Plot plotSpeedL, plotSpeedR, plotYaw, plotComYaw, plotCom, plotPeriL, plotPeriR, plotComZ, plotComX;
+Plot plotComY, plotComMag, plotSenL, plotSenR, plotSenMow, plotFrictionL, plotFrictionR;
+Plot plotPIDimuError,  plotDiffOdoIMU,   plotPIDleftError,   plotPIDrightError;
+Plot plotAccY, plotAccZ, plotAccX, plotProb; 
   
   
   // rescale to -PI..+PI
@@ -227,6 +206,18 @@ void setup(PApplet parent){
   // Check the listed serial ports in your machine
   // and use the correct index number in Serial.list()[].
 
+  tabPlot = new Tabsheet(null, 720,0,475,680);   
+  sheetPlotMain = new Sheet(tabPlot, "1");
+  sheetPlotMisc = new Sheet(tabPlot, "2");
+  tabPlot.activeSheet = sheetPlotMain;
+  
+  tabMenu = new Tabsheet(null, 320,210,220,400);   
+  sheetMenuMain = new Sheet(tabMenu, "1");
+  sheetMenuMisc = new Sheet(tabMenu, "2");
+  tabMenu.activeSheet = sheetMenuMain;
+  createPlots();
+  createMenu();  
+
   if (!demo) {    
     if (useTcp) myTcp =  new Client(parent, tcpHost, tcpPort);  
       else mySerial = new Serial(parent, comPort, 115200, 'N', 8, 1);          
@@ -248,7 +239,8 @@ void setup(PApplet parent){
     // perimeter settings
     sendPort("?84," + str(timedOutIfBelowSmag) + "," + str(timeOutSecIfNotInside) + "," + str(swapCoilPolarity) + "\n"); 
     // IMU settings
-    sendPort("?82," + str(useGyro) +  "," + float2String(gyroBiasDpsMax) + "," + str(imuMode) + "\n"); 
+    sendPort("?82," + str(useGyro) +  "," + float2String(gyroBiasDpsMax) + "," + str(imuMode) + "\n");
+    sendVerbose();
     
     //if (mySerial != null) mySerial.buffer(32);    
   }  
@@ -262,46 +254,6 @@ void setup(PApplet parent){
   //frameRate(30);
 }
 
-
-void drawMenu(int px, int py, String data){
-  int w = 200;
-  int h = 20;
-  int selidx = -1;  
-  stroke(0,0,0);  
-  if (!data.startsWith("{")) return;
-  if (!data.endsWith("}")) return;
-  data = data.replaceAll("\\{","");
-  data = data.replaceAll("\\}","");  
-  String[] list = splitTokens(data, "|");
-  if (list.length == 0) return;
-  for (int i=0; i < list.length; i++){
-    String[] items = splitTokens(list[i], "~");
-    if (items.length >= 1){      
-      fill(255,255,255);
-      if ((mouseX >= px) && (mouseX <= px + w) && (mouseY >= py+i*h) && (mouseY <= py+i*h+h-1)){
-        selidx = i;
-        fill(0,0,0);        
-      }      
-      rect(px, py+i*h, w, h, 10);     
-      fill(0,0,0);
-      if (selidx == i) fill(255,255,255);      
-      String title;
-      textAlign(LEFT);
-      if (items.length >=2) {
-        title = items[1];
-        text(title, px+10, py+i*h+h/2+5);
-        if ((selidx ==i) && (mouseClicked)){
-          mouseClicked = false;
-          menuResponse = items[0];
-        }
-      } else { 
-        title = items[0].replaceAll("\\.", "");
-        textAlign(CENTER);
-        text(title, px+w/2, py+i*h+h/2+5);
-      }               
-    }        
-  }  
-}
 
 void drawInfo(int px, int py){
   int x = px;
@@ -325,70 +277,40 @@ void drawInfo(int px, int py){
   text("voltage:  "+float2String(batteryVoltage),          x,y+14*w);
 }
 
-void plot(int idx, float minY, float maxY, FloatList list, String label, int posX, int posY, int r, int g, int b){  
-  int h = ploth;
-  int w = plotw;
-  int px = posX;
-  int oldpy = 0;  
-  int py;
-  float rangeY = abs(maxY-minY);   
-  float stepY = ((float)h)/rangeY;  
-  stroke(0,0,0);
-  fill(255,255,255);
-  rect(px, posY, w, h, 10);
-  // zero line
-  stroke(200,200,200);
-  py = posY + h-((int)( (0-minY) *stepY ));
-  line(px, py, px+w, py);
-  fill(r,g,b);
-  stroke(r,g,b);
-  text(label, posX+w+10, posY+idx*20+15);
-  if (list.size() < 2) return;
-  text(float2String(list.get(list.size()-1)), posX+w+90, posY+idx*20+15);
-  for (int i=0; i < list.size(); i++){
-    //println(list.get(i));
-    float value = max(minY, min(maxY, list.get(i)));
-    py = posY + h-((int)( (value-minY) *stepY ));    
-    if (i > 0) line(px-1, oldpy, px, py);    
-    px++;
-    oldpy = py;
-  }
-}
-
 
 void addPlotData(FloatList list, float value){  
   list.append( value );
   if (list.size() > 300) list.remove(0);
 }
 
-void drawPlots(int px, int py){
-  int x = px;
-  int y = py;  
-  plot(0, -25, 25,     dataSpeedL, "speedL", x, y+0*ploth, 255, 0, 0);
-  plot(1, -25, 25,     dataSpeedR, "speedR", x, y+0*ploth, 0, 127, 0);    
-  plot(0, -181, 181,   dataYaw,    "yaw",    x, y+1*ploth, 0, 0, 255);
-  plot(1, -181, 181,   dataComYaw, "comYaw", x, y+1*ploth, 120, 120, 0);  
-  plot(0, -2800, 2800, dataPeriL,   "periL",   x, y+2*ploth, 255, 0, 255);  
-  plot(1, -2800, 2800, dataPeriR,   "periR",   x, y+2*ploth, 0, 127, 0);
-  plot(0, -500, 500, dataComZ,   "comZ",   x, y+3*ploth, 0, 0, 255);
-  plot(1, -900, 900, dataComX,   "comX",   x, y+3*ploth, 120, 120, 0);
-  plot(2, -900, 900, dataComY,   "comY",   x, y+3*ploth, 0, 127, 0);  
-  plot(3, -900, 900, dataComMag,   "comMag",   x, y+3*ploth, 255, 0, 0);
-  plot(0, -0.15, 2, dataSenseL,   "senL",   x, y+4*ploth, 255, 0, 0);
-  plot(1, -0.15, 2, dataSenseR,   "senR",   x, y+4*ploth, 0, 127, 0);
-  plot(2, -0.3, 5, dataSenseMow,   "senMow",   x, y+4*ploth, 0, 0, 255);
-  plot(0, -0.15, 4000, dataFrictionL,   "frictionL",   x, y+5*ploth, 255, 0, 0);
-  plot(1, -0.15, 4000, dataFrictionR,   "frictionR",   x, y+5*ploth, 0, 127, 0);     
+void createPlots(){
+  int x = 0;
+  int y = 0;  
+  plotSpeedL = new Plot(sheetPlotMain, 0, -25, 25,     "speedL", x, y+0*ploth, plotw, ploth, 255, 0, 0);
+  plotSpeedR = new Plot(sheetPlotMain,1, -25, 25,      "speedR", x, y+0*ploth, plotw, ploth, 0, 127, 0);    
+  plotYaw = new Plot(sheetPlotMain,0, -181, 181,       "yaw",    x, y+1*ploth, plotw, ploth, 0, 0, 255);
+  plotComYaw = new Plot(sheetPlotMain,1, -181, 181,    "comYaw", x, y+1*ploth, plotw, ploth, 120, 120, 0);  
+  plotPeriL = new Plot(sheetPlotMain,0, -2800, 2800,    "periL",   x, y+2*ploth, plotw, ploth, 255, 0, 255);  
+  plotPeriR = new Plot(sheetPlotMain,1, -2800, 2800,    "periR",   x, y+2*ploth, plotw, ploth, 0, 127, 0);
+  plotComZ = new Plot(sheetPlotMain,0, -500, 500,    "comZ",   x, y+3*ploth, plotw, ploth, 0, 0, 255);
+  plotComX = new Plot(sheetPlotMain,1, -900, 900,   "comX",   x, y+3*ploth, plotw, ploth, 120, 120, 0);
+  plotComY = new Plot(sheetPlotMain,2, -900, 900, "comY",   x, y+3*ploth, plotw, ploth, 0, 127, 0);  
+  plotComMag =new Plot(sheetPlotMain,3, -900, 900, "comMag",   x, y+3*ploth, plotw, ploth, 255, 0, 0);
+  plotSenL = new Plot(sheetPlotMain,0, -0.15, 2, "senL",   x, y+4*ploth, plotw, ploth, 255, 0, 0);
+  plotSenR = new Plot(sheetPlotMain,1, -0.15, 2, "senR",   x, y+4*ploth, plotw, ploth, 0, 127, 0);
+  plotSenMow = new Plot(sheetPlotMain,2, -0.3, 5, "senMow",   x, y+4*ploth, plotw, ploth, 0, 0, 255);
+  plotFrictionL = new Plot(sheetPlotMain,0, -0.15, 4000, "frictionL",   x, y+5*ploth, plotw, ploth, 255, 0, 0);
+  plotFrictionR = new Plot(sheetPlotMain,1, -0.15, 4000, "frictionR",   x, y+5*ploth, plotw, ploth, 0, 127, 0);     
   /*plot(0, -0.2, 5, dataRanging1,   "rang1",   x, y+7*ploth, 255, 0, 0);
   plot(1, -0.2, 5, dataRanging2,   "rang2",   x, y+7*ploth, 0, 127 , 0);
   plot(2, -0.2, 5, dataRanging3,   "rang3",   x, y+7*ploth, 0, 0, 255);*/
-  plot(0, -5, 5, dataPIDimuError,   "imuErr",   x, y+6*ploth, 255, 0, 0);  
-  plot(1, -0.3, 0.3, dataDiffOdoIMU,   "diffOdoIMU",   x, y+6*ploth, 0, 127, 0);  
-  plot(2, -40, 40, dataPIDleftError,   "leftErr",   x, y+6*ploth, 0, 0, 255);   
-  plot(3, -40, 40, dataPIDrightError,   "rightErr",   x, y+6*ploth, 120, 120, 0);
-  plot(0, -1, 1, dataAccY,   "accY",   x, y+7*ploth, 120, 120, 0);
-  plot(1, -1, 1, dataAccZ,   "accZ",   x, y+7*ploth, 0, 0, 127);
-  plot(2, -1, 1, dataAccX,   "accX",   x, y+7*ploth, 255, 0, 0);
+  plotPIDimuError = new Plot(sheetPlotMain,0, -5, 5, "imuErr",   x, y+6*ploth, plotw, ploth, 255, 0, 0);  
+  plotDiffOdoIMU = new Plot(sheetPlotMain,1, -0.3, 0.3,  "diffOdoIMU",   x, y+6*ploth, plotw, ploth, 0, 127, 0);  
+  plotPIDleftError = new Plot(sheetPlotMain,2, -40, 40, "leftErr",   x, y+6*ploth, plotw, ploth, 0, 0, 255);   
+  plotPIDrightError = new Plot(sheetPlotMain,3, -40, 40, "rightErr",   x, y+6*ploth, plotw, ploth, 120, 120, 0);
+  plotAccY = new Plot(sheetPlotMain,0, -1, 1, "accY",   x, y+7*ploth, plotw, ploth, 120, 120, 0);
+  plotAccZ = new Plot(sheetPlotMain,1, -1, 1, "accZ",   x, y+7*ploth, plotw, ploth, 0, 0, 127);
+  plotAccX = new Plot(sheetPlotMain,2, -1, 1, "accX",   x, y+7*ploth, plotw, ploth, 255, 0, 0);
   //plot(0, -0.1, 1.1, dataProb,   "prob",   x, y+6*ploth, 255, 0, 0);  
 }
 
@@ -444,29 +366,51 @@ void drawJoystick(int px, int py){
   popMatrix();
 }
 
-void drawMainMenu(){
-  String menu = "{.main menu|mn0~stop|mn1~track|";
+void createMenu(){
+  String s = "OFF";
+  if (map.stateMapping) s = "ON";
+  int h = 26;
+  btnStop  = new Button(null, 0, 0, 220, 26, "STOP");
+  btnMapping  = new Button(sheetMenuMain, 0, h*0, 220, 26, "mapping is "+s);
+  btnResetParticles  = new Button(sheetMenuMain, 0, h*1, 220, 26, "reset particles");
+  btnTrack  = new Button(sheetMenuMain, 0, h*2, 220, 26, "track");   
+  btnMowRand  = new Button(sheetMenuMain, 0, h*3, 220, 26, "mow rand");
+  btnMowLane  = new Button(sheetMenuMain, 0, h*4, 220, 26, "mow lane");
+   
+  btnADCcal  = new Button(sheetMenuMisc, 0, h*0, 220, 26, "ADC cal");
+  btnMPUselftest  = new Button(sheetMenuMisc, 0, h*1, 220, 26, "MPU selftest");
+  btnIMUstartCal  = new Button(sheetMenuMisc, 0, h*2, 220, 26, "IMU start cal");
+  btnIMUstopCal  = new Button(sheetMenuMisc, 0, h*3, 220, 26, "IMU stop cal");  
+  btnMow50  = new Button(sheetMenuMisc, 0, h*4, 220, 26, "Mow 50% ON");
+  btnMowON  = new Button(sheetMenuMisc, 0, h*5, 220, 26, "Mow ON");
+  btnMowOFF  = new Button(sheetMenuMisc, 0, h*6, 220, 26, "Mow OFF");
+  btnLine  = new Button(sheetMenuMisc, 0, h*7, 220, 26, "line");
+  btnLineRev  = new Button(sheetMenuMisc, 0, h*8, 220, 26, "line rev");
+  btnLine90  = new Button(sheetMenuMisc, 0, h*9, 220, 26, "line angle +90deg");
+  btnRotate90  = new Button(sheetMenuMisc, 0, h*10, 220, 26, "rotate +90deg");     
+}
+
+void processMenu(){
+  /*String menu = "{.main menu|mn0~stop|mn1~track|";
   menu += "mn2~mapping is ";
   if (map.stateMapping) menu += "ON";
     else menu += "OFF";    
   menu += "|mn21~rand mow|mn3~lane mow|mn19~line|mn22~line rev|mn20~line angle +90deg";
-  //mn4~request map|mn5~request outline|mn12~request particles|mn13~reset particles";
+  //mn4~request map|mn5~request outline|mn12~request particles";
+  menu += "|mn13~reset particles";
   menu += "|mn6~ADC cal|mn16~MPU selftest|mn17~IMU start cal|mn18~IMU stop cal|mn24~map verbose|mn23~motor verbose|mn8~IMU verbose|mn9~mow 50% ON|mn11~mow ON|mn10~mow OFF|mn15~rotate +90deg}";
-  drawMenu(330, 200, menu);
-}
-
-void processMenu(){
-  if (menuResponse == null) return;
-  println("menu: "+menuResponse);
-  if (menuResponse.equals("mn0")) {
-    // stop    
+  drawMenu(330, 200, menu);*/
+  
+  if (btnStop.clicked) {
+    // stop
+    btnStop.label = "BLUB";
     map.stateMapping = false;
     map.stateLocalize = true;
     map.stateLocalizeOutline = false;
     map.stateMowing = false;
     sendPort("?00\n");
   }
-  if (menuResponse.equals("mn1")) {
+  if (btnTrack.clicked) {
     // track
     //map.overallDist = 0;
     map.distributeParticlesOutline();    
@@ -476,7 +420,7 @@ void processMenu(){
     map.stateMowing = false;
     sendPort("?11\n");    
   }
-  if (menuResponse.equals("mn2")) {
+  if (btnMapping.clicked) {
     // mapping
     if (map.stateMapping){
       map.stopMapping();
@@ -487,7 +431,20 @@ void processMenu(){
       sendPort("?11\n");
     }
   }
-  if (menuResponse.equals("mn3")) {
+  if (btnResetParticles.clicked) {
+    // reset particles
+    map.distributeParticlesOutline();
+    //map.overallDist = 0;
+    //mySerial.write("?16\n");
+  }
+  if (btnMowRand.clicked) {
+    map.stateMapping=false;
+    map.stateLocalize=true;
+    map.stateLocalizeOutline=false;
+    map.stateMowing = true;
+    sendStartRandomMowing();
+  }
+  if (btnMowLane.clicked) {
     // lane mow
     map.stateMapping=false;
     map.stateLocalize=true;
@@ -495,32 +452,26 @@ void processMenu(){
     map.stateMowing = true;
     sendPort("?13\n");
   }
-  if (menuResponse.equals("mn4")) sendPort("?03\n");
-  if (menuResponse.equals("mn5")) sendPort("?05\n");
-  if (menuResponse.equals("mn6")) sendPort("?71\n");  
-  if (menuResponse.equals("mn8")) { imuVerbose = (1-imuVerbose); sendVerbose(); }
-  if (menuResponse.equals("mn23")) { motorVerbose = (1-motorVerbose); sendVerbose(); }
-  if (menuResponse.equals("mn24")) { mapVerbose = (1-mapVerbose); sendVerbose(); }  
-  if (menuResponse.equals("mn9")) sendPort("?74,0.5\n");  
-  if (menuResponse.equals("mn10")) sendPort("?74,0\n");
-  if (menuResponse.equals("mn11")) sendPort("?74,1.0\n");  
-  if (menuResponse.equals("mn14")) sendPort("?75\n");
-  //if (menuResponse.equals("mn15")) sendPort("?08," + scalePI(PI/180.0*20.0) + ",0.1\n");
-  if (menuResponse.equals("mn15")) sendRotateAngle(scalePI(PI/180.0*90.0), 0.2);  
-  if (menuResponse.equals("mn16")) sendPort("?79\n");
-  if (menuResponse.equals("mn17")) sendPort("?80\n");
-  if (menuResponse.equals("mn18")) sendPort("?81\n");
+  //if (menuResponse.equals("mn4")) sendPort("?03\n");
+  //if (menuResponse.equals("mn5")) sendPort("?05\n");
+  if (btnADCcal.clicked) sendPort("?71\n");  
+  //if (menuResponse.equals("mn8")) { imuVerbose = (1-imuVerbose); sendVerbose(); }
+  //if (menuResponse.equals("mn23")) { motorVerbose = (1-motorVerbose); sendVerbose(); }
+  //if (menuResponse.equals("mn24")) { mapVerbose = (1-mapVerbose); sendVerbose(); }  
+  if (btnMow50.clicked) sendPort("?74,0.5\n");  
+  if (btnMowOFF.clicked) sendPort("?74,0\n");
+  if (btnMowON.clicked) sendPort("?74,1.0\n");  
+  //if (menuResponse.equals("mn14")) sendPort("?75\n");
+  //if (menuResponse.equals("mn15")) sendPort("?08," + scalePI(PI/180.0*20.0) + ",0.1\n");  
+  if (btnRotate90.clicked) sendRotateAngle(scalePI(PI/180.0*90.0), 0.2);  
+  if (btnMPUselftest.clicked) sendPort("?79\n");
+  if (btnIMUstartCal.clicked) sendPort("?80\n");
+  if (btnIMUstopCal.clicked) sendPort("?81\n");
   //if (menuResponse.equals("mn19")) sendPort("?06,10000," + scalePI(yaw+PI/180.0*90.0) + ",1.0\n");
-  if (menuResponse.equals("mn19")) sendTravelLineDistance(10000, scalePI(yaw), 1.0);  
-  if (menuResponse.equals("mn22")) sendTravelLineDistance(20, scalePI(yaw), -1.0);  
-  if (menuResponse.equals("mn20")) sendPort("?85,10000," + scalePI(PI/180.0*90.0) + ",1.0\n");
-  if (menuResponse.equals("mn21")) sendStartRandomMowing();  
-  if (menuResponse.equals("mn13")) {
-    // reset particles
-    map.distributeParticlesOutline();
-    //map.overallDist = 0;
-    //mySerial.write("?16\n");
-  }
+  if (btnLine.clicked) sendTravelLineDistance(10000, scalePI(yaw), 1.0);  
+  if (btnLineRev.clicked) sendTravelLineDistance(20, scalePI(yaw), -1.0);  
+  if (btnLine90.clicked) sendPort("?85,10000," + scalePI(PI/180.0*90.0) + ",1.0\n");
+      
     
   menuResponse = null;
 }
@@ -552,18 +503,18 @@ void draw () {
     //comYaw = scalePI(yaw + PI/4); 
     /*pitch = scalePI(pitch + PI/300);
     roll = scalePI(roll + PI/300);*/
-    addPlotData(dataSpeedL, speedL );
-    addPlotData(dataSpeedR, speedR );    
+    plotSpeedL.addPlotData(speedL );
+    plotSpeedR.addPlotData(speedR );    
     //addPlotData(dataPeriL, random(-100, 100) );
     //addPlotData(dataPeriR, random(-100, 100) );
-    addPlotData(dataYaw,  yaw/PI*180.0);
+    plotYaw.addPlotData(yaw/PI*180.0);
     //addPlotData(dataComYaw,  comYaw/PI*180.0);
     /*addPlotData(dataComX, random(1000, 2000) );
     addPlotData(dataComY, random(0, 500) );
     addPlotData(dataComZ, random(-1000, -500) );
     addPlotData(dataEffL, random(-1, 1) );    
     addPlotData(dataEffR, random(-1, 1) );*/
-    addPlotData(dataProb, map.overallProb );
+    //plotProb.addPlotData(map.overallProb );
     map.stateLocalize = true;
     map.stateLocalizeOutline = true;
     float dist = 0;    
@@ -577,8 +528,8 @@ void draw () {
         periRight *= -1;
       }
     }
-    addPlotData(dataPeriL, periLeft);
-    addPlotData(dataPeriR, periRight);       
+    plotPeriL.addPlotData(periLeft);
+    plotPeriR.addPlotData(periRight);       
     if ( (abs(speedL) > 0) || (abs(speedR) > 0) ) map.run(yaw, dist, periLeft, periRight);
   }  
  //  if (!updateScreen) return;
@@ -593,16 +544,17 @@ void draw () {
   //drawHelp();
   drawInfo(550, 200);
   drawJoystick(400, 100);
-  drawCompass(580,100);
-  drawPlots(710, 10);  
+  drawCompass(580,100);   
   drawRobot(130,420);
-  drawMainMenu();
+  btnStop.update();
+  tabPlot.update();
+  tabMenu.update();  
   fill(0,0,0);
   text("console", 10,600);
   if (inString != null){           
     text(inString,10,630);    
   }
-  text("map", 10,30);
+  text("map", 10,40);
   map.draw();  
          
   if (!focused){
@@ -724,19 +676,19 @@ void processDataReceived(String data) {
         //map.robotState.y = Float.parseFloat(list[21]);
         periLeft = Integer.parseInt(list[8]);
         periRight = Integer.parseInt(list[9]);
-        addPlotData(dataPeriL, periLeft);
-        addPlotData(dataPeriR, periRight);
-        addPlotData(dataSpeedL, speedL);      
-        addPlotData(dataSpeedR, speedR);
-        addPlotData(dataYaw, yaw/PI*180.0);
-        addPlotData(dataComYaw, comYaw/PI*180.0);        
-        addPlotData(dataSenseL, Float.parseFloat(list[22]));
+        plotPeriL.addPlotData(periLeft);
+        plotPeriR.addPlotData(periRight);
+        plotSpeedL.addPlotData(speedL);      
+        plotSpeedR.addPlotData(speedR);
+        plotYaw.addPlotData(yaw/PI*180.0);
+        plotComYaw.addPlotData(comYaw/PI*180.0);        
+        /*addPlotData(dataSenseL, Float.parseFloat(list[22]));
         addPlotData(dataSenseR, Float.parseFloat(list[23]));
         addPlotData(dataSenseMow, Float.parseFloat(list[24]));
         addPlotData(dataFrictionL, Float.parseFloat(list[25]));        
-        addPlotData(dataFrictionR, Float.parseFloat(list[26]));        
+        addPlotData(dataFrictionR, Float.parseFloat(list[26]));*/        
         //addPlotData(dataProb, Float.parseFloat(list[27]));
-        addPlotData(dataProb, map.overallProb);
+        //plotProb.addPlotData(map.overallProb);
         batteryVoltage = Float.parseFloat(list[28]);
         motion = Integer.parseInt(list[29]);
         imuState = Integer.parseInt(list[30]);
@@ -757,20 +709,25 @@ void processDataReceived(String data) {
         int addr  = Integer.parseInt(list[2]);                
         float distance  = Float.parseFloat(list[3]);
         float power  = Float.parseFloat(list[4]);
-        if (addr == 1) addPlotData(dataRanging1, distance);
+        /*if (addr == 1) addPlotData(dataRanging1, distance);
         if (addr == 2) addPlotData(dataRanging2, distance);
-        if (addr == 3) addPlotData(dataRanging3, distance);
+        if (addr == 3) addPlotData(dataRanging3, distance);*/
       }
     }
     if (data.startsWith("!86")){
       // motor controller data
       String[] list = splitTokens(data, ",");
       //println(data);      
-      if (list.length >= 5){
-        addPlotData(dataDiffOdoIMU, Float.parseFloat(list[1]));
-        addPlotData(dataPIDimuError, Float.parseFloat(list[2]));                                             
-        addPlotData(dataPIDleftError, Float.parseFloat(list[3]));
-        addPlotData(dataPIDrightError, Float.parseFloat(list[4]));
+      if (list.length >= 10){
+        plotSenL.addPlotData(Float.parseFloat(list[1]));
+        plotSenR.addPlotData(Float.parseFloat(list[2]));
+        plotSenMow.addPlotData(Float.parseFloat(list[3]));
+        plotFrictionL.addPlotData(Float.parseFloat(list[4]));        
+        plotFrictionR.addPlotData(Float.parseFloat(list[5]));
+        plotDiffOdoIMU.addPlotData(Float.parseFloat(list[6]));
+        plotPIDimuError.addPlotData(Float.parseFloat(list[7]));                                             
+        plotPIDleftError.addPlotData(Float.parseFloat(list[8]));
+        plotPIDrightError.addPlotData(Float.parseFloat(list[9]));
       }
     }    
     if (data.startsWith("!76")){
@@ -805,17 +762,17 @@ void processDataReceived(String data) {
         comMag = 0.99 * comMag + 0.01 * sqrt(sq(comX) + sq(comY) + sq(comZ)); 
         if (millis() >= nextComPlotTime){
           //nextComPlotTime = millis() + 1000;
-          addPlotData(dataComX, comX);
-          addPlotData(dataComY, comY);
-          addPlotData(dataComZ, comZ);
+          plotComX.addPlotData(comX);
+          plotComY.addPlotData(comY);
+          plotComZ.addPlotData(comZ);
           /*if (abs(accXmax) > abs(accXmin))
             addPlotData(dataAccX, accXmax);
           else 
             addPlotData(dataAccX, accXmin);*/
-          addPlotData(dataAccX, accX);
-          addPlotData(dataAccY, accY);
-          addPlotData(dataAccZ, accZ);
-          addPlotData(dataComMag, comMag);
+          plotAccX.addPlotData(accX);
+          plotAccY.addPlotData(accY);
+          plotAccZ.addPlotData(accZ);
+          plotComMag.addPlotData(comMag);
           //pitch = Float.parseFloat(list[11]);
           //roll = Float.parseFloat(list[12]);
         }

@@ -568,6 +568,16 @@ void MotorClass::run() {
 
 	if (verboseOutput){
 		ROBOTMSG.print(F("!86,"));
+    ROBOTMSG.print(motorLeftSense);
+    ROBOTMSG.print(F(","));       
+    ROBOTMSG.print(motorRightSense);    
+    ROBOTMSG.print(F(","));       
+    ROBOTMSG.print(motorMowSense);
+    ROBOTMSG.print(F(","));           
+    ROBOTMSG.print(motorLeftFriction);
+    ROBOTMSG.print(F(","));               
+    ROBOTMSG.print(motorRightFriction);
+    ROBOTMSG.print(F(","));               		
 		ROBOTMSG.print(diffOdoIMU, 4);		
 		ROBOTMSG.print(F(","));
 		ROBOTMSG.print(imuPID.eold, 4);				

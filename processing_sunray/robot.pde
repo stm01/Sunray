@@ -75,6 +75,12 @@ static final int MOT_ROTATE_ANGLE   = 4;
 static final int MOT_STOP           = 5;
 static final int MOT_CAL_RAMP       = 6;
 
+String[] logStates = {"OFF", "PLAY", "REC"};
+static final int LOG_OFF      = 0;
+static final int LOG_PLAY     = 1;
+static final int LOG_REC      = 2;
+
+
 
 //Variables
 int mapVerbose = 1;
@@ -111,6 +117,7 @@ boolean joyActive = false;
 int state = 0;
 int imuState = IMU_RUN;
 int motion = MOT_STOP;
+int logState = LOG_OFF;
 int frq = 0;
 boolean mouseDragged = false;
 int packetsReceived = 0;
@@ -134,7 +141,9 @@ Plot plotSpeedL, plotSpeedR, plotYaw, plotComYaw, plotCom, plotPeriL, plotPeriR,
 Plot plotComY, plotComMag, plotSenL, plotSenR, plotSenMow, plotFrictionL, plotFrictionR;
 Plot plotPIDimuError,  plotDiffOdoIMU,   plotPIDleftError,   plotPIDrightError;
 Plot plotAccY, plotAccZ, plotAccX, plotProb; 
-  
+PrintWriter logOutput;
+BufferedReader logInput;
+
   
   // rescale to -PI..+PI
 float scalePI(float v)
@@ -211,12 +220,14 @@ void setup(PApplet parent){
   sheetPlotMisc = new Sheet(tabPlot, "2");
   tabPlot.activeSheet = sheetPlotMain;
   
-  tabMenu = new Tabsheet(null, 320,210,220,400);   
+  tabMenu = new Tabsheet(null, 320,200,220,400);   
   sheetMenuMain = new Sheet(tabMenu, "1");
   sheetMenuMisc = new Sheet(tabMenu, "2");
   tabMenu.activeSheet = sheetMenuMain;
   createPlots();
-  createMenu();  
+  createMenu();
+  
+  if (logState == LOG_PLAY) demo = true;
 
   if (!demo) {    
     if (useTcp) myTcp =  new Client(parent, tcpHost, tcpPort);  
@@ -252,6 +263,8 @@ void setup(PApplet parent){
   textAlign(LEFT);
   stroke(0, 0, 0);  
   //frameRate(30);
+  
+  logging(null);
 }
 
 
@@ -260,7 +273,7 @@ void drawInfo(int px, int py){
   int y = py;
   int w = 20;
   fill(0,0,0);         
-  text("--info--",                    x,y+0*w);  
+  text("logfile: "+logFile + " ("+logStates[logState]+")",   x,y+0*w);  
   text("port:  "+comPort,       x,y+1*w);
   text("pkts:  "+packetsReceived, x,y+2*w);
   text("time:  "+time,                 x,y+3*w);
@@ -330,7 +343,7 @@ void drawJoystick(int px, int py){
   int my = mouseY;
   float dx = (float(mx-cx))/((float)w/2);
   float dy = (float(my-cy))/((float)w/2);
-  if ((mouseDragged) && (abs(dx) < 1.5) && (abs(dy) < 1.5)){ 
+  if ((mouseDragged) && (abs(dx) < 1.1) && (abs(dy) < 1.1)){ 
     dx = min(1.0, max(-1.0, dx));
     dy = min(1.0, max(-1.0, dy));
     mx = mouseX;
@@ -402,8 +415,7 @@ void processMenu(){
   drawMenu(330, 200, menu);*/
   
   if (btnStop.clicked) {
-    // stop
-    btnStop.label = "BLUB";
+    // stop    
     map.stateMapping = false;
     map.stateLocalize = true;
     map.stateLocalizeOutline = false;
@@ -429,7 +441,10 @@ void processMenu(){
       map.startMapping();       
       //sendPort("?12\n");    
       sendPort("?11\n");
-    }
+    }  
+    String s = "OFF";
+    if (map.stateMapping) s = "ON";
+    btnMapping.label = "mapping is "+s;
   }
   if (btnResetParticles.clicked) {
     // reset particles
@@ -560,10 +575,12 @@ void draw () {
   if (!focused){
     //text("click window for keyboard input!", 10,550);    
   }
-  processMenu();  
+  processMenu();
+  if (logState == LOG_PLAY) logging(null);
 }
 
-void processDataReceived(String data) {    
+void processDataReceived(String data) {
+  if (logState == LOG_REC) logging(data); 
   if (data != null) {    
     data = trim(data);                // trim off whitespaces.
     packetsReceived++;    
@@ -791,10 +808,51 @@ void mouseReleased(){
       //e.printStackTrace();
       println("ERROR loading EEPROM file");
     }       
+  }  
+  
+
+  
+  public void logging(String data) {    
+    if (logState == LOG_OFF){    
+      if (logFile != ""){
+        File afile = new File(logFile);        
+        if (afile.exists()){
+          println("playing log from "+afile.getAbsolutePath());
+          logState = LOG_PLAY;
+          logInput = createReader(afile);
+        } else {
+          println("recording log to "+afile.getAbsolutePath());
+          logState = LOG_REC;
+          logOutput = createWriter(afile);
+        }
+      }
+    }    
+    if (logState == LOG_PLAY){
+       if (logInput == null) return;
+       String line = "";
+       try {
+         line = logInput.readLine();
+         processDataReceived(line);
+       } catch (IOException e) {
+         e.printStackTrace();
+         line = null;
+       }
+       if (line == null) {
+         // Stop reading because of an error or file is empty
+         noLoop();  
+         try {
+           logInput.close();
+         } catch (IOException e){
+           e.printStackTrace();
+         }
+         logInput = null;
+       }
+    }     
+    if (logState == LOG_REC){
+      logOutput.println(data);
+      logOutput.flush(); // Writes the remaining data to the file
+      //logOutput.close(); 
+    }
   }
 
-  
 }
-  
-
-  

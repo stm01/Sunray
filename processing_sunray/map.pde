@@ -319,9 +319,10 @@ class Map  {
   }
   
   public void save() {
-    println("saving map");
+    File afile = new File(MAP_FILENAME);
+    println("saving map to " + afile.getAbsolutePath());
     try{
-      FileOutputStream fout= new FileOutputStream (MAP_FILENAME);
+      FileOutputStream fout= new FileOutputStream (afile);
       ObjectOutputStream oos = new ObjectOutputStream(fout);      
       oos.writeObject(outlineList);
       oos.writeObject(mapData);
@@ -335,9 +336,10 @@ class Map  {
   }
   
   public void load() {    
-    println("loading map");
+    File afile = new File(MAP_FILENAME);
+    println("loading map from "+afile.getAbsolutePath());
     try{
-      FileInputStream fin= new FileInputStream (MAP_FILENAME);
+      FileInputStream fin= new FileInputStream (afile);
       ObjectInputStream ois = new ObjectInputStream(fin);
       outlineList = (ArrayList)ois.readObject();      
       mapData = (MapData[][])ois.readObject();

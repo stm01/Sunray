@@ -8,17 +8,15 @@ import processing.net.*;
 String comPort = "COM9";
 boolean useTcp = false;
 String tcpHost = "raspberrypi.local";
-String logFile = "test.log";
+String logFile = "indoor_track.log";
 int tcpPort = 8083;
 boolean useSatMap = false;
 double centerLat = 52.267312;    
 double centerLon = 8.609331;
-boolean demo = true;
-
+boolean demo = false;
+double meterPerPixel=0;
 
 Robot robot = new Robot();
-PImage satImg;
-double meterPerPixel=0;
 //Movie mov;
 
 
@@ -30,8 +28,7 @@ void setup () {
   //String url =  "http://raspberrypi.local:8081";
   //img = loadImage(url, "jpg");
   //mov = new Movie(this, url);  
-  //mov.play();
-  if (useSatMap) loadSatImage(centerLat, centerLon);    
+  //mov.play();    
 }
 
 /*
@@ -42,9 +39,6 @@ void movieEvent(Movie m) {
 
 void draw () {
   robot.draw();   
-  tint(255, 127);  // Display at half opacity
-  if (satImg != null) image(satImg, 0, 0);
-  //image(mov, 0, 0);
 }
 
 void serialEvent (Serial myPort) {
@@ -75,25 +69,6 @@ void mouseReleased(){
 }
 
 
-
-void loadSatImage(double lat, double lon){
-  String satFileName = sketchPath() + "\\map_" + lat + "_" + lon + ".png";
-  println(satFileName);
-  File f = new File(satFileName);
-  int zoom = 20;
-  meterPerPixel = (Math.cos(lat * Math.PI/180) * 2 * Math.PI * 6378137) / (256 * Math.pow(2, zoom));
-  print("meterPerPixel="+meterPerPixel);
-  if (!f.exists()){ 
-    String url = "http://maps.google.com/maps/api/staticmap?center=";    
-    url += lat + "," + lon;
-    url += "&zoom=" + zoom + "&size=640x640&maptype=satellite&sensor=false";
-    println(url);
-    satImg = loadImage(url, "png");
-    satImg.save(satFileName);
-  } else {
-    satImg = loadImage(satFileName, "png");
-  }
-}
 
 
 /*void movieEvent(Movie m) {

@@ -86,7 +86,7 @@ static final int LOG_REC      = 2;
 int mapVerbose = 1;
 int imuVerbose = 0;
 int motorVerbose = 0;
-Map map = new Map();
+Map map = null;
 HashMap<Integer, Integer> eeprom = new HashMap<Integer, Integer>();
 String menu;
 String menuResponse;
@@ -143,7 +143,8 @@ Plot plotPIDimuError,  plotDiffOdoIMU,   plotPIDleftError,   plotPIDrightError;
 Plot plotAccY, plotAccZ, plotAccX, plotProb; 
 PrintWriter logOutput;
 BufferedReader logInput;
-
+PImage satImg;
+int nextPlayTime = 0;
   
   // rescale to -PI..+PI
 float scalePI(float v)
@@ -200,6 +201,7 @@ void sendVerbose(){
 
 
 void sendPort(String s){
+  if (logState == LOG_PLAY) return;
   if (demo) return;
   if (useTcp) myTcp.write(s);
     else mySerial.write(s);
@@ -208,6 +210,8 @@ void sendPort(String s){
 
 void setup(PApplet parent){
   println("-----setup-----");
+  map = new Map();
+  if (useSatMap) satImg = loadSatImage(centerLat, centerLon);
 
   // List all the available serial ports
   print("Available serial ports: ");
@@ -215,7 +219,7 @@ void setup(PApplet parent){
   // Check the listed serial ports in your machine
   // and use the correct index number in Serial.list()[].
 
-  tabPlot = new Tabsheet(null, 720,0,475,680);   
+  tabPlot = new Tabsheet(null, 740,0,475,680);   
   sheetPlotMain = new Sheet(tabPlot, "1");
   sheetPlotMisc = new Sheet(tabPlot, "2");
   tabPlot.activeSheet = sheetPlotMain;
@@ -226,10 +230,17 @@ void setup(PApplet parent){
   tabMenu.activeSheet = sheetMenuMain;
   createPlots();
   createMenu();
-  
-  if (logState == LOG_PLAY) demo = true;
+  logging(null);  
 
-  if (!demo) {    
+  background(255);      // set inital background:
+  
+  pf = createFont("Arial Bold",14,true);
+  textFont(pf,14);
+  textAlign(LEFT);
+  stroke(0, 0, 0);  
+  //frameRate(30);
+  
+  if ((!demo) && (logState != LOG_PLAY))  {    
     if (useTcp) myTcp =  new Client(parent, tcpHost, tcpPort);  
       else mySerial = new Serial(parent, comPort, 115200, 'N', 8, 1);          
     // A serialEvent() is generated when a newline character is received :    
@@ -254,17 +265,7 @@ void setup(PApplet parent){
     sendVerbose();
     
     //if (mySerial != null) mySerial.buffer(32);    
-  }  
-
-  background(255);      // set inital background:
-  
-  pf = createFont("Arial Bold",14,true);
-  textFont(pf,14);
-  textAlign(LEFT);
-  stroke(0, 0, 0);  
-  //frameRate(30);
-  
-  logging(null);
+  }    
 }
 
 
@@ -570,13 +571,23 @@ void draw () {
     text(inString,10,630);    
   }
   text("map", 10,40);
-  map.draw();  
-         
+  map.draw();
+          
   if (!focused){
     //text("click window for keyboard input!", 10,550);    
   }
   processMenu();
-  if (logState == LOG_PLAY) logging(null);
+  
+  tint(255, 127);  // Display at half opacity
+  if (satImg != null) image(satImg, 0, 0);
+  //image(mov, 0, 0);    
+  
+  if (logState == LOG_PLAY) {
+    if (millis() >= nextPlayTime){
+      nextPlayTime = millis() + 10;
+      logging(null);
+    }
+  }
 }
 
 void processDataReceived(String data) {
@@ -789,7 +800,7 @@ void mouseReleased(){
   public void loadEEPROM() {    
     println("loadEEPROM");    
     try{
-      FileInputStream fin= new FileInputStream (EEPROM_FILENAME);
+      FileInputStream fin= new FileInputStream (sketchPath() + "\\data\\" + EEPROM_FILENAME);
       ObjectInputStream ois = new ObjectInputStream(fin);
       eeprom = (HashMap)ois.readObject();      
       fin.close();
@@ -814,8 +825,8 @@ void mouseReleased(){
   
   public void logging(String data) {    
     if (logState == LOG_OFF){    
-      if (logFile != ""){
-        File afile = new File(logFile);        
+      if ((logFile != "") && (logFile != null)){
+        File afile = new File(sketchPath() + "\\data\\" + logFile);        
         if (afile.exists()){
           println("playing log from "+afile.getAbsolutePath());
           logState = LOG_PLAY;
@@ -825,10 +836,11 @@ void mouseReleased(){
           logState = LOG_REC;
           logOutput = createWriter(afile);
         }
-      }
+        return;
+      }      
     }    
     if (logState == LOG_PLAY){
-       if (logInput == null) return;
+       if (logInput == null) return;       
        String line = "";
        try {
          line = logInput.readLine();
@@ -838,6 +850,7 @@ void mouseReleased(){
          line = null;
        }
        if (line == null) {
+         println("logging: EOF");
          // Stop reading because of an error or file is empty
          noLoop();  
          try {
@@ -849,10 +862,14 @@ void mouseReleased(){
        }
     }     
     if (logState == LOG_REC){
-      logOutput.println(data);
+      if (data == null) return;
+      logOutput.print(data);
       logOutput.flush(); // Writes the remaining data to the file
       //logOutput.close(); 
     }
   }
 
 }
+
+    
+    

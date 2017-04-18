@@ -82,3 +82,25 @@ void drawCompass(int cx, int cy, float yaw, float comYaw){
   fill(0,0,0);  
   text(float2String(yaw/PI*180.0), cx-20, cy+5);  
 }
+
+
+PImage loadSatImage(double lat, double lon){  
+  PImage satImg;
+  String satFileName = sketchPath() + "\\data\\map_" + lat + "_" + lon + ".png";
+  println(satFileName);
+  File f = new File(satFileName);
+  int zoom = 20;
+  meterPerPixel = (Math.cos(lat * Math.PI/180) * 2 * Math.PI * 6378137) / (256 * Math.pow(2, zoom));
+  print("meterPerPixel="+meterPerPixel);
+  if (!f.exists()){ 
+    String url = "http://maps.google.com/maps/api/staticmap?center=";    
+    url += lat + "," + lon;
+    url += "&zoom=" + zoom + "&size=640x640&maptype=satellite&sensor=false";
+    println(url);
+    satImg = loadImage(url, "png");
+    satImg.save(satFileName);
+  } else {
+    satImg = loadImage(satFileName, "png");
+  }
+  return satImg;
+}

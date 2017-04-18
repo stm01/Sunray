@@ -319,7 +319,7 @@ class Map  {
   }
   
   public void save() {
-    File afile = new File(MAP_FILENAME);
+    File afile = new File(sketchPath() + "\\data\\" + MAP_FILENAME);
     println("saving map to " + afile.getAbsolutePath());
     try{
       FileOutputStream fout= new FileOutputStream (afile);
@@ -336,7 +336,7 @@ class Map  {
   }
   
   public void load() {    
-    File afile = new File(MAP_FILENAME);
+    File afile = new File(sketchPath() + "\\data\\" + MAP_FILENAME);
     println("loading map from "+afile.getAbsolutePath());
     try{
       FileInputStream fin= new FileInputStream (afile);

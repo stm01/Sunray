@@ -133,8 +133,10 @@ float periLeft = 0;
 float periRight = 0;
 float distanceCmSet = 0;
 float angleRadSet = 0;
+boolean playPaused = true;
 Button btnMapping,btnStop,btnResetParticles,btnTrack,btnMowRand,btnMowLane,btnADCcal,btnMPUselftest;
 Button btnIMUstartCal,btnIMUstopCal,btnMow50,btnMowON,btnMowOFF,btnLine,btnLineRev,btnLine90,btnRotate90;
+Button btnPlayPaused = null;
 Tabsheet tabPlot, tabMenu;
 Sheet sheetPlotMain,sheetPlotMisc,sheetMenuMain,sheetMenuMisc;
 Plot plotSpeedL, plotSpeedR, plotYaw, plotComYaw, plotCom, plotPeriL, plotPeriR, plotComZ, plotComX;
@@ -227,10 +229,10 @@ void setup(PApplet parent){
   tabMenu = new Tabsheet(null, 320,200,220,400);   
   sheetMenuMain = new Sheet(tabMenu, "1");
   sheetMenuMisc = new Sheet(tabMenu, "2");
-  tabMenu.activeSheet = sheetMenuMain;
+  tabMenu.activeSheet = sheetMenuMain;  
+  logging(null);
   createPlots();
   createMenu();
-  logging(null);  
 
   background(255);      // set inital background:
   
@@ -325,7 +327,7 @@ void createPlots(){
   plotAccY = new Plot(sheetPlotMain,0, -1, 1, "accY",   x, y+7*ploth, plotw, ploth, 120, 120, 0);
   plotAccZ = new Plot(sheetPlotMain,1, -1, 1, "accZ",   x, y+7*ploth, plotw, ploth, 0, 0, 127);
   plotAccX = new Plot(sheetPlotMain,2, -1, 1, "accX",   x, y+7*ploth, plotw, ploth, 255, 0, 0);
-  //plot(0, -0.1, 1.1, dataProb,   "prob",   x, y+6*ploth, 255, 0, 0);  
+  plotProb = new Plot(sheetPlotMisc, 0, -0.1, 1.1, "prob",   x, y+0*ploth, plotw, ploth, 255, 0, 0);  
 }
 
 void drawJoystick(int px, int py){
@@ -381,10 +383,16 @@ void drawJoystick(int px, int py){
 }
 
 void createMenu(){
-  String s = "OFF";
-  if (map.stateMapping) s = "ON";
+  String s; 
   int h = 26;
-  btnStop  = new Button(null, 0, 0, 220, 26, "STOP");
+  btnStop  = new Button(null, 0, 0, 100, 26, "STOP");
+  if (logState == LOG_PLAY){
+    s = "Playing";
+    if (playPaused) s += " paused";
+    btnPlayPaused  = new Button(null, 100, 0, 150, 26, s);
+  }
+  s = "OFF";
+  if (map.stateMapping) s = "ON";
   btnMapping  = new Button(sheetMenuMain, 0, h*0, 220, 26, "mapping is "+s);
   btnResetParticles  = new Button(sheetMenuMain, 0, h*1, 220, 26, "reset particles");
   btnTrack  = new Button(sheetMenuMain, 0, h*2, 220, 26, "track");   
@@ -414,7 +422,7 @@ void processMenu(){
   menu += "|mn13~reset particles";
   menu += "|mn6~ADC cal|mn16~MPU selftest|mn17~IMU start cal|mn18~IMU stop cal|mn24~map verbose|mn23~motor verbose|mn8~IMU verbose|mn9~mow 50% ON|mn11~mow ON|mn10~mow OFF|mn15~rotate +90deg}";
   drawMenu(330, 200, menu);*/
-  
+    
   if (btnStop.clicked) {
     // stop    
     map.stateMapping = false;
@@ -422,6 +430,13 @@ void processMenu(){
     map.stateLocalizeOutline = false;
     map.stateMowing = false;
     sendPort("?00\n");
+  }
+  if ((btnPlayPaused != null) && (btnPlayPaused.clicked)){
+    // pause/play
+    playPaused = !playPaused;
+    String s = "Playing";
+    if (playPaused) s += " paused";
+    btnPlayPaused.label = s; 
   }
   if (btnTrack.clicked) {
     // track
@@ -563,6 +578,7 @@ void draw () {
   drawCompass(580,100,yaw,comYaw);   
   drawRobot(130,420, pitch, roll);
   btnStop.update();
+  if (btnPlayPaused != null) btnPlayPaused.update();
   tabPlot.update();
   tabMenu.update();  
   fill(0,0,0);
@@ -583,9 +599,11 @@ void draw () {
   //image(mov, 0, 0);    
   
   if (logState == LOG_PLAY) {
-    if (millis() >= nextPlayTime){
-      nextPlayTime = millis() + 10;
-      logging(null);
+    if (!playPaused){
+      //if (millis() >= nextPlayTime){
+        nextPlayTime = millis() + 10;
+        logging(null);
+      //}
     }
   }
 }
@@ -606,7 +624,8 @@ void processDataReceived(String data) {
       if (list.length >= 3){
         float distance = Float.parseFloat(list[1]);
         float yaw = Float.parseFloat(list[2]);
-        map.run(yaw, distance, periLeft, periRight); 
+        map.run(yaw, distance, periLeft, periRight);
+        plotProb.addPlotData(map.overallProb);
       }      
     }    
     if (data.startsWith("!01")){
@@ -638,8 +657,7 @@ void processDataReceived(String data) {
         addPlotData(dataSenseMow, Float.parseFloat(list[24]));
         addPlotData(dataFrictionL, Float.parseFloat(list[25]));        
         addPlotData(dataFrictionR, Float.parseFloat(list[26]));*/        
-        //addPlotData(dataProb, Float.parseFloat(list[27]));
-        //plotProb.addPlotData(map.overallProb);
+        //addPlotData(dataProb, Float.parseFloat(list[27]));        
         batteryVoltage = Float.parseFloat(list[28]);
         motion = Integer.parseInt(list[29]);
         imuState = Integer.parseInt(list[30]);
@@ -851,8 +869,7 @@ void mouseReleased(){
        }
        if (line == null) {
          println("logging: EOF");
-         // Stop reading because of an error or file is empty
-         noLoop();  
+         // Stop reading because of an error or file is empty  
          try {
            logInput.close();
          } catch (IOException e){

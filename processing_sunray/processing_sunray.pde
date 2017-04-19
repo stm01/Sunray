@@ -8,7 +8,7 @@ import processing.net.*;
 String comPort = "COM9";
 boolean useTcp = false;
 String tcpHost = "raspberrypi.local";
-String logFile = "outdoor_track.log";
+String logFile = "outdoor_mow_rand.log";
 int tcpPort = 8083;
 boolean useSatMap = false;
 double centerLat = 52.267312;    

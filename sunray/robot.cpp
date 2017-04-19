@@ -492,7 +492,7 @@ void RobotClass::startRandomMowing(){
   mowState = MOW_LINE;
   mowingAngle = IMU.getYaw();
   mowingDirection = mowingAngle-PI/2;
-  Motor.travelLineDistance(10000, mowingAngle, 1.0);
+  Motor.travelLineDistance(100000, mowingAngle, 1.0);
 }
 
 void RobotClass::startTrackingForEver(){  
@@ -584,7 +584,7 @@ void RobotClass::mow(){
           //DEBUGLN(F("MOW_ENTER_LINE"));
         } else {
           mowState = MOW_LINE;
-          Motor.travelLineDistance(300, mowingAngle, 1.0);
+          Motor.travelLineDistance(100000, mowingAngle, 1.0);
           //DEBUGLN(F("MOW_LINE"));
         }
       }
@@ -618,7 +618,7 @@ void RobotClass::mow(){
       break;
     case MOW_ENTER_LINE:
       if (Motor.motion == MOT_STOP){
-        Motor.travelLineDistance(3000, mowingAngle, 1.0);
+        Motor.travelLineDistance(100000, mowingAngle, 1.0);
         mowState = MOW_LINE;
         //DEBUGLN(F("MOW_LINE"));
         lastStartLineTime = millis();
@@ -628,7 +628,7 @@ void RobotClass::mow(){
       //if (!Perimeter.isInside()) Motor.stopSlowly();
       if ( (!Perimeter.isInside()) || (Motor.motion == MOT_STOP)  ){      
         Motor.stopImmediately();
-        Motor.travelLineDistance(15, mowingAngle, -reverseSpeedPerc);
+        Motor.travelLineDistance(50, mowingAngle, -reverseSpeedPerc);
         mowState = MOW_REV;
         //DEBUGLN(F("MOW_REV"));
       }

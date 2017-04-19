@@ -142,7 +142,7 @@ Sheet sheetPlotMain,sheetPlotMisc,sheetMenuMain,sheetMenuMisc;
 Plot plotSpeedL, plotSpeedR, plotYaw, plotComYaw, plotCom, plotPeriL, plotPeriR, plotComZ, plotComX;
 Plot plotComY, plotComMag, plotSenL, plotSenR, plotSenMow, plotFrictionL, plotFrictionR;
 Plot plotPIDimuError,  plotDiffOdoIMU,   plotPIDleftError,   plotPIDrightError;
-Plot plotAccY, plotAccZ, plotAccX, plotProb, plotParticlesDist; 
+Plot plotAccY, plotAccZ, plotAccX, plotProb, plotParticlesDist,  plotSmoothProb; 
 PrintWriter logOutput;
 BufferedReader logInput;
 PImage satImg;
@@ -291,6 +291,7 @@ void drawInfo(int px, int py){
   text("Y:     "+float2String(map.robotState.y),         x,y+12*w);
   text("dist:  "+float2String(map.overallDist),          x,y+13*w);
   text("voltage:  "+float2String(batteryVoltage),          x,y+14*w);
+  text("localize outline: "+ map.stateLocalizeOutline,          x,y+15*w);
 }
 
 
@@ -327,7 +328,8 @@ void createPlots(){
   plotAccY = new Plot(sheetPlotMain,0, -1, 1, "accY",   x, y+7*ploth, plotw, ploth, 120, 120, 0);
   plotAccZ = new Plot(sheetPlotMain,1, -1, 1, "accZ",   x, y+7*ploth, plotw, ploth, 0, 0, 127);
   plotAccX = new Plot(sheetPlotMain,2, -1, 1, "accX",   x, y+7*ploth, plotw, ploth, 255, 0, 0);
-  plotProb = new Plot(sheetPlotMisc, 0, -0.1, 1.1, "prob",   x, y+0*ploth, plotw, ploth, 255, 0, 0);  
+  plotProb = new Plot(sheetPlotMisc, 0, -0.1, 1.1, "prob",   x, y+0*ploth, plotw, ploth, 255, 0, 0);
+  plotSmoothProb = new Plot(sheetPlotMisc, 1, -0.1, 1.1, "prob",   x, y+0*ploth, plotw, ploth, 0, 255, 0);
   plotParticlesDist = new Plot(sheetPlotMisc, 0, -30, 30, "partDist",   x, y+1*ploth, plotw, ploth, 255, 0, 0);  
 }
 
@@ -627,6 +629,7 @@ void processDataReceived(String data) {
         float yaw = Float.parseFloat(list[2]);
         map.run(yaw, distance, periLeft, periRight);
         plotProb.addPlotData(map.overallProb);
+        plotSmoothProb.addPlotData(map.smoothOverallProb);
         plotParticlesDist.addPlotData(map.particlesDistance);
       }      
     }    
@@ -647,7 +650,11 @@ void processDataReceived(String data) {
         //map.robotState.x = Float.parseFloat(list[20]);
         //map.robotState.y = Float.parseFloat(list[21]);
         periLeft = Integer.parseInt(list[8]);
-        periRight = Integer.parseInt(list[9]);
+        periRight = Integer.parseInt(list[9]);        
+        if ((periLeft < 0) && (periLeft > -900) && (periRight > 0)) periLeft = 1;
+        else if ((periLeft > 0) && (periLeft < 900) && (periRight < 0)) periLeft = -1;
+        else if ((periRight < 0) && (periRight > -900) && (periLeft > 0)) periRight = 1;
+        else if ((periRight > 0) && (periRight < 900) && (periLeft < 0)) periRight = -1;
         plotPeriL.addPlotData(periLeft);
         plotPeriR.addPlotData(periRight);
         plotSpeedL.addPlotData(speedL);      

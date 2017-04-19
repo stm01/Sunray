@@ -8,7 +8,7 @@ class Map  {
   public static final int MAP_SIZE_Y = 50;
   
   public static final int OUTLINE_SIZE = 500;
-  public static final int PARTICLES = 500;
+  public static final int PARTICLES = 5000;
   
   public static final int MAP_DATA_SIGNAL_MAX = 31;
   
@@ -19,9 +19,9 @@ class Map  {
   public static final int DRAW_Y = 50;
   
   public static final int perimeterWireLengthMeter = 15;
-  public static final float steeringNoise = 0.005;
-  public static final float distanceNoise = 0.01;
-  public static final float measurementNoise = 0.01;
+  public static final float steeringNoise = 0.5;
+  public static final float distanceNoise = 0.15;
+  //public static final float measurementNoise = 0.01;
   
   public class RobotState   {
     public float x;
@@ -32,6 +32,7 @@ class Map  {
   public float mapScaleX = 0;
   public float mapScaleY = 0;
   public float overallProb = 0;
+  public float smoothOverallProb = 0;
   public float currMapX = 0;
   public float currMapY = 0;
   public float particlesDistanceX = 0;
@@ -120,13 +121,15 @@ class Map  {
       particlesMotion(course, distanceSum);
       sense(leftMag, rightMag);
       computeParticlesState();     
-      hasLocalized = (particlesDistance<3);            
+      if (particlesDistance<6) hasLocalized = true;            
       if (hasLocalized){
-        if ( overallProb > 0.9 ){ 
+        if ( smoothOverallProb > 0.5 ){ 
           robotState.x = particlesState.x;
           robotState.y = particlesState.y;
         } else{
-          if (stateLocalizeOutline) distributeParticlesOutline();
+          //if (stateLocalizeOutline) distributeParticlesOutline();
+          if ((leftMag > 0) || (rightMag > 0)) distributeParticlesOutline();
+          hasLocalized = false;
         }
       }
       if (stateMowing){
@@ -683,7 +686,7 @@ class Map  {
     for (int i=0; i < PARTICLES; i++){
       float measurement_prob1 = measurementProb(i, leftMag, rightMag);
       overallProb += measurement_prob1 / ((float)PARTICLES);
-      int idx = int(random(1.0) * PARTICLES);
+      int idx = int(random(PARTICLES));
       float measurement_prob2 = measurementProb(idx, leftMag, rightMag);    
       //float rnd = ((float)rand())/((float)RAND_MAX);
       if (measurement_prob1 > measurement_prob2){
@@ -691,12 +694,13 @@ class Map  {
         particles[idx].x = particles[i].x;
         particles[idx].y = particles[i].y;
       } 
-      else if (measurement_prob2 >  measurement_prob1) {      
+      else if (measurement_prob2 >=  measurement_prob1) {      
         //if (rnd > 0.5) 
         particles[i].x = particles[idx].x;
         particles[i].y = particles[idx].y;
       }
     }
+    smoothOverallProb = 0.9 * smoothOverallProb + 0.1 * overallProb;
   }
 
 

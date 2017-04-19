@@ -767,7 +767,17 @@ void processDataReceived(String data) {
     if (data.startsWith("!15")){
       // particles
       particles = data;       
-    }           
+    }
+    if (data.startsWith("!99")){
+      // marker
+      println("add marker");
+      String[] list = splitTokens(data, ",");
+      if (list.length >= 3){                
+        float x= Float.parseFloat(list[1]);
+        float y= Float.parseFloat(list[2]);
+        map.addMarker(x,y);        
+      }      
+    }
     updateScreen=true;
   }
 }
@@ -793,10 +803,12 @@ void mouseClicked(){
   mouseClicked = true;
   int x = mouseX;
   int y = mouseY;
-  if (map.isInsideWindow(x,y)){
+  /*if (map.isInsideWindow(x,y)){
     map.setRobotPositionManual(x, y);
     map.overallDist = 0;
-  }
+  }*/
+  PVector pt = map.getMarker(x, y);
+  if (pt != null) processDataReceived("!99,"+ float2String(pt.x)+"," + float2String(pt.y)+"\n");
 }
 
 void mouseMoved(){      

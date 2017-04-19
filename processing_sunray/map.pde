@@ -49,7 +49,8 @@ class Map  {
           
   public MapData[][] mapData = new MapData[MAP_SIZE_Y][MAP_SIZE_X];  
   public ArrayList<PVector> outlineList = new ArrayList<PVector>();
-  public RobotState[] particles = new RobotState[PARTICLES]; 
+  public ArrayList<PVector> markerList = new ArrayList<PVector>();
+  public RobotState[] particles = new RobotState[PARTICLES];   
   public RobotState robotState = new RobotState();
   public RobotState particlesState = new RobotState();
   protected float distanceSum = 0;
@@ -165,10 +166,11 @@ class Map  {
     strokeWeight(0);
     fill(200, 200, 200);
     rect(px, py, w, h); 
-    drawOutline();
-    drawMap();
-    drawParticles();    
-    drawRobotPos();
+    drawOutline();    
+    drawMap();    
+    drawParticles();
+    drawMarker();
+    drawRobotPos();    
   }
   
   public void drawParticles(){
@@ -245,12 +247,32 @@ class Map  {
     }
   }
   
+  public void drawMarker(){    
+    int px = DRAW_X;
+    int py = DRAW_Y;
+    int dh = DRAW_HEIGHT;
+    int dw = DRAW_WIDTH;
+    int mw = MAP_SIZE_X;
+    int mh = MAP_SIZE_Y;            
+    int stepx = Math.round(  ((float)dw) / ((float)mw) );
+    int stepy = Math.round( ((float)dh) / ((float)mh) );
+    fill(100,0,240);
+    strokeWeight(0);
+    for (int i=0; i < markerList.size(); i++){
+      PVector pt = markerList.get(i);
+      float cx = pt.x;
+      float cy = pt.y;
+      ellipse(px + Math.round(cx*mapScaleX*stepx), py + DRAW_HEIGHT-Math.round(cy*mapScaleY*stepy), 10, 10);           
+    }
+  }
+    
   public boolean isInsideWindow(int px, int py){
     return (    (px >= DRAW_X) && (px < DRAW_X+DRAW_WIDTH) 
              && (py >= DRAW_Y) && (py < DRAW_Y+DRAW_HEIGHT)  );       
   }
   
   public void setRobotPositionManual(int px, int py){
+    if (!isInsideWindow(px,py)) return;
     px -= DRAW_X;
     py -= DRAW_Y;
     int stepx = Math.round( ((float)DRAW_WIDTH) / ((float)MAP_SIZE_X) );
@@ -265,6 +287,28 @@ class Map  {
     }
     robotState.x = x;
     robotState.y = y;
+  }
+  
+  public PVector getMarker(int px, int py){
+    if (!isInsideWindow(px,py)) return null;
+    px -= DRAW_X;
+    py -= DRAW_Y;
+    int stepx = Math.round( ((float)DRAW_WIDTH) / ((float)MAP_SIZE_X) );
+    int stepy = Math.round( ((float)DRAW_HEIGHT) / ((float)MAP_SIZE_Y) );    
+    PVector pt = new PVector();
+    float x = px/(mapScaleX*stepx);
+    float y = (DRAW_HEIGHT-py)/(mapScaleY*stepy);
+    pt.x = x;
+    pt.y = y;
+    return pt;
+  }
+  
+  public void addMarker(float x, float y){          
+    PVector pt=new PVector();
+    pt.x=x;
+    pt.y=y;
+    markerList.clear();
+    markerList.add(pt);
   }
  
   
@@ -340,34 +384,36 @@ class Map  {
   public void save() {
     File afile = new File(sketchPath() + "\\data\\" + MAP_FILENAME);
     println("saving map to " + afile.getAbsolutePath());
+    FileOutputStream fout = null;
     try{
-      FileOutputStream fout= new FileOutputStream (afile);
+      fout = new FileOutputStream (afile);
       ObjectOutputStream oos = new ObjectOutputStream(fout);      
       oos.writeObject(outlineList);
       oos.writeObject(mapData);
       oos.writeObject(mapScaleX);
-      oos.writeObject(mapScaleY);
+      oos.writeObject(mapScaleY);      
       fout.close();
     } catch (Exception e){
       //e.printStackTrace();
-      println("ERROR saving map file");
+      println("ERROR saving map file");      
     }    
   }
   
   public void load() {    
     File afile = new File(sketchPath() + "\\data\\" + MAP_FILENAME);
     println("loading map from "+afile.getAbsolutePath());
+    FileInputStream fin = null;
     try{
-      FileInputStream fin= new FileInputStream (afile);
+      fin = new FileInputStream (afile);
       ObjectInputStream ois = new ObjectInputStream(fin);
       outlineList = (ArrayList)ois.readObject();      
       mapData = (MapData[][])ois.readObject();
       mapScaleX = (float)ois.readObject();
-      mapScaleY = (float)ois.readObject();
+      mapScaleY = (float)ois.readObject();      
       fin.close();
     } catch (Exception e){
       //e.printStackTrace();
-      println("ERROR loading map file");
+      println("ERROR loading map file");      
     }
   }
   

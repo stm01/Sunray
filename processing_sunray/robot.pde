@@ -142,7 +142,7 @@ Sheet sheetPlotMain,sheetPlotMisc,sheetMenuMain,sheetMenuMisc;
 Plot plotSpeedL, plotSpeedR, plotYaw, plotComYaw, plotCom, plotPeriL, plotPeriR, plotComZ, plotComX;
 Plot plotComY, plotComMag, plotSenL, plotSenR, plotSenMow, plotFrictionL, plotFrictionR;
 Plot plotPIDimuError,  plotDiffOdoIMU,   plotPIDleftError,   plotPIDrightError;
-Plot plotAccY, plotAccZ, plotAccX, plotProb; 
+Plot plotAccY, plotAccZ, plotAccX, plotProb, plotParticlesDist; 
 PrintWriter logOutput;
 BufferedReader logInput;
 PImage satImg;
@@ -328,6 +328,7 @@ void createPlots(){
   plotAccZ = new Plot(sheetPlotMain,1, -1, 1, "accZ",   x, y+7*ploth, plotw, ploth, 0, 0, 127);
   plotAccX = new Plot(sheetPlotMain,2, -1, 1, "accX",   x, y+7*ploth, plotw, ploth, 255, 0, 0);
   plotProb = new Plot(sheetPlotMisc, 0, -0.1, 1.1, "prob",   x, y+0*ploth, plotw, ploth, 255, 0, 0);  
+  plotParticlesDist = new Plot(sheetPlotMisc, 0, -30, 30, "partDist",   x, y+1*ploth, plotw, ploth, 255, 0, 0);  
 }
 
 void drawJoystick(int px, int py){
@@ -626,6 +627,7 @@ void processDataReceived(String data) {
         float yaw = Float.parseFloat(list[2]);
         map.run(yaw, distance, periLeft, periRight);
         plotProb.addPlotData(map.overallProb);
+        plotParticlesDist.addPlotData(map.particlesDistance);
       }      
     }    
     if (data.startsWith("!01")){

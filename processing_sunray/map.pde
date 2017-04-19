@@ -120,7 +120,7 @@ class Map  {
       particlesMotion(course, distanceSum);
       sense(leftMag, rightMag);
       computeParticlesState();     
-      hasLocalized = (particlesDistance<2.5);            
+      hasLocalized = (particlesDistance<3);            
       if (hasLocalized){
         if ( overallProb > 0.9 ){ 
           robotState.x = particlesState.x;
@@ -662,7 +662,7 @@ class Map  {
     if (stateLocalizeOutline){
       // tracking perimeter
       //prob = gaussian(strength, measurementNoise, 1.0);    
-      if (md.signal < MAP_DATA_SIGNAL_MAX-3) return 0;
+      if (md.signal < MAP_DATA_SIGNAL_MAX-1) return 0;
       //return ((float)md.s.signal) / ((float)MAP_DATA_SIGNAL_MAX);
     } else if (stateLocalize) {
       // mowing

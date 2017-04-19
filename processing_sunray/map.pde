@@ -3,7 +3,7 @@ import java.io.*;
 
 class Map  {
   
-  public static final String MAP_FILENAME = "map.bin";
+  public static final String MAP_FILENAME = "outdoor_map.bin";
   public static final int MAP_SIZE_X = 50;
   public static final int MAP_SIZE_Y = 50;
   
@@ -15,7 +15,7 @@ class Map  {
   public static final int DRAW_WIDTH = 300;
   public static final int DRAW_HEIGHT = 300;
   
-  public static final int DRAW_X = 10;
+  public static final int DRAW_X = 10; 
   public static final int DRAW_Y = 50;
   
   public static final int perimeterWireLengthMeter = 15;
@@ -78,8 +78,8 @@ class Map  {
   
   public void startMapping(){
     println("startMapping");
-    mapScaleX = 5;
-    mapScaleY = 5;
+    mapScaleX = 2;
+    mapScaleY = 2;
     clearOutline();
     stateMapping=true;
     stateLocalize=false;
@@ -217,18 +217,26 @@ class Map  {
   
   public void drawOutline(){    
     int px = DRAW_X;
-    int py = DRAW_Y;    
+    int py = DRAW_Y;
+    int dh = DRAW_HEIGHT;
+    int dw = DRAW_WIDTH;
+    int mw = MAP_SIZE_X;
+    int mh = MAP_SIZE_Y;
+    if (stateMapping){
+      px = 600;
+      py = 0;
+    }        
     stroke(200,80,0);
     strokeWeight(3);
     if (outlineList.size() < 3) return;    
-    int stepx = Math.round(  ((float)DRAW_WIDTH) / ((float)MAP_SIZE_X) );
-    int stepy = Math.round( ((float)DRAW_HEIGHT) / ((float)MAP_SIZE_Y) );      
+    int stepx = Math.round(  ((float)dw) / ((float)mw) );
+    int stepy = Math.round( ((float)dh) / ((float)mh) );      
     PVector ptLast = null;    
     for (int i=0; i < outlineList.size(); i++){
       PVector pt = outlineList.get(i);
       if (i > 0){                       
-        line(px + ptLast.x * mapScaleX*stepx, py + DRAW_HEIGHT - ptLast.y * mapScaleY*stepy, 
-             px + pt.x     * mapScaleX*stepx, py + DRAW_HEIGHT - pt.y     * mapScaleY*stepy);
+        line(px + ptLast.x * mapScaleX*stepx, py + dh - ptLast.y * mapScaleY*stepy, 
+             px + pt.x     * mapScaleX*stepx, py + dh - pt.y     * mapScaleY*stepy);
       }
       ptLast = pt;
     }
@@ -259,7 +267,15 @@ class Map  {
   
   public void drawRobotPos(){  
     int px = DRAW_X;
-    int py = DRAW_Y;    
+    int py = DRAW_Y;
+    int dh = DRAW_HEIGHT;
+    int dw = DRAW_WIDTH;
+    int mw = MAP_SIZE_X;
+    int mh = MAP_SIZE_Y;
+    if (stateMapping){
+      px = 600;
+      py = 0;
+    }        
     pushMatrix();
     translate(0,0,1);  
     strokeWeight(2);
@@ -268,10 +284,10 @@ class Map  {
       fill(0,150,0);
     else
       fill(255,0,0);
-    int stepx = Math.round( ((float)DRAW_WIDTH) / ((float)MAP_SIZE_X) );
-    int stepy = Math.round( ((float)DRAW_HEIGHT) / ((float)MAP_SIZE_Y) );  
+    int stepx = Math.round( ((float)dw) / ((float)mw) );
+    int stepy = Math.round( ((float)dh) / ((float)mh) );  
     int cx = px + Math.round(robotState.x*mapScaleX*stepx); 
-    int cy = py + DRAW_HEIGHT-Math.round(robotState.y*mapScaleY*stepy);
+    int cy = py + dh-Math.round(robotState.y*mapScaleY*stepy);
     ellipse(cx, cy, 20, 20);    
     stroke(0,0,0);        
     line(cx, cy, cx + Math.round(15*cos(robot.angleRadSet)), cy - Math.round(15*sin(robot.angleRadSet)) );    

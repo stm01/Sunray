@@ -221,7 +221,7 @@ void setup(PApplet parent){
   // Check the listed serial ports in your machine
   // and use the correct index number in Serial.list()[].
 
-  tabPlot = new Tabsheet(null, 740,0,475,680);   
+  tabPlot = new Tabsheet(null, 750,0,475,680);   
   sheetPlotMain = new Sheet(tabPlot, "1");
   sheetPlotMisc = new Sheet(tabPlot, "2");
   tabPlot.activeSheet = sheetPlotMain;
@@ -276,7 +276,7 @@ void drawInfo(int px, int py){
   int y = py;
   int w = 20;
   fill(0,0,0);         
-  text("logfile: "+logFile + " ("+logStates[logState]+")",   x,y+0*w);  
+  text("log: "+logFile + " ("+logStates[logState]+")",   x,y+0*w);  
   text("port:  "+comPort,       x,y+1*w);
   text("pkts:  "+packetsReceived, x,y+2*w);
   text("time:  "+time,                 x,y+3*w);

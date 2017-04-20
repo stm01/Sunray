@@ -19,8 +19,8 @@ class Map  {
   public static final int DRAW_Y = 50;
   
   public static final int perimeterWireLengthMeter = 15;
-  public static final float steeringNoise = 0.5;
-  public static final float distanceNoise = 0.15;
+  public static final float steeringNoise = 0.5;  // tracking 0.005 , mowing 0.5
+  public static final float distanceNoise = 0.15; // tracking 0.01  , mowing 0.15 
   //public static final float measurementNoise = 0.01;
   
   public class RobotState   {
@@ -122,7 +122,7 @@ class Map  {
       particlesMotion(course, distanceSum);
       sense(leftMag, rightMag);
       computeParticlesState();     
-      if (particlesDistance<6) hasLocalized = true;            
+      if (particlesDistance<10) hasLocalized = true;            
       if (hasLocalized){
         if ( smoothOverallProb > 0.5 ){ 
           robotState.x = particlesState.x;
@@ -165,7 +165,7 @@ class Map  {
     stroke(255, 0, 0);
     strokeWeight(0);
     fill(200, 200, 200);
-    rect(px, py, w, h); 
+    rect(px, py, w, h);    
     drawOutline();    
     drawMap();    
     drawParticles();
@@ -256,13 +256,14 @@ class Map  {
     int mh = MAP_SIZE_Y;            
     int stepx = Math.round(  ((float)dw) / ((float)mw) );
     int stepy = Math.round( ((float)dh) / ((float)mh) );
-    fill(100,0,240);
-    strokeWeight(0);
+    fill(0,0,127);
+    stroke(255,255,255);
+    strokeWeight(1);
     for (int i=0; i < markerList.size(); i++){
       PVector pt = markerList.get(i);
       float cx = pt.x;
       float cy = pt.y;
-      ellipse(px + Math.round(cx*mapScaleX*stepx), py + DRAW_HEIGHT-Math.round(cy*mapScaleY*stepy), 10, 10);           
+      ellipse(px + Math.round(cx*mapScaleX*stepx), py + DRAW_HEIGHT-Math.round(cy*mapScaleY*stepy), 15, 15);           
     }
   }
     

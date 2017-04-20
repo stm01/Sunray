@@ -650,11 +650,15 @@ void processDataReceived(String data) {
         //map.robotState.x = Float.parseFloat(list[20]);
         //map.robotState.y = Float.parseFloat(list[21]);
         periLeft = Integer.parseInt(list[8]);
-        periRight = Integer.parseInt(list[9]);        
-        if ((periLeft < 0) && (periLeft > -900) && (periRight > 0)) periLeft = 1;
-        else if ((periLeft > 0) && (periLeft < 900) && (periRight < 0)) periLeft = -1;
-        else if ((periRight < 0) && (periRight > -900) && (periLeft > 0)) periRight = 1;
-        else if ((periRight > 0) && (periRight < 900) && (periLeft < 0)) periRight = -1;
+        periRight = Integer.parseInt(list[9]);                
+        if (plotPeriL.list.size() > 0){
+          float lastPeriLeft = plotPeriL.list.get(plotPeriL.list.size()-1);
+          float lastPeriRight = plotPeriR.list.get(plotPeriR.list.size()-1);
+          if ((periLeft >= 0) && (periLeft < 1500) && (lastPeriLeft < 0)) periLeft = lastPeriLeft; 
+          if ((periLeft <= 0) && (periLeft > -1500) && (lastPeriLeft > 0)) periLeft = lastPeriLeft;
+          if ((periRight >= 0) && (periRight < 1500) && (lastPeriRight < 0)) periRight = lastPeriRight; 
+          if ((periRight <= 0) && (periRight > -1500) && (lastPeriRight > 0)) periRight = lastPeriRight;                    
+        }
         plotPeriL.addPlotData(periLeft);
         plotPeriR.addPlotData(periRight);
         plotSpeedL.addPlotData(speedL);      

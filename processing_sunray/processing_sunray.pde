@@ -8,12 +8,12 @@ import processing.net.*;
 String comPort = "COM9";
 boolean useTcp = false;
 String tcpHost = "raspberrypi.local";
-String logFile = "test.log";
+String logFile = "outdoor_mow_rand.log";
 int tcpPort = 8083;
 boolean useSatMap = false;
 double centerLat = 52.267312;    
 double centerLon = 8.609331;
-boolean demo = true;
+boolean demo = false;
 double meterPerPixel=0;
 
 Robot robot = new Robot();

@@ -20,7 +20,7 @@ class Map  {
   
   public static final int perimeterWireLengthMeter = 15;
   public static final float steeringNoise = 0.5;  // tracking 0.005 , mowing 0.5
-  public static final float distanceNoise = 0.15; // tracking 0.01  , mowing 0.15 
+  public static final float distanceNoise = 0.03; // tracking 0.01  , mowing 0.03
   //public static final float measurementNoise = 0.01;
   
   public class RobotState   {
@@ -712,7 +712,7 @@ class Map  {
     if (stateLocalizeOutline){
       // tracking perimeter
       //prob = gaussian(strength, measurementNoise, 1.0);    
-      if (md.signal < MAP_DATA_SIGNAL_MAX-1) return 0;
+      if (md.signal < MAP_DATA_SIGNAL_MAX-3) return 0;
       //return ((float)md.s.signal) / ((float)MAP_DATA_SIGNAL_MAX);
     } else if (stateLocalize) {
       // mowing
@@ -741,7 +741,7 @@ class Map  {
         particles[idx].x = particles[i].x;
         particles[idx].y = particles[i].y;
       } 
-      else if (measurement_prob2 >=  measurement_prob1) {      
+      else if (measurement_prob2 >  measurement_prob1) {      
         //if (rnd > 0.5) 
         particles[i].x = particles[idx].x;
         particles[i].y = particles[idx].y;

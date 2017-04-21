@@ -147,6 +147,7 @@ PrintWriter logOutput;
 BufferedReader logInput;
 PImage satImg;
 int nextPlayTime = 0;
+int nextScreenUpdate = 0;
   
   // rescale to -PI..+PI
 float scalePI(float v)
@@ -240,7 +241,7 @@ void setup(PApplet parent){
   textFont(pf,14);
   textAlign(LEFT);
   stroke(0, 0, 0);  
-  //frameRate(30);
+  frameRate(200);
   
   if ((!demo) && (logState != LOG_PLAY))  {    
     if (useTcp) myTcp =  new Client(parent, tcpHost, tcpPort);  
@@ -567,39 +568,41 @@ void draw () {
     if ( (abs(speedL) > 0) || (abs(speedR) > 0) ) map.run(yaw, dist, periLeft, periRight);
   }  
  //  if (!updateScreen) return;
-  updateScreen=false;
-  /*float fov = PI/3.0; 
-  float cameraZ = (height/2.0) / tan(fov/2.0);   
-  perspective(fov, float(width)/float(height), cameraZ/2.0, cameraZ*2.0);*/
-  background(210);
-  lights();  
-  pointLight(100, 200, 160,   500, 0, 100); // color, pos
-  //ambientLight(255, 255, 255);
-  //drawHelp();
-  drawInfo(550, 200);
-  drawJoystick(400, 100);
-  drawCompass(580,100,yaw,comYaw);   
-  drawRobot(130,420, pitch, roll);
-  btnStop.update();
-  if (btnPlayPaused != null) btnPlayPaused.update();
-  tabPlot.update();
-  tabMenu.update();  
-  fill(0,0,0);
-  text("console", 10,600);
-  if (inString != null){           
-    text(inString,10,630);    
-  }
-  text("map", 10,40);
-  map.draw();
+  if (millis() >= nextScreenUpdate){  
+    nextScreenUpdate = millis() + 200; 
+    /*float fov = PI/3.0; 
+    float cameraZ = (height/2.0) / tan(fov/2.0);   
+    perspective(fov, float(width)/float(height), cameraZ/2.0, cameraZ*2.0);*/
+    background(210);
+    lights();  
+    pointLight(100, 200, 160,   500, 0, 100); // color, pos
+    //ambientLight(255, 255, 255);
+    //drawHelp();
+    drawInfo(550, 200);
+    drawJoystick(400, 100);
+    drawCompass(580,100,yaw,comYaw);   
+    drawRobot(130,420, pitch, roll);
+    btnStop.update();
+    if (btnPlayPaused != null) btnPlayPaused.update();
+    tabPlot.update();
+    tabMenu.update();  
+    fill(0,0,0);
+    text("console", 10,600);
+    if (inString != null){           
+      text(inString,10,630);    
+    }
+    text("map", 10,40);
+    map.draw();
           
-  if (!focused){
-    //text("click window for keyboard input!", 10,550);    
-  }
-  processMenu();
+    if (!focused){
+      //text("click window for keyboard input!", 10,550);    
+    }
+    processMenu();
   
-  tint(255, 127);  // Display at half opacity
-  if (satImg != null) image(satImg, 0, 0);
-  //image(mov, 0, 0);    
+    tint(255, 127);  // Display at half opacity
+    if (satImg != null) image(satImg, 0, 0);
+    //image(mov, 0, 0);
+  }
   
   if (logState == LOG_PLAY) {
     if (!playPaused){

@@ -134,7 +134,7 @@ float periRight = 0;
 float distanceCmSet = 0;
 float angleRadSet = 0;
 boolean playPaused = true;
-Button btnMapping,btnStop,btnResetParticles,btnTrack,btnMowRand,btnMowLane,btnADCcal,btnMPUselftest;
+Button btnMapping,btnStop,btnResetParticles,btnTrackClockwise,btnTrackAnticlockwise,btnMowRand,btnMowLane,btnADCcal,btnMPUselftest;
 Button btnIMUstartCal,btnIMUstopCal,btnMow50,btnMowON,btnMowOFF,btnLine,btnLineRev,btnLine90,btnRotate90;
 Button btnPlayPaused = null;
 Tabsheet tabPlot, tabMenu;
@@ -196,6 +196,16 @@ void sendRotateTime(float duration, float speed){
 
 void sendStartRandomMowing(){
    sendPort("?14\n");
+}
+
+void sendStartTracking(int trackClockWise){
+  //map.overallDist = 0;
+  map.distributeParticlesOutline();    
+  map.stateMapping = false;
+  map.stateLocalize=true;
+  map.stateLocalizeOutline=true;
+  map.stateMowing = false;
+  sendPort("?11," + str(trackClockWise) + "\n");
 }
 
 void sendVerbose(){
@@ -399,9 +409,10 @@ void createMenu(){
   if (map.stateMapping) s = "ON";
   btnMapping  = new Button(sheetMenuMain, 0, h*0, 220, 26, "mapping is "+s);
   btnResetParticles  = new Button(sheetMenuMain, 0, h*1, 220, 26, "reset particles");
-  btnTrack  = new Button(sheetMenuMain, 0, h*2, 220, 26, "track");   
-  btnMowRand  = new Button(sheetMenuMain, 0, h*3, 220, 26, "mow rand");
-  btnMowLane  = new Button(sheetMenuMain, 0, h*4, 220, 26, "mow lane");
+  btnTrackClockwise  = new Button(sheetMenuMain, 0, h*2, 220, 26, "track clockwise");
+  btnTrackAnticlockwise  = new Button(sheetMenuMain, 0, h*3, 220, 26, "track anticlockwise");
+  btnMowRand  = new Button(sheetMenuMain, 0, h*4, 220, 26, "mow rand");
+  btnMowLane  = new Button(sheetMenuMain, 0, h*5, 220, 26, "mow lane");
    
   btnADCcal  = new Button(sheetMenuMisc, 0, h*0, 220, 26, "ADC cal");
   btnMPUselftest  = new Button(sheetMenuMisc, 0, h*1, 220, 26, "MPU selftest");
@@ -442,15 +453,13 @@ void processMenu(){
     if (playPaused) s += " paused";
     btnPlayPaused.label = s; 
   }
-  if (btnTrack.clicked) {
-    // track
-    //map.overallDist = 0;
-    map.distributeParticlesOutline();    
-    map.stateMapping = false;
-    map.stateLocalize=true;
-    map.stateLocalizeOutline=true;
-    map.stateMowing = false;
-    sendPort("?11\n");    
+  if (btnTrackClockwise.clicked) {
+    // track    
+    sendStartTracking(1);    
+  }
+  if (btnTrackAnticlockwise.clicked) {
+    // track    
+    sendStartTracking(0);    
   }
   if (btnMapping.clicked) {
     // mapping
@@ -504,7 +513,7 @@ void processMenu(){
   if (btnIMUstopCal.clicked) sendPort("?81\n");
   //if (menuResponse.equals("mn19")) sendPort("?06,10000," + scalePI(yaw+PI/180.0*90.0) + ",1.0\n");
   if (btnLine.clicked) sendTravelLineDistance(10000, scalePI(yaw), 1.0);  
-  if (btnLineRev.clicked) sendTravelLineDistance(20, scalePI(yaw), -1.0);  
+  if (btnLineRev.clicked) sendTravelLineDistance(50, scalePI(yaw), -1.0);  
   if (btnLine90.clicked) sendPort("?85,10000," + scalePI(PI/180.0*90.0) + ",1.0\n");
       
     

@@ -115,6 +115,7 @@ void RobotClass::begin(){
   mowState = MOW_LINE;
   mowPattern = PATTERN_NONE;
   trackState = TRK_RUN;  
+	trackClockwise = true;
 
   nextControlTime = 0;  
   nextInfoTime = 0;  
@@ -258,7 +259,8 @@ void RobotClass::readRobotMessages(){
           case 71: //ADCMan.calibrate(); 
                    break;
           //case 72: IMU.startCompassCalibration(); break;
-          case 11: startTrackingForEver(); break;
+          case 11: trackClockwise = ROBOTMSG.parseInt(); 
+								   startTrackingForEver(); break;
           case 12: startMapping(); break;
           case 13: startLaneMowing(); break;
           case 14: startRandomMowing(); break;
@@ -504,10 +506,16 @@ void RobotClass::startTrackingForEver(){
 
 void RobotClass::track(){
   float leftMag = Perimeter.getMagnitude(IDX_LEFT);
-  float rightMag = Perimeter.getMagnitude(IDX_RIGHT);
-  boolean leftIn = (leftMag < 0);
-  boolean rightIn = (rightMag < 0);  
-  float startDist;       
+  float rightMag = Perimeter.getMagnitude(IDX_RIGHT);  	
+	boolean leftIn = (leftMag < 0);
+  boolean rightIn = (rightMag < 0);  	
+	float rotationSign = 1;
+	if (trackClockwise) {
+		leftIn = 	(rightMag < 0);
+		rightIn = 	(leftMag < 0);
+		rotationSign = -1;
+	}	  
+	float startDist;       	
   switch (trackState){
     case TRK_FIND:      
 	    if  ((!leftIn) || (!rightIn)){
@@ -527,12 +535,12 @@ void RobotClass::track(){
        if (!leftIn) {          
           //Motor.setSpeedPWM(-speedRot, speedRot);
           //Motor.rotateAngle(IMU.getYaw()+PI/180.0*3, speedRot);          
-          Motor.rotateTime(300, trackRotationSpeedPerc);
+          Motor.rotateTime(300, rotationSign * trackRotationSpeedPerc);
           trackAngle = IMU.getYaw();
         } else {          
           //Motor.setSpeedPWM(speedRot, -speedRot);
           //Motor.rotateAngle(IMU.getYaw()-PI/180.0*3, speedRot);          
-          Motor.rotateTime(300, -trackRotationSpeedPerc);
+          Motor.rotateTime(300, rotationSign * (-trackRotationSpeedPerc) );
           trackAngle = IMU.getYaw();
         }                    
       }      

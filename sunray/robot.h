@@ -57,6 +57,7 @@ class RobotClass
 	  RobotState state;
 	  RobotState lastState;
 	  TrackState trackState;
+		bool trackClockwise;
 	  MowState mowState;
 	  MowPattern mowPattern;
 	  byte loopsPerSec;

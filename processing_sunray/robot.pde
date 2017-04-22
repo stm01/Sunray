@@ -27,6 +27,7 @@ static final float stuckMaxIMUerror = 5.0;
 static final int timedOutIfBelowSmag = 10;
 static final int timeOutSecIfNotInside = 15;
 static final byte swapCoilPolarity = 0;
+statci final boolean filterPerimeterSpikes = true; 
 // IMU
 static final byte useGyro = 1;
 static final float gyroBiasDpsMax = 0.01;
@@ -671,8 +672,8 @@ void processDataReceived(String data) {
         //map.robotState.x = Float.parseFloat(list[20]);
         //map.robotState.y = Float.parseFloat(list[21]);
         periLeft = Integer.parseInt(list[8]);
-        periRight = Integer.parseInt(list[9]);                
-        if (plotPeriL.list.size() > 0){
+        periRight = Integer.parseInt(list[9]);                        
+        if ((filterPerimeterSpikes) && (plotPeriL.list.size() > 0)) {
           float lastPeriLeft = plotPeriL.list.get(plotPeriL.list.size()-1);
           float lastPeriRight = plotPeriR.list.get(plotPeriR.list.size()-1);
           if ((periLeft >= 0) && (periLeft < 1500) && (lastPeriLeft < 0)) periLeft = lastPeriLeft; 

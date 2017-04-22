@@ -20,7 +20,7 @@ class Map  {
   
   public static final int perimeterWireLengthMeter = 15;
   public static final float steeringNoise = 0.5;  // tracking 0.005 , mowing 0.5
-  public static final float distanceNoise = 0.03; // tracking 0.01  , mowing 0.03
+  public static final float distanceNoise = 0.05; // tracking 0.01  , mowing 0.03
   //public static final float measurementNoise = 0.01;
   
   public class RobotState   {
@@ -427,14 +427,18 @@ class Map  {
       println("ERROR loading map file");      
     }
   }
-  
+
+  /* remove a small piece (in x and y direction) from each outline measurement to get outline error (start-to-end) to zero
+     note: this approach not retain outline measurements orientation! 
+  */
   public void correctOutline(){
     println("correctOutline");
     if (outlineList.size() < 10) return;    
     // determine error
-    float errx=outlineList.get(outlineList.size()-1).x-outlineList.get(0).x;
+    float errx=outlineList.get(outlineList.size()-1).x-outlineList.get(0).x; // error in meter
     float erry=outlineList.get(outlineList.size()-1).y-outlineList.get(0).y;
-    float corrx = (errx*100) / ((float)outlineList.size());
+    //errx = erry = Math.min(errx, erry); // this would retain orientation 
+    float corrx = (errx*100) / ((float)outlineList.size()); // correction in cm
     float corry = (erry*100) / ((float)outlineList.size());
     println("errx=" + errx + ", erry=" + erry);
     println("corrx=" + nfc(corrx,4) + ", corry=" + nfc(corry,4));
@@ -448,8 +452,8 @@ class Map  {
       cx += corrx;
       cy += corry;
     }    
-    // connect end and start
-    /*PVector pt = new PVector();
+    /*// connect end and start
+    PVector pt = new PVector();
     pt.x = outlineList.get(0).x;
     pt.y = outlineList.get(0).y;
     outlineList.add(pt);*/    

@@ -27,7 +27,7 @@ static final float stuckMaxIMUerror = 5.0;
 static final int timedOutIfBelowSmag = 10;
 static final int timeOutSecIfNotInside = 15;
 static final byte swapCoilPolarity = 0;
-statci final boolean filterPerimeterSpikes = true; 
+static final boolean filterPerimeterSpikes = true; 
 // IMU
 static final byte useGyro = 1;
 static final float gyroBiasDpsMax = 0.01;
@@ -287,13 +287,13 @@ void setup(PApplet parent){
   
   timer.schedule( new TimerTask() {
     public void run(){
-      //while (true){        
+      for (int i=0; i < logPlaySpeed; i++){        
         if (logState == LOG_PLAY) {            
             if (!playPaused){                          
                 logging(null);                
             }
          }
-      //}
+      }
     }
   }, 0, 1);  
   

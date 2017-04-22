@@ -245,6 +245,16 @@ class Map  {
       }
       ptLast = pt;
     }
+    // draw charging station
+    pushMatrix();
+    translate(0,0,1);
+    fill(255,127,200);
+    stroke(255,255,255);
+    strokeWeight(3);
+    float cx = outlineList.get(0).x;
+    float cy = outlineList.get(0).y;
+    ellipse(px + Math.round(cx*mapScaleX*stepx), py + dh-Math.round(cy*mapScaleY*stepy), 15, 15);
+    popMatrix();
   }
   
   public void drawMarker(){    
@@ -263,7 +273,7 @@ class Map  {
       PVector pt = markerList.get(i);
       float cx = pt.x;
       float cy = pt.y;
-      ellipse(px + Math.round(cx*mapScaleX*stepx), py + DRAW_HEIGHT-Math.round(cy*mapScaleY*stepy), 15, 15);           
+      ellipse(px + Math.round(cx*mapScaleX*stepx), py + dh-Math.round(cy*mapScaleY*stepy), 15, 15);           
     }
   }
     
@@ -420,32 +430,29 @@ class Map  {
   
   public void correctOutline(){
     println("correctOutline");
-    if (outlineList.size() == 0) return;    
-    for (int i=outlineList.size()-1; i > 0; i--){
-      // determine error
-      float errx=outlineList.get(outlineList.size()-1).x-outlineList.get(0).x;
-      float erry=outlineList.get(outlineList.size()-1).y-outlineList.get(0).y;
-      float dist = sqrt( sq(errx) + sq(erry) );
-      if (dist < 0.01) break;
-      // determine piece distance
-      float diffX = outlineList.get(i).x-outlineList.get(i-1).x;
-      float diffY = outlineList.get(i).y-outlineList.get(i-1).y;
-      if (  (Math.signum(errx) == Math.signum(diffX)) && (Math.signum(erry) == Math.signum(diffY))
-          && (abs(diffX) < abs(errx))
-          && (abs(diffY) < abs(erry))     )
-      {
-        // outline piece helps us to reduce error => remove piece
-        for (int j=i; j < outlineList.size(); j++){
-          outlineList.get(j).x-=diffX;
-          outlineList.get(j).y-=diffY;
-        }      
-      }
-    }
+    if (outlineList.size() < 10) return;    
+    // determine error
+    float errx=outlineList.get(outlineList.size()-1).x-outlineList.get(0).x;
+    float erry=outlineList.get(outlineList.size()-1).y-outlineList.get(0).y;
+    float corrx = (errx*100) / ((float)outlineList.size());
+    float corry = (erry*100) / ((float)outlineList.size());
+    println("errx=" + errx + ", erry=" + erry);
+    println("corrx=" + nfc(corrx,4) + ", corry=" + nfc(corry,4));
+    //float dist = sqrt( sq(errx) + sq(erry) );
+    //if (dist < 0.05) break;
+    float cx = 0;
+    float cy = 0;
+    for (int i=0; i < outlineList.size(); i++){
+      outlineList.get(i).x -= cx / 100;
+      outlineList.get(i).y -= cy / 100;
+      cx += corrx;
+      cy += corry;
+    }    
     // connect end and start
-    PVector pt = new PVector();
+    /*PVector pt = new PVector();
     pt.x = outlineList.get(0).x;
     pt.y = outlineList.get(0).y;
-    outlineList.add(pt);    
+    outlineList.add(pt);*/    
   }
     
 

@@ -8,7 +8,8 @@ import processing.net.*;
 String comPort = "COM9";
 boolean useTcp = false;
 String tcpHost = "raspberrypi.local";
-String logFile = "";
+String logFile = "outdoor_mow_rand.log";  // if file exists, playback mode, otherwise record mode
+int logPlaySpeed = 1;
 int tcpPort = 8083;
 boolean useSatMap = false;
 double centerLat = 52.267312;    

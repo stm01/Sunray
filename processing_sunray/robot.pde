@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 class Robot {
@@ -148,6 +150,8 @@ BufferedReader logInput;
 PImage satImg;
 int nextPlayTime = 0;
 int nextScreenUpdate = 0;
+Timer timer = new Timer();
+
   
   // rescale to -PI..+PI
 float scalePI(float v)
@@ -251,7 +255,7 @@ void setup(PApplet parent){
   textFont(pf,14);
   textAlign(LEFT);
   stroke(0, 0, 0);  
-  frameRate(200);
+  //frameRate(200);
   
   if ((!demo) && (logState != LOG_PLAY))  {    
     if (useTcp) myTcp =  new Client(parent, tcpHost, tcpPort);  
@@ -278,7 +282,20 @@ void setup(PApplet parent){
     sendVerbose();
     
     //if (mySerial != null) mySerial.buffer(32);    
-  }    
+  }
+  
+  timer.schedule( new TimerTask() {
+    public void run(){
+      //while (true){        
+        if (logState == LOG_PLAY) {            
+            if (!playPaused){                          
+                logging(null);                
+            }
+         }
+      //}
+    }
+  }, 0, 1);  
+  
 }
 
 
@@ -578,7 +595,7 @@ void draw () {
   }  
  //  if (!updateScreen) return;
   if (millis() >= nextScreenUpdate){  
-    nextScreenUpdate = millis() + 200; 
+    //nextScreenUpdate = millis() + 200; 
     /*float fov = PI/3.0; 
     float cameraZ = (height/2.0) / tan(fov/2.0);   
     perspective(fov, float(width)/float(height), cameraZ/2.0, cameraZ*2.0);*/
@@ -613,14 +630,6 @@ void draw () {
     //image(mov, 0, 0);
   }
   
-  if (logState == LOG_PLAY) {
-    if (!playPaused){
-      //if (millis() >= nextPlayTime){
-        nextPlayTime = millis() + 10;
-        logging(null);
-      //}
-    }
-  }
 }
 
 void processDataReceived(String data) {

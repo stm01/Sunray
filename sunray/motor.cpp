@@ -208,6 +208,10 @@ void MotorClass::speedControlLine() {
   imuPID.compute();
   if (imuPID.y > 0) correctRight = abs(imuPID.y);
   if (imuPID.y < 0) correctLeft  = abs(imuPID.y);
+	if (speedRpmSet < 0) { // reverse 
+		correctLeft *= -1;
+	  correctRight *= -1;
+	}
   motorLeftPID.x = motorLeftRpmCurr;
   motorLeftPID.w  = speedRpmSet - correctLeft;
   motorLeftPID.y_min = -pwmMax;

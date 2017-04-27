@@ -1,7 +1,7 @@
 # Sunray
 
 ## Description
-The next Ardumower Firmware (experimental)
+The next Ardumower Firmware (experimental) for Ardumower PCB 1.3 and Arduino Due, IMU GY-88
 
 The robot mower uses odometry, an IMU (gyro+compass) and a perimeter to localize itself on the perimeter and within the perimeter. A particle filter estimates the robot position based on moved distance and absolute angle.
 

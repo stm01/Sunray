@@ -1,3 +1,7 @@
+/* For Ardumower PCB 1.3 and Arduino Due
+
+*/
+
 #define IOREF 3.3   // I/O reference voltage 
 
 

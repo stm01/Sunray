@@ -10,6 +10,7 @@ boolean useTcp = false;
 String tcpHost = "raspberrypi.local";
 String logFile = "outdoor_mow_rand.log";  // if file exists, playback mode, otherwise record mode
 int logPlaySpeed = 1; // 1..100
+int logPlayIntervalMillis = 10; // 1..10
 int tcpPort = 8083;
 boolean useSatMap = false;
 double centerLat = 52.267312;    

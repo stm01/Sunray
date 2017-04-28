@@ -295,7 +295,7 @@ void setup(PApplet parent){
          }
       }
     }
-  }, 0, 1);  
+  }, 0, logPlayIntervalMillis);  
   
 }
 

@@ -5,6 +5,9 @@ The next Ardumower Firmware (experimental) for Ardumower PCB 1.3 and Arduino Due
 
 The robot mower uses odometry, an IMU (gyro+compass) and a perimeter to localize itself on the perimeter and within the perimeter. A particle filter estimates the robot position based on moved distance and absolute angle.
 
+## Wiki
+http://wiki.ardumower.de/index.php?title=Ardumower_Sunray
+
 ## Demo video
 https://www.youtube.com/watch?v=Ewqkd6leQjc
 

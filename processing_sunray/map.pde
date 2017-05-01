@@ -21,7 +21,7 @@ class Map  {
   public static final int perimeterWireLengthMeter = 15;
   public static final float steeringNoise = 0.5;  // tracking 0.005 , mowing 0.5
   public static final float distanceNoise = 0.05; // tracking 0.01  , mowing 0.03
-  //public static final float measurementNoise = 0.01;
+  public static final float measurementNoise = 0.01;
   
   public class RobotState   {
     public float x;
@@ -726,7 +726,8 @@ class Map  {
       if (md.signal < MAP_DATA_SIGNAL_MAX-3) return 0;
       //return ((float)md.s.signal) / ((float)MAP_DATA_SIGNAL_MAX);
     } else if (stateLocalize) {
-      // mowing
+      // mowing            
+      //if (Math.abs(md.signal*60 - leftMag) > 3000) return 0;      
       if (!md.inside) {
         if ((leftMag < 0) && (rightMag < 0)) return 0;        
       } else {

@@ -2,6 +2,7 @@
 #include "config.h"
 #include "motor.h"
 #include "buzzer.h"
+#include "robot.h"
 #include <Arduino.h>
 
 BumperClass Bumper;
@@ -15,10 +16,12 @@ void BumperClass::run(){
   if (millis() >= nextCheckTime){    
     if (pressed()){
       nextCheckTime = millis() + 4000;
-      DEBUGLN(F("BUMPER"));      
+      if (leftPressed) Robot.sensorTriggered(SEN_BUMPER_LEFT);
+			if (rightPressed) Robot.sensorTriggered(SEN_BUMPER_RIGHT);
+			DEBUGLN(F("BUMPER"));      
       //Motor.stopMowerImmediately();
       Motor.stopImmediately();
-      Buzzer.sound(SND_OVERCURRENT, true);
+      Buzzer.sound(SND_OVERCURRENT, true);			
     }
   }
 }

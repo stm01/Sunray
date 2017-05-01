@@ -1,50 +1,50 @@
 /*
  * robot messages
- *  101 : sensor data
- *  103 : map bitmap data  
- *  105 : perimeter outline data
- *  111 : tracking forever
- *  112 : start mapping
- *  113 : mowing lanes
- *  114 : mowing random
- *  115 : particles data
- *  116 : distribute particles on perimeter
- *  117 : robot motion data (distance, orientation)
- *  170 : configure bluetooth  
- *  175 : erase microcontroller flash memory
- *  176 : eeprom data
+ *  01 : sensor data
+ *  03 : map bitmap data  
+ *  05 : perimeter outline data
+ *  11 : tracking forever
+ *  12 : start mapping
+ *  13 : mowing lanes
+ *  14 : mowing random
+ *  15 : particles data
+ *  16 : distribute particles on perimeter
+ *  17 : robot motion data (distance, orientation) 
+ *  70 : configure bluetooth  
+ *  75 : erase microcontroller flash memory
+ *  76 : eeprom data
  
  * perimeter messages
- *  284 : perimeter settings
+ *  84 : perimeter settings
  
  * motor messages
- *  300 : stop immediately
- *  302 : set motor pwm (left, right)
- *  385 : travel angle distance (speed, distance, orientation)
- *  306 : travel line distance (speed, distance, orientation)
- *  307 : travel line time (speed, time, orientation) 
- *  308 : rotate angle (speed)
- *  309 : rotate time (speed) 
- *  374 : set mow motor pwm
- *  383 : motor settings 
- *  386 : motor controller data
+ *  00 : stop immediately
+ *  02 : set motor pwm (left, right)
+ *  85 : travel angle distance (speed, distance, orientation)
+ *  06 : travel line distance (speed, distance, orientation)
+ *  07 : travel line time (speed, time, orientation) 
+ *  08 : rotate angle (speed)
+ *  09 : rotate time (speed) 
+ *  74 : set mow motor pwm
+ *  83 : motor settings 
+ *  86 : motor controller data
  
  * ADC messages
- *  471 : calibrate ADC
+ *  71 : calibrate ADC
  
  * IMU messages
- *  504 : IMU data (verbose)
- *  510 : calibrate gyro
- *  572 : calibrate compass 
- *  573 : toggle verbose
- *  578 : compass calibration data (centre X,Y,Z,radii X,Y,Z)
- *  579 : IMU self test
- *  580 : start compass calibration  
- *  581 : stop compass calibration  
- *  582 : IMU settings
+ *  04 : IMU data (verbose)
+ *  10 : calibrate gyro
+ *  72 : calibrate compass 
+ *  73 : toggle verbose
+ *  78 : compass calibration data (centre X,Y,Z,radii X,Y,Z)
+ *  79 : IMU self test
+ *  80 : start compass calibration  
+ *  81 : stop compass calibration  
+ *  82 : IMU settings
  
  * ranging messages
- *  677 : ranging data (time, address, distance, power)
+ *  77 : ranging data (time, address, distance, power)
  
  
  */
@@ -117,6 +117,7 @@ void RobotClass::begin(){
   trackState = TRK_RUN;  
 	trackClockwise = true;
 
+	sensorTriggerStatus = 0;
   nextControlTime = 0;  
   nextInfoTime = 0;  
   nextIMUTime = 0;
@@ -218,7 +219,9 @@ void RobotClass::printSensorData(){
     ROBOTMSG.print(Motor.distanceCmSet);   
     ROBOTMSG.print(F(","));             
     ROBOTMSG.print(Motor.angleRadSet);   
-    ROBOTMSG.println(); 
+		ROBOTMSG.print(F(","));	
+	  ROBOTMSG.print(sensorTriggerStatus);  
+    ROBOTMSG.println(); 		
 }
 
 void RobotClass::readRobotMessages(){
@@ -365,6 +368,7 @@ void RobotClass::run(){
     //DEBUGLN(ADCMan.getConvCounter());
     
     printSensorData();    
+		sensorTriggerStatus = 0;
     
 	  if ( IMU_USE && (!RC.enable) && (IMU.needGyroCal()) ) {     
 	    Motor.setPaused(true);
@@ -583,7 +587,9 @@ void RobotClass::track(){
 
 
 void RobotClass::mow(){  
-  switch (mowState){
+  if (!Perimeter.isInside(IDX_LEFT)) sensorTriggered(SEN_PERIMETER_LEFT);
+  if (!Perimeter.isInside(IDX_RIGHT)) sensorTriggered(SEN_PERIMETER_RIGHT);
+	switch (mowState){
     case MOW_ROTATE:
       if (Motor.motion == MOT_STOP){
         if (mowPattern == PATTERN_LANES){
@@ -634,8 +640,8 @@ void RobotClass::mow(){
       break;
     case MOW_LINE:
       //if (!Perimeter.isInside()) Motor.stopSlowly();
-      if ( (!Perimeter.isInside()) || (Motor.motion == MOT_STOP)  ){      
-        Motor.stopImmediately();
+      if ( (!Perimeter.isInside()) || (Motor.motion == MOT_STOP)  ){              
+				Motor.stopImmediately();
         Motor.travelLineDistance(50, mowingAngle, -reverseSpeedPerc);
         mowState = MOW_REV;
         //DEBUGLN(F("MOW_REV"));
@@ -872,7 +878,7 @@ void RobotClass::sendInfo(){
   content += ",";
   content += Motor.distanceCmSet;   
   content += ",";
-  content += Motor.angleRadSet;     
+  content += Motor.angleRadSet;  
   content += "]);";  
   finishHTTP();
 }
@@ -939,7 +945,9 @@ void RobotClass::serveHTTP(){
   }  
 }
 
-
+void RobotClass::sensorTriggered(uint16_t sensorID){
+	sensorTriggerStatus |= sensorID;	
+}
 
 
 

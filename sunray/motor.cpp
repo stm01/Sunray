@@ -7,6 +7,7 @@
 #include "helper.h"
 #include "adcman.h"
 #include "pinman.h"
+#include "robot.h"
 
 MotorClass Motor;
 
@@ -545,7 +546,10 @@ void MotorClass::run() {
     if ( (motorMowSense > mowSenseMax) || ((motorLeftFriction > motorFrictionMax) || (motorRightFriction > motorFrictionMax))  ) {  
       if (overCurrentTimeout == 0) overCurrentTimeout = millis() + 1000;
       if (millis() > overCurrentTimeout) {
-        DEBUG(F("OVERCURRENT "));
+        if (motorMowSense > mowSenseMax) Robot.sensorTriggered(SEN_MOTOR_FRICTION_MOW);
+				if (motorLeftFriction > motorFrictionMax) Robot.sensorTriggered(SEN_MOTOR_FRICTION_LEFT);
+				if (motorRightFriction > motorFrictionMax) Robot.sensorTriggered(SEN_MOTOR_FRICTION_RIGHT);
+				DEBUG(F("FRICTION "));
         DEBUG(motorLeftFriction);
         DEBUG(F(","));
         DEBUG(motorRightFriction);
@@ -554,7 +558,7 @@ void MotorClass::run() {
         stopMowerImmediately();       
         stopImmediately();
         Buzzer.sound(SND_OVERCURRENT, true);
-        overCurrentTimeout = 0;
+        overCurrentTimeout = 0;				
       }
     } else overCurrentTimeout = 0;
   }
@@ -562,12 +566,13 @@ void MotorClass::run() {
 	// stuck detection
 	diffOdoIMU = angleRadCurrDeltaOdometry - angleRadCurrDeltaIMU;
 	if ((abs(diffOdoIMU) > stuckMaxDiffOdometryIMU) || (abs(imuPID.eold) > stuckMaxIMUerror)){		
-    DEBUGLN(F("STUCKED "));		
+    Robot.sensorTriggered(SEN_MOTOR_STUCK);
+		DEBUGLN(F("STUCKED "));		
 		DEBUG(diffOdoIMU);
     DEBUG(F(","));		
 		DEBUGLN(imuPID.eold);
 		stopImmediately();
-		Buzzer.sound(SND_STUCK, true);
+		Buzzer.sound(SND_STUCK, true);		
 	} 
 
 	if (verboseOutput){
@@ -639,17 +644,20 @@ void MotorClass::checkFault() {
     DEBUGLN(F("Error: motor left fault"));
     stopImmediately();
     resetFault();
+		Robot.sensorTriggered(SEN_MOTOR_ERROR_LEFT);
   }
   if  (digitalRead(pinMotorRightFault) == LOW) {
     DEBUGLN(F("Error: motor right fault"));
     stopImmediately();
     resetFault();
+		Robot.sensorTriggered(SEN_MOTOR_ERROR_RIGHT);
   }
   if (digitalRead(pinMotorMowFault) == LOW) {
     DEBUGLN(F("Error: motor mow fault"));
     stopImmediately();
     setMowerPWM(0);    
     resetFault();
+		Robot.sensorTriggered(SEN_MOTOR_ERROR_MOW);
   }
 }
 

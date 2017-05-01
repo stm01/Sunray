@@ -78,6 +78,23 @@ static final int MOT_ROTATE_ANGLE   = 4;
 static final int MOT_STOP           = 5;
 static final int MOT_CAL_RAMP       = 6;
 
+// sensor trigger IDs
+static final int SEN_BUMPER_LEFT      = (1<<0);
+static final int SEN_BUMPER_RIGHT     = (1<<1);
+static final int SEN_SONAR_LEFT       = (1<<2);
+static final int SEN_SONAR_CENTER     = (1<<3);
+static final int SEN_SONAR_RIGHT      = (1<<4);
+static final int SEN_PERIMETER_LEFT   = (1<<5);
+static final int SEN_PERIMETER_RIGHT  = (1<<6);
+static final int SEN_MOTOR_FRICTION_LEFT = (1<<7);
+static final int SEN_MOTOR_FRICTION_RIGHT = (1<<8);
+static final int SEN_MOTOR_FRICTION_MOW   = (1<<9);
+static final int SEN_MOTOR_STUCK          = (1<<10);
+static final int SEN_MOTOR_ERROR_LEFT     = (1<<11);
+static final int SEN_MOTOR_ERROR_RIGHT    = (1<<12);
+static final int SEN_MOTOR_ERROR_MOW      = (1<<13);
+
+
 String[] logStates = {"OFF", "PLAY", "REC"};
 static final int LOG_OFF      = 0;
 static final int LOG_PLAY     = 1;
@@ -103,6 +120,7 @@ int screenh = 600;
 int plotw = 300;
 int ploth = 80;
 int time = 0;
+int sensorTrigger = 0;
 float yaw = 0;
 float pitch = 0;
 float roll = 0;
@@ -145,7 +163,10 @@ Sheet sheetPlotMain,sheetPlotMisc,sheetMenuMain,sheetMenuMisc;
 Plot plotSpeedL, plotSpeedR, plotYaw, plotComYaw, plotCom, plotPeriL, plotPeriR, plotComZ, plotComX;
 Plot plotComY, plotComMag, plotSenL, plotSenR, plotSenMow, plotFrictionL, plotFrictionR;
 Plot plotPIDimuError,  plotDiffOdoIMU,   plotPIDleftError,   plotPIDrightError;
-Plot plotAccY, plotAccZ, plotAccX, plotProb, plotParticlesDist,  plotSmoothProb; 
+Plot plotAccY, plotAccZ, plotAccX, plotProb, plotParticlesDist,  plotSmoothProb;
+Plot plotTrigBumperLeft, plotTrigBumperRight, plotTrigSonarLeft, plotTrigSonarRight, plotTrigSonarCenter;
+Plot plotTrigMotorFrictionLeft, plotTrigMotorFrictionRight, plotTrigMotorFrictionMow, plotTrigMotorStuck, plotTrigMotorErrorLeft, plotTrigMotorErrorRight, plotTrigMotorErrorMow;
+Plot plotTrigPerimeterLeft, plotTrigPerimeterRight; 
 PrintWriter logOutput;
 BufferedReader logInput;
 PImage satImg;
@@ -356,10 +377,28 @@ void createPlots(){
   plotPIDrightError = new Plot(sheetPlotMain,3, -40, 40, "rightErr",   x, y+6*ploth, plotw, ploth, 120, 120, 0);
   plotAccY = new Plot(sheetPlotMain,0, -1, 1, "accY",   x, y+7*ploth, plotw, ploth, 120, 120, 0);
   plotAccZ = new Plot(sheetPlotMain,1, -1, 1, "accZ",   x, y+7*ploth, plotw, ploth, 0, 0, 127);
-  plotAccX = new Plot(sheetPlotMain,2, -1, 1, "accX",   x, y+7*ploth, plotw, ploth, 255, 0, 0);
-  plotProb = new Plot(sheetPlotMisc, 0, -0.1, 1.1, "prob",   x, y+0*ploth, plotw, ploth, 255, 0, 0);
-  plotSmoothProb = new Plot(sheetPlotMisc, 1, -0.1, 1.1, "prob",   x, y+0*ploth, plotw, ploth, 0, 255, 0);
-  plotParticlesDist = new Plot(sheetPlotMisc, 0, -30, 30, "partDist",   x, y+1*ploth, plotw, ploth, 255, 0, 0);  
+  plotAccX = new Plot(sheetPlotMain,2, -1, 1, "accX",   x, y+7*ploth, plotw, ploth, 255, 0, 0);    
+  plotTrigBumperLeft      = new Plot(sheetPlotMisc, 0, 0, 2, "trBumL",      x, y+0*ploth, plotw, ploth, 63, 0, 0);
+  plotTrigBumperRight     = new Plot(sheetPlotMisc, 1, 0, 2, "trBumR",      x, y+0*ploth, plotw, ploth, 255, 0, 0);  
+  plotTrigSonarLeft       = new Plot(sheetPlotMisc, 0, 0, 2, "trSonL",      x, y+1*ploth, plotw, ploth, 0, 63, 0);
+  plotTrigSonarCenter     = new Plot(sheetPlotMisc, 1, 0, 2, "trSonC",      x, y+1*ploth, plotw, ploth, 0, 100, 0);
+  plotTrigSonarRight      = new Plot(sheetPlotMisc, 2, 0, 2, "trSonR",      x, y+1*ploth, plotw, ploth, 0, 140, 0);
+  plotTrigPerimeterLeft   = new Plot(sheetPlotMisc, 0, 0, 2, "trPeriL",     x, y+2*ploth, plotw, ploth, 0, 0, 63);
+  plotTrigPerimeterRight  = new Plot(sheetPlotMisc, 1, 0, 2, "trPeriR",     x, y+2*ploth, plotw, ploth, 0, 0, 255);      
+  plotTrigMotorFrictionLeft   = new Plot(sheetPlotMisc, 0, 0, 2, "trFricL",   x, y+3*ploth, plotw, ploth, 63, 0, 0);     
+  plotTrigMotorFrictionRight  = new Plot(sheetPlotMisc, 1, 0, 2, "trFricR",   x, y+3*ploth, plotw, ploth, 127, 0, 0);
+  plotTrigMotorFrictionMow    = new Plot(sheetPlotMisc, 2, 0, 2, "trFricM",   x, y+3*ploth, plotw, ploth, 255, 0, 0); 
+  plotTrigMotorStuck          = new Plot(sheetPlotMisc, 0, 0, 2, "trStuck",   x, y+4*ploth, plotw, ploth, 0, 140, 0);
+  plotTrigMotorErrorLeft      = new Plot(sheetPlotMisc, 0, 0, 2, "trErrL",    x, y+5*ploth, plotw, ploth, 0, 0, 63);
+  plotTrigMotorErrorRight     = new Plot(sheetPlotMisc, 1, 0, 2, "trErrR",    x, y+5*ploth, plotw, ploth, 0, 0, 127);
+  plotTrigMotorErrorMow       = new Plot(sheetPlotMisc, 2, 0, 2, "trErrM",    x, y+5*ploth, plotw, ploth, 0, 0, 255);   
+  plotProb = new Plot(sheetPlotMisc, 0, -0.1, 1.1, "prob",   x, y+6*ploth, plotw, ploth, 255, 0, 0);
+  plotSmoothProb = new Plot(sheetPlotMisc, 1, -0.1, 1.1, "probS",   x, y+6*ploth, plotw, ploth, 0, 63, 0);
+  plotParticlesDist = new Plot(sheetPlotMisc, 0, -30, 30, "partDist",   x, y+7*ploth, plotw, ploth, 255, 0, 0);
+      
+
+ 
+
 }
 
 void drawJoystick(int px, int py){
@@ -656,8 +695,10 @@ void processDataReceived(String data) {
       }      
     }    
     if (data.startsWith("!01")){
+      // sensor data
+      //println("SENS: " + data);
       String[] list = splitTokens(data, ",");
-      if (list.length >= 33){
+      if (list.length >= 34){
         time = Integer.parseInt(list[1]);
         state = Integer.parseInt(list[2]);
         frq = Integer.parseInt(list[3]);
@@ -698,6 +739,22 @@ void processDataReceived(String data) {
         imuState = Integer.parseInt(list[30]);
         distanceCmSet = Float.parseFloat(list[31]);
         angleRadSet = Float.parseFloat(list[32]);
+        sensorTrigger = Integer.parseInt(list[33]);        
+        //println("TRIG: " + sensorTrigger);
+        plotTrigBumperLeft.addPlotData(Math.min(1,sensorTrigger & SEN_BUMPER_LEFT));
+        plotTrigBumperRight.addPlotData(Math.min(1,sensorTrigger & SEN_BUMPER_RIGHT));
+        plotTrigSonarLeft.addPlotData(Math.min(1,sensorTrigger & SEN_SONAR_LEFT));
+        plotTrigSonarRight.addPlotData(Math.min(1,sensorTrigger & SEN_SONAR_RIGHT));
+        plotTrigSonarCenter.addPlotData(Math.min(1,sensorTrigger & SEN_SONAR_CENTER));
+        plotTrigPerimeterLeft.addPlotData(Math.min(1,sensorTrigger & SEN_PERIMETER_LEFT));
+        plotTrigPerimeterRight.addPlotData(Math.min(1,sensorTrigger & SEN_PERIMETER_RIGHT));
+        plotTrigMotorStuck.addPlotData(Math.min(1,sensorTrigger & SEN_MOTOR_STUCK));
+        plotTrigMotorFrictionLeft.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_FRICTION_LEFT));
+        plotTrigMotorFrictionRight.addPlotData(Math.min(1,sensorTrigger & SEN_MOTOR_FRICTION_RIGHT));
+        plotTrigMotorFrictionMow.addPlotData(Math.min(1,sensorTrigger & SEN_MOTOR_FRICTION_MOW));
+        plotTrigMotorErrorLeft.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_ERROR_LEFT));
+        plotTrigMotorErrorRight.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_ERROR_RIGHT));
+        plotTrigMotorErrorMow.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_ERROR_MOW));
         
         //map.run(yaw, 0, periLeft, periRight);
         

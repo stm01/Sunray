@@ -39,6 +39,22 @@ typedef enum MowState MowState;
 enum MowPattern { PATTERN_NONE, PATTERN_RANDOM, PATTERN_LANES } ;
 typedef enum MowPattern MowPattern;
 
+// sensor trigger IDs
+#define SEN_BUMPER_LEFT          (1L<<0)
+#define SEN_BUMPER_RIGHT         (1L<<1)
+#define SEN_SONAR_LEFT           (1L<<2)
+#define SEN_SONAR_CENTER  	     (1L<<3)
+#define SEN_SONAR_RIGHT   	     (1L<<4)
+#define SEN_PERIMETER_LEFT       (1L<<5)
+#define SEN_PERIMETER_RIGHT      (1L<<6)
+#define SEN_MOTOR_FRICTION_LEFT  (1L<<7)
+#define SEN_MOTOR_FRICTION_RIGHT (1L<<8)
+#define SEN_MOTOR_FRICTION_MOW   (1L<<9)
+#define SEN_MOTOR_STUCK          (1L<<10)
+#define SEN_MOTOR_ERROR_LEFT     (1L<<11)
+#define SEN_MOTOR_ERROR_RIGHT    (1L<<12)
+#define SEN_MOTOR_ERROR_MOW      (1L<<13)
+
 
 class RobotClass
 {
@@ -52,6 +68,7 @@ class RobotClass
 		float trackRotationSpeedPerc;
 		float rotationSpeedPerc;
     float mowingDirection;      
+		uint16_t sensorTriggerStatus; // bitmap of triggered sensors
 	  unsigned long lastStartLineTime;
     unsigned long loopCounter;
 	  RobotState state;
@@ -74,6 +91,7 @@ class RobotClass
 	  void sendMap();
     void sendParticles();
     void sendPerimeterOutline();
+		void sensorTriggered(uint16_t sensorID);
   protected:    
     int lastPerimeterMag;
 	  unsigned long trackLineTimeout;

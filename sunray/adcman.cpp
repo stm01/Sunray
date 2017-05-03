@@ -1,4 +1,7 @@
-// NOTE: requires Arduino Due
+/* NOTE: requires Arduino Due
+   Continouesly performs ADC conversion for all configured ADC channels one after the other using Arduino Due DMA transfer.
+*/
+
 #include <chip.h>
 #include <Arduino.h>
 #include <limits.h>

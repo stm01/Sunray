@@ -62,6 +62,7 @@
 #include "map.h"
 #include "battery.h"
 #include "pinman.h"
+#include "settings.h"
 #include "bt.h"
 #ifndef __AVR
   #include <Reset.h>
@@ -88,6 +89,7 @@ void RobotClass::begin(){
 //  receiveEEPROM_or_ERASE(); 
   I2C_reset();
   Wire.begin();            
+	Settings.begin();
   PinMan.begin();  
   ADCMan.begin();      
   //RemoteCtl.begin();      

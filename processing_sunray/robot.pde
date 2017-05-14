@@ -572,7 +572,14 @@ void processMenu(){
   if (btnLine.clicked) sendTravelLineDistance(10000, scalePI(yaw), 1.0);  
   if (btnLineRev.clicked) sendTravelLineDistance(50, scalePI(yaw), -1.0);  
   if (btnLine90.clicked) sendPort("?85,10000," + scalePI(PI/180.0*90.0) + ",1.0\n");
-      
+  if (plotComY.clicked) {  
+    imuVerbose = 1-imuVerbose;
+    sendVerbose();
+  }
+  if (plotSenL.clicked) {  
+    motorVerbose = 1-motorVerbose;
+    sendVerbose();
+  }  
     
   menuResponse = null;
 }

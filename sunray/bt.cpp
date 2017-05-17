@@ -280,8 +280,8 @@ void BluetoothConfig::setParams(String name, int pin, long baudrate, boolean qui
       setPin(pin);
       setBaudrate(baudrate);
       DEBUGLN(F("You may restart BT module now!"));  
-    } else Console.println(F("ERROR: Bluetooth module version not recognized"));
-  } else Console.println(F("ERROR: Bluetooth module not found"));
+    } else DEBUGLN(F("ERROR: Bluetooth module version not recognized"));
+  } else DEBUGLN(F("ERROR: Bluetooth module not found"));
 }
 
 

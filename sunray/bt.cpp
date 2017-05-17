@@ -249,7 +249,7 @@ void BluetoothConfig::detectModuleType(){
   DEBUGLN();
   DEBUGLN(F("detecting BT type..."));
   writeReadBT(F("AT+VERSION"));  
-  if (btResult.startsWith(F("OKlinvor"))){
+  if ( (btResult.startsWith("OKlinvor")) || (btResult.startsWith("hc01")) ){
     DEBUGLN(F("=>it's a linvor/HC06"));
     btType = BT_LINVOR_HC06;
     return;

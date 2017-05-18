@@ -100,7 +100,7 @@ void SettingsClass::begin(){
 	DEBUG(F("testing DS1307..."));
 	write(0, 42);
 	byte data = read(0);
-	if (data != 42) DEBUGLN(F("failed"));
+	if (data != 42) DEBUGLN(F("failed - battery connected to PCB?"));
 	  else DEBUGLN(F("success"));
 }
 

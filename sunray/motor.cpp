@@ -82,14 +82,14 @@ void MotorClass::begin() {
   pwmMaxMow = 255;
   rpmMax = 25;
   mowSenseMax = 4.0;
-  motorFrictionMax = 0.6;
+  motorFrictionMax = 1700;
 	motorFrictionMin = 0.2;
 	robotMass = 10;
   ticksPerCm = 13.49 * 2;
   ticksPerRevolution = 1060 * 2;
   wheelBaseCm = 36;    // wheel-to-wheel distance (cm)
-	stuckMaxDiffOdometryIMU = 0.5;
-	stuckMaxIMUerror = 4;
+	stuckMaxDiffOdometryIMU = 0.2;
+	stuckMaxIMUerror = 5;
 
   motorLeftPID.Kp       = 2.0;  
   motorLeftPID.Ki       = 0.03; 

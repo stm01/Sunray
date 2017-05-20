@@ -53,9 +53,9 @@ class Plot extends View {
     }
     fill(r, g, b);
     stroke(r, g, b);
-    text(label, getXPos()+plotw+10, getYPos()+idx*20+15);
+    text(label, getXPos()+plotw+10, getYPos()+idx*12+15);
     if (list.size() < 2) return;
-    text(float2String(list.get(list.size()-1)), getXPos()+plotw+90, getYPos()+idx*20+15);
+    text(float2String(list.get(list.size()-1)), getXPos()+plotw+90, getYPos()+idx*12+15);
     for (int i=0; i < list.size(); i++) {
       //println(list.get(i));
       float value = max(minY, min(maxY, list.get(i)));

@@ -17,6 +17,9 @@
  * perimeter messages
  *  84 : perimeter settings
  
+ * sonar messages
+ *  87 : sonar data (verbose)
+ 
  * motor messages
  *  00 : stop immediately
  *  02 : set motor pwm (left, right)
@@ -64,6 +67,7 @@
 #include "pinman.h"
 #include "settings.h"
 #include "bt.h"
+#include "sonar.h"
 #ifndef __AVR
   #include <Reset.h>
 #endif
@@ -102,10 +106,11 @@ void RobotClass::begin(){
 
   RANGING.begin(115200);
 
-  Bumper.begin();
+  Bumper.begin();	
   if (IMU_USE) IMU.begin();    
   Motor.begin();      
   Perimeter.begin(pinPerimeterLeft, pinPerimeterRight);          
+	Sonar.begin();
     
   Map.begin();
   DEBUG(F("freeRam="));
@@ -223,6 +228,12 @@ void RobotClass::printSensorData(){
     ROBOTMSG.print(Motor.angleRadSet);   
 		ROBOTMSG.print(F(","));	
 	  ROBOTMSG.print(sensorTriggerStatus);  
+		ROBOTMSG.print(F(","));
+		ROBOTMSG.print(Sonar.distanceLeft);
+		ROBOTMSG.print(F(","));
+		ROBOTMSG.print(Sonar.distanceCenter);
+		ROBOTMSG.print(F(","));
+		ROBOTMSG.print(Sonar.distanceRight);						
     ROBOTMSG.println(); 		
 }
 
@@ -393,6 +404,7 @@ void RobotClass::run(){
 
   Buzzer.run();
 	ADCMan.run();
+	Sonar.run();
 
   if (millis() >= nextControlTime){    
     nextControlTime = millis() + 200; // 5 Hz

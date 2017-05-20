@@ -118,7 +118,7 @@ boolean updateScreen = false;
 int screenw = 1200;
 int screenh = 600;
 int plotw = 300;
-int ploth = 80;
+int ploth = 60;
 int time = 0;
 int sensorTrigger = 0;
 float yaw = 0;
@@ -127,6 +127,9 @@ float roll = 0;
 float comYaw = 0;
 int odoL = 0;
 int odoR = 0;
+int sonL = 0;
+int sonC = 0;
+int sonR = 0;
 int nextSendTime = 0;
 int nextComPlotTime = 0;
 float speedL = 0;
@@ -164,6 +167,7 @@ Plot plotSpeedL, plotSpeedR, plotYaw, plotComYaw, plotCom, plotPeriL, plotPeriR,
 Plot plotComY, plotComMag, plotSenL, plotSenR, plotSenMow, plotFrictionL, plotFrictionR;
 Plot plotPIDimuError,  plotDiffOdoIMU,   plotPIDleftError,   plotPIDrightError;
 Plot plotAccY, plotAccZ, plotAccX, plotProb, plotParticlesDist,  plotSmoothProb;
+Plot plotSonarC, plotSonarL, plotSonarR;
 Plot plotTrigBumperLeft, plotTrigBumperRight, plotTrigSonarLeft, plotTrigSonarRight, plotTrigSonarCenter;
 Plot plotTrigMotorFrictionLeft, plotTrigMotorFrictionRight, plotTrigMotorFrictionMow, plotTrigMotorStuck, plotTrigMotorErrorLeft, plotTrigMotorErrorRight, plotTrigMotorErrorMow;
 Plot plotTrigPerimeterLeft, plotTrigPerimeterRight; 
@@ -377,7 +381,11 @@ void createPlots(){
   plotPIDrightError = new Plot(sheetPlotMain,3, -40, 40, "rightErr",   x, y+6*ploth, plotw, ploth, 120, 120, 0);
   plotAccY = new Plot(sheetPlotMain,0, -1, 1, "accY",   x, y+7*ploth, plotw, ploth, 120, 120, 0);
   plotAccZ = new Plot(sheetPlotMain,1, -1, 1, "accZ",   x, y+7*ploth, plotw, ploth, 0, 0, 127);
-  plotAccX = new Plot(sheetPlotMain,2, -1, 1, "accX",   x, y+7*ploth, plotw, ploth, 255, 0, 0);    
+  plotAccX = new Plot(sheetPlotMain,2, -1, 1, "accX",   x, y+7*ploth, plotw, ploth, 255, 0, 0);
+  plotSonarL = new Plot(sheetPlotMain,0, 0, 4000, "sonL",   x, y+8*ploth, plotw, ploth, 120, 120, 0);
+  plotSonarC = new Plot(sheetPlotMain,1, 0, 4000, "sonC",   x, y+8*ploth, plotw, ploth, 0, 0, 127);
+  plotSonarR = new Plot(sheetPlotMain,2, 0, 4000, "sonR",   x, y+8*ploth, plotw, ploth, 255, 0, 0);
+  
   plotTrigBumperLeft      = new Plot(sheetPlotMisc, 0, 0, 2, "trBumL",      x, y+0*ploth, plotw, ploth, 63, 0, 0);
   plotTrigBumperRight     = new Plot(sheetPlotMisc, 1, 0, 2, "trBumR",      x, y+0*ploth, plotw, ploth, 255, 0, 0);  
   plotTrigSonarLeft       = new Plot(sheetPlotMisc, 0, 0, 2, "trSonL",      x, y+1*ploth, plotw, ploth, 0, 63, 0);
@@ -705,7 +713,7 @@ void processDataReceived(String data) {
       // sensor data
       //println("SENS: " + data);
       String[] list = splitTokens(data, ",");
-      if (list.length >= 34){
+      if (list.length >= 37){
         time = Integer.parseInt(list[1]);
         state = Integer.parseInt(list[2]);
         frq = Integer.parseInt(list[3]);
@@ -746,7 +754,13 @@ void processDataReceived(String data) {
         imuState = Integer.parseInt(list[30]);
         distanceCmSet = Float.parseFloat(list[31]);
         angleRadSet = Float.parseFloat(list[32]);
-        sensorTrigger = Integer.parseInt(list[33]);        
+        sensorTrigger = Integer.parseInt(list[33]);
+        sonL = Integer.parseInt(list[34]);
+        sonC = Integer.parseInt(list[35]);
+        sonR = Integer.parseInt(list[36]);
+        plotSonarL.addPlotData(sonL);
+        plotSonarC.addPlotData(sonC);
+        plotSonarR.addPlotData(sonR);
         //println("TRIG: " + sensorTrigger);
         plotTrigBumperLeft.addPlotData(Math.min(1,sensorTrigger & SEN_BUMPER_LEFT));
         plotTrigBumperRight.addPlotData(Math.min(1,sensorTrigger & SEN_BUMPER_RIGHT));

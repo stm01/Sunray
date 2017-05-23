@@ -40,32 +40,33 @@ void startHCSR04(int triggerPin, int aechoPin){
   
 }
 
-void echoLeft(){
+ISR(echoLeft){
   if (idx != 0) return;
   if (digitalRead(pinSonarLeftEcho) == HIGH) {    
-    echoTime = 0;
     startTime = micros();           
+		echoTime = 0;    
   } else {    
     echoTime = micros();            
     echoDuration = echoTime - startTime;          
   }
 }
 
-void echoCenter(){
+ISR(echoCenter){
   if (idx != 1) return;
   if (digitalRead(pinSonarCenterEcho) == HIGH) {    
-    echoTime = 0;
     startTime = micros();           
+		echoTime = 0;    
   } else {    
     echoTime = micros();            
     echoDuration = echoTime - startTime;          
   }
 }
-void echoRight(){
+
+ISR(echoRight){
   if (idx != 2) return;
   if (digitalRead(pinSonarRightEcho) == HIGH) {    
-    echoTime = 0;
     startTime = micros();           
+		echoTime = 0;    
   } else {    
     echoTime = micros();            
     echoDuration = echoTime - startTime;          
@@ -73,22 +74,6 @@ void echoRight(){
 }
 
 void SonarClass::run(){      
-  if (millis() > timeoutTime){                    
-    if (!added) {                      
-      if (idx == 0) sonarLeftMeasurements.add(MAX_DURATION);        
-        else if (idx == 1) sonarCenterMeasurements.add(MAX_DURATION);        
-        else sonarRightMeasurements.add(MAX_DURATION);             
-    }
-    added = false;
-    //if (millis() > nextSonarTime){        
-    idx = (idx + 1) % 3;
-      //nextSonarTime = millis() + 100;
-    //}
-    if (idx == 0) startHCSR04(pinSonarLeftTrigger, pinSonarLeftEcho);        
-      else if (idx == 1) startHCSR04(pinSonarCenterTrigger, pinSonarCenterEcho);        
-      else startHCSR04(pinSonarRightTrigger, pinSonarRightEcho);        
-    timeoutTime = millis() + 10;    
-  }
   if (echoDuration != 0) {            
     added = true;
     unsigned long raw = echoDuration;    
@@ -97,6 +82,23 @@ void SonarClass::run(){
       else if (idx == 1) sonarCenterMeasurements.add(raw);        
       else sonarRightMeasurements.add(raw);        
     echoDuration = 0;
+  }
+  if (millis() > timeoutTime){                    
+    if (!added) {                      
+      if (idx == 0) sonarLeftMeasurements.add(MAX_DURATION);        
+        else if (idx == 1) sonarCenterMeasurements.add(MAX_DURATION);        
+        else sonarRightMeasurements.add(MAX_DURATION);             
+    }    
+    //if (millis() > nextSonarTime){        
+    idx = (idx + 1) % 3;		
+      //nextSonarTime = millis() + 100;
+    //}
+    echoDuration = 0;
+		if (idx == 0) startHCSR04(pinSonarLeftTrigger, pinSonarLeftEcho);        
+      else if (idx == 1) startHCSR04(pinSonarCenterTrigger, pinSonarCenterEcho);        
+      else startHCSR04(pinSonarRightTrigger, pinSonarRightEcho);        				  		
+		timeoutTime = millis() + 10;    			
+		added = false;
   }
   if (millis() > nextEvalTime){
     nextEvalTime = millis() + 200;        		
@@ -109,20 +111,22 @@ void SonarClass::run(){
 
 void SonarClass::begin()
 {
-  pinMode(pinSonarCenterTrigger , OUTPUT);
-  pinMode(pinSonarLeftTrigger , OUTPUT);
+	pinMode(pinSonarLeftTrigger , OUTPUT);
+  pinMode(pinSonarCenterTrigger , OUTPUT);  
   pinMode(pinSonarRightTrigger , OUTPUT);
-  pinMode(pinSonarCenterEcho , INPUT);  
+
   pinMode(pinSonarLeftEcho , INPUT);  
+  pinMode(pinSonarCenterEcho , INPUT);    
   pinMode(pinSonarRightEcho , INPUT);  
 
+	attachInterrupt(pinSonarLeftEcho, echoLeft, CHANGE); 
   attachInterrupt(pinSonarCenterEcho, echoCenter, CHANGE);
   attachInterrupt(pinSonarRightEcho, echoRight, CHANGE);
-  attachInterrupt(pinSonarLeftEcho, echoLeft, CHANGE); 
+  
 	
-	PinMan.setDebounce(pinSonarCenterEcho, 100);  // reject spikes shorter than usecs on pin
+	/*PinMan.setDebounce(pinSonarCenterEcho, 100);  // reject spikes shorter than usecs on pin
 	PinMan.setDebounce(pinSonarRightEcho, 100);  // reject spikes shorter than usecs on pin
-	PinMan.setDebounce(pinSonarLeftEcho, 100);  // reject spikes shorter than usecs on pin
+	PinMan.setDebounce(pinSonarLeftEcho, 100);  // reject spikes shorter than usecs on pin*/
 	verboseOutput = false;
 }
 

@@ -26,6 +26,7 @@ void BatteryClass::begin()
   ADCMan.setupChannel(pinChargeVoltage, 1, false);   
   
   nextCheckTime = 0;
+	timeMinutes=0;
   chargerConnectedState = false;    
   
   batteryFactor = (47+5.1) / 5.1;    // ADC voltage to battery voltage
@@ -45,6 +46,7 @@ void BatteryClass::enableCharging(bool flag){
   DEBUGLN(flag);
   chargingEnabled = flag;
   digitalWrite(pinChargeRelay, flag);      
+	nextPrintTime = 0;  	   	   	
 }
 
 bool BatteryClass::chargerConnected(){
@@ -65,6 +67,23 @@ void BatteryClass::allowSwitchOff(bool flag){
   if (flag) resetIdle();
 }
 
+void BatteryClass::print(){
+	ROBOTMSG.print(F("!88,"));
+	ROBOTMSG.print(timeMinutes);
+	ROBOTMSG.print(F(","));       
+	ROBOTMSG.print(batteryVoltage);
+	ROBOTMSG.print(F(","));       
+	ROBOTMSG.print(chargingVoltage);    
+	ROBOTMSG.print(F(","));       
+	ROBOTMSG.print(chargingCurrent);			
+	ROBOTMSG.print(F(","));       
+	ROBOTMSG.print(chargingEnabled);
+	ROBOTMSG.print(F(","));       
+	ROBOTMSG.print(chargerConnected());
+	ROBOTMSG.print(F(","));       
+	ROBOTMSG.print(switchOffAllowed);			
+	ROBOTMSG.println();        			
+}
 
 void BatteryClass::run(){  
   chargingVoltage = ((float)ADCMan.getVoltage(pinChargeVoltage)) * batteryFactor;  
@@ -78,19 +97,19 @@ void BatteryClass::run(){
 	      chargerConnectedState = true;		    
 		    DEBUGLN(F("CHARGER CONNECTED"));      	              
         Buzzer.sound(SND_OVERCURRENT, true);
-        enableCharging(true);        
+        enableCharging(true);        				
 	    }
   } else {
       if (chargerConnectedState){        
         chargerConnectedState = false;
-        DEBUGLN(F("CHARGER DISCONNECTED"));              
-        enableCharging(false);
+        DEBUGLN(F("CHARGER DISCONNECTED"));              				
+        enableCharging(false);				
       }
   }      		
   
   if (millis() >= nextCheckTime){    
     nextCheckTime = millis() + 5000;  	   	   	
-    unsigned long timeMinutes = (millis()-chargingStartTime) / 1000 /60;
+    timeMinutes = (millis()-chargingStartTime) / 1000 /60;
     if (switchOffAllowed){
       if (millis() >= switchOffTime){
         Buzzer.sound(SND_OVERCURRENT, true);
@@ -119,7 +138,8 @@ void BatteryClass::run(){
 		
 		if (millis() >= nextPrintTime){
 			nextPrintTime = millis() + 60000;  	   	   	
-			DEBUG(F("charger conn="));
+			print();			
+			/*DEBUG(F("charger conn="));
 			DEBUG(chargerConnected());
 			DEBUG(F(" chgEnabled="));
 			DEBUG(chargingEnabled);
@@ -135,10 +155,9 @@ void BatteryClass::run(){
 			DEBUG(F(" V  "));    
 			DEBUG(F("switchOffAllowed="));   
 			DEBUG(switchOffAllowed);      
-			DEBUGLN();      
-		} 
-  }	
+			DEBUGLN();      */					
+    }	
+  }
 }
-
 
 

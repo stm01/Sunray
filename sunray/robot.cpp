@@ -14,6 +14,9 @@
  *  75 : erase microcontroller flash memory
  *  76 : eeprom data
  
+ * battery messages
+ *  88 : battery data
+ 
  * perimeter messages
  *  84 : perimeter settings
  

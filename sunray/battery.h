@@ -26,12 +26,14 @@ class BatteryClass {
     bool shouldGoHome();    
     void resetIdle();
   protected:           
-    bool chargerConnectedState;
+    unsigned long timeMinutes;
+		bool chargerConnectedState;
     bool switchOffAllowed;
     unsigned long switchOffTime;
     unsigned long chargingStartTime;
 	  unsigned long nextCheckTime;	  
 		unsigned long nextPrintTime;	  
+		void print();
 };
 
 extern BatteryClass Battery;

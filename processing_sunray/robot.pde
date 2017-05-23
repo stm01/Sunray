@@ -168,6 +168,8 @@ Plot plotComY, plotComMag, plotSenL, plotSenR, plotSenMow, plotFrictionL, plotFr
 Plot plotPIDimuError,  plotDiffOdoIMU,   plotPIDleftError,   plotPIDrightError;
 Plot plotAccY, plotAccZ, plotAccX, plotProb, plotParticlesDist,  plotSmoothProb;
 Plot plotSonarC, plotSonarL, plotSonarR;
+Plot plotBatteryVolt, plotChargerVolt;
+Plot plotChargerAmp;
 Plot plotTrigBumperLeft, plotTrigBumperRight, plotTrigSonarLeft, plotTrigSonarRight, plotTrigSonarCenter;
 Plot plotTrigMotorFrictionLeft, plotTrigMotorFrictionRight, plotTrigMotorFrictionMow, plotTrigMotorStuck, plotTrigMotorErrorLeft, plotTrigMotorErrorRight, plotTrigMotorErrorMow;
 Plot plotTrigPerimeterLeft, plotTrigPerimeterRight; 
@@ -385,6 +387,9 @@ void createPlots(){
   plotSonarL = new Plot(sheetPlotMain,0, 0, 4000, "sonL",   x, y+8*ploth, plotw, ploth, 120, 120, 0);
   plotSonarC = new Plot(sheetPlotMain,1, 0, 4000, "sonC",   x, y+8*ploth, plotw, ploth, 0, 0, 127);
   plotSonarR = new Plot(sheetPlotMain,2, 0, 4000, "sonR",   x, y+8*ploth, plotw, ploth, 255, 0, 0);
+  plotBatteryVolt = new Plot(sheetPlotMain,0, 0, 32, "batV",   x, y+9*ploth, plotw, ploth, 120, 120, 0);
+  plotChargerVolt = new Plot(sheetPlotMain,1, 0, 32, "chgV",   x, y+9*ploth, plotw, ploth, 0, 0, 127);
+  plotChargerAmp = new Plot(sheetPlotMain,2, 0, 1.7, "chgA",   x, y+9*ploth, plotw, ploth, 255, 0, 0);  
   
   plotTrigBumperLeft      = new Plot(sheetPlotMisc, 0, 0, 2, "trBumL",      x, y+0*ploth, plotw, ploth, 63, 0, 0);
   plotTrigBumperRight     = new Plot(sheetPlotMisc, 1, 0, 2, "trBumR",      x, y+0*ploth, plotw, ploth, 255, 0, 0);  
@@ -404,9 +409,6 @@ void createPlots(){
   plotSmoothProb = new Plot(sheetPlotMisc, 1, -0.1, 1.1, "probS",   x, y+6*ploth, plotw, ploth, 0, 63, 0);
   plotParticlesDist = new Plot(sheetPlotMisc, 0, -30, 30, "partDist",   x, y+7*ploth, plotw, ploth, 255, 0, 0);
       
-
- 
-
 }
 
 void drawJoystick(int px, int py){
@@ -782,6 +784,15 @@ void processDataReceived(String data) {
         String line =   time + "," + yaw + "," + pitch + "," + roll;                          
         //saveMagData(line);
       }
+    }
+    if (data.startsWith("!88")){
+      // battery data
+      String[] list = splitTokens(data, ",");
+      if (list.length >= 8){                
+        plotBatteryVolt.addPlotData(Float.parseFloat(list[2]));
+        plotChargerVolt.addPlotData(Float.parseFloat(list[3]));
+        plotChargerAmp.addPlotData(Float.parseFloat(list[4]));
+      }      
     }
     if (data.startsWith("!77")){
       // ranging data

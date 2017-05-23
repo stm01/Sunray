@@ -13,6 +13,21 @@ static uint8_t TCChanEnabled[] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 PinManager PinMan;
 
 
+void PinManager::setDebounce(int pin, int usecs){  // reject spikes shorter than usecs on pin
+ if(usecs){
+   g_APinDescription[pin].pPort -> PIO_IFER = g_APinDescription[pin].ulPin;
+   g_APinDescription[pin].pPort -> PIO_DIFSR |= g_APinDescription[pin].ulPin;
+ }
+ else {
+   g_APinDescription[pin].pPort -> PIO_IFDR = g_APinDescription[pin].ulPin;
+   g_APinDescription[pin].pPort -> PIO_DIFSR &=~ g_APinDescription[pin].ulPin;
+   return;
+ }
+  int div=(usecs/31)-1; if(div<0)div=0; if(div > 16383) div=16383;
+  g_APinDescription[pin].pPort -> PIO_SCDR = div;
+}
+
+
 void PinManager::begin() {
 // PWM frequency
 #ifdef __AVR__

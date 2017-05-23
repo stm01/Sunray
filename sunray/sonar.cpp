@@ -3,6 +3,7 @@
 #include "motor.h"
 #include "buzzer.h"
 #include "robot.h"
+#include "pinman.h"
 #include "RunningMedian.h"
 #include <Arduino.h>
 
@@ -118,6 +119,10 @@ void SonarClass::begin()
   attachInterrupt(pinSonarCenterEcho, echoCenter, CHANGE);
   attachInterrupt(pinSonarRightEcho, echoRight, CHANGE);
   attachInterrupt(pinSonarLeftEcho, echoLeft, CHANGE); 
+	
+	PinMan.setDebounce(pinSonarCenterEcho, 100);  // reject spikes shorter than usecs on pin
+	PinMan.setDebounce(pinSonarRightEcho, 100);  // reject spikes shorter than usecs on pin
+	PinMan.setDebounce(pinSonarLeftEcho, 100);  // reject spikes shorter than usecs on pin
 	verboseOutput = false;
 }
 

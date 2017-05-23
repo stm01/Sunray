@@ -2,6 +2,7 @@
 #include "config.h"
 #include "motor.h"
 #include "buzzer.h"
+#include "pinman.h"
 #include "robot.h"
 #include <Arduino.h>
 
@@ -40,6 +41,10 @@ void BumperClass::begin()
   pinMode(pinBumperRight, INPUT_PULLUP);                   
 	attachInterrupt(pinBumperLeft, BumperLeftInterruptRoutine, LOW);
 	attachInterrupt(pinBumperRight, BumperRightInterruptRoutine, LOW);
+	
+	PinMan.setDebounce(pinBumperLeft, 100);  // reject spikes shorter than usecs on pin
+	PinMan.setDebounce(pinBumperRight, 100);  // reject spikes shorter than usecs on pin
+	
   nextCheckTime = 0;
 }
 

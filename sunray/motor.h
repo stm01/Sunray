@@ -53,6 +53,7 @@ class MotorClass {
     int motorRightTicks;
     int motorRightTicksZero;
     float ticksPerCm;  // ticks per cm
+		int wheelDiameter; // wheel diameter mm
     int ticksPerRevolution; // ticks per revolution
     float wheelBaseCm;  // wheel-to-wheel diameter
 

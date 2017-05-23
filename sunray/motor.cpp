@@ -74,6 +74,9 @@ void MotorClass::begin() {
   //attachInterrupt(pinOdometryLeft2, PCINT2_vect, CHANGE);
   attachInterrupt(pinOdometryRight, PCINT2_vect, CHANGE);
   //attachInterrupt(pinOdometryRight2, PCINT2_vect, CHANGE);
+	
+	PinMan.setDebounce(pinOdometryLeft, 10);  // reject spikes shorter than usecs on pin
+	PinMan.setDebounce(pinOdometryRight, 10);  // reject spikes shorter than usecs on pin	
 
 	verboseOutput = false;
   lowPass = true;
@@ -84,10 +87,11 @@ void MotorClass::begin() {
   mowSenseMax = 4.0;
   motorFrictionMax = 1700;
 	motorFrictionMin = 0.2;
-	robotMass = 10;
-  ticksPerCm = 13.49 * 2;
+	robotMass = 10;  
   ticksPerRevolution = 1060 * 2;
-  wheelBaseCm = 36;    // wheel-to-wheel distance (cm)
+	wheelDiameter              = 250;        // wheel diameter (mm)
+	wheelBaseCm = 36;    // wheel-to-wheel distance (cm)
+	ticksPerCm         = ((float)ticksPerRevolution) / (((float)wheelDiameter)/10.0) / (2*3.1415);    // computes encoder ticks per cm (do not change)  
 	stuckMaxDiffOdometryIMU = 0.2;
 	stuckMaxIMUerror = 5;
 

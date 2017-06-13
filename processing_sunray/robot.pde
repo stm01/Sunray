@@ -21,12 +21,12 @@ static final float imuPID_Kd = 3.0;
 static final float motorPID_Kp = 2.0;
 static final float motorPID_Ki = 0.03;
 static final float motorPID_Kd = 0.03;
-static final float stuckMaxDiffOdometryIMU = 0.2;
-static final float stuckMaxIMUerror = 5.0;
+static final float stuckMaxDiffOdometryIMU = 20; // 0.2
+static final float stuckMaxIMUerror = 50.0; // 5.0
 // perimeter
 static final int timedOutIfBelowSmag = 10;
 static final int timeOutSecIfNotInside = 15;
-static final byte swapCoilPolarity = 0;
+static final byte swapCoilPolarity = 1;
 static final boolean filterPerimeterSpikes = true; 
 // IMU
 static final byte useGyro = 1;
@@ -387,8 +387,8 @@ void createPlots(){
   plotSonarL = new Plot(sheetPlotMain,0, 0, 4000, "sonL",   x, y+8*ploth, plotw, ploth, 120, 120, 0);
   plotSonarC = new Plot(sheetPlotMain,1, 0, 4000, "sonC",   x, y+8*ploth, plotw, ploth, 0, 0, 127);
   plotSonarR = new Plot(sheetPlotMain,2, 0, 4000, "sonR",   x, y+8*ploth, plotw, ploth, 255, 0, 0);
-  plotBatteryVolt = new Plot(sheetPlotMain,0, 0, 32, "batV",   x, y+9*ploth, plotw, ploth, 120, 120, 0);
-  plotChargerVolt = new Plot(sheetPlotMain,1, 0, 32, "chgV",   x, y+9*ploth, plotw, ploth, 0, 0, 127);
+  plotBatteryVolt = new Plot(sheetPlotMain,0, 20, 32, "batV",   x, y+9*ploth, plotw, ploth, 120, 120, 0);
+  plotChargerVolt = new Plot(sheetPlotMain,1, 20, 32, "chgV",   x, y+9*ploth, plotw, ploth, 0, 0, 127);
   plotChargerAmp = new Plot(sheetPlotMain,2, 0, 1.7, "chgA",   x, y+9*ploth, plotw, ploth, 255, 0, 0);  
   
   plotTrigBumperLeft      = new Plot(sheetPlotMisc, 0, 0, 2, "trBumL",      x, y+0*ploth, plotw, ploth, 63, 0, 0);

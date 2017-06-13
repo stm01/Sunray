@@ -85,15 +85,15 @@ void MotorClass::begin() {
   pwmMaxMow = 255;
   rpmMax = 25;
   mowSenseMax = 4.0;
-  motorFrictionMax = 1700;
+  motorFrictionMax = 3400;
 	motorFrictionMin = 0.2;
 	robotMass = 10;  
   ticksPerRevolution = 1060 * 2;
 	wheelDiameter              = 250;        // wheel diameter (mm)
 	wheelBaseCm = 36;    // wheel-to-wheel distance (cm)
 	ticksPerCm         = ((float)ticksPerRevolution) / (((float)wheelDiameter)/10.0) / (2*3.1415);    // computes encoder ticks per cm (do not change)  
-	stuckMaxDiffOdometryIMU = 0.2;
-	stuckMaxIMUerror = 5;
+	stuckMaxDiffOdometryIMU = 2;
+	stuckMaxIMUerror = 50;
 
   motorLeftPID.Kp       = 2.0;  
   motorLeftPID.Ki       = 0.03; 

@@ -715,7 +715,7 @@ void processDataReceived(String data) {
       // sensor data
       //println("SENS: " + data);
       String[] list = splitTokens(data, ",");
-      if (list.length >= 37){
+      if (list.length >= 23){
         time = Integer.parseInt(list[1]);
         state = Integer.parseInt(list[2]);
         frq = Integer.parseInt(list[3]);
@@ -755,30 +755,31 @@ void processDataReceived(String data) {
         motion = Integer.parseInt(list[29]);
         imuState = Integer.parseInt(list[30]);
         distanceCmSet = Float.parseFloat(list[31]);
-        angleRadSet = Float.parseFloat(list[32]);
-        sensorTrigger = Integer.parseInt(list[33]);
-        sonL = Integer.parseInt(list[34]);
-        sonC = Integer.parseInt(list[35]);
-        sonR = Integer.parseInt(list[36]);
-        plotSonarL.addPlotData(sonL);
-        plotSonarC.addPlotData(sonC);
-        plotSonarR.addPlotData(sonR);
-        //println("TRIG: " + sensorTrigger);
-        plotTrigBumperLeft.addPlotData(Math.min(1,sensorTrigger & SEN_BUMPER_LEFT));
-        plotTrigBumperRight.addPlotData(Math.min(1,sensorTrigger & SEN_BUMPER_RIGHT));
-        plotTrigSonarLeft.addPlotData(Math.min(1,sensorTrigger & SEN_SONAR_LEFT));
-        plotTrigSonarRight.addPlotData(Math.min(1,sensorTrigger & SEN_SONAR_RIGHT));
-        plotTrigSonarCenter.addPlotData(Math.min(1,sensorTrigger & SEN_SONAR_CENTER));
-        plotTrigPerimeterLeft.addPlotData(Math.min(1,sensorTrigger & SEN_PERIMETER_LEFT));
-        plotTrigPerimeterRight.addPlotData(Math.min(1,sensorTrigger & SEN_PERIMETER_RIGHT));
-        plotTrigMotorStuck.addPlotData(Math.min(1,sensorTrigger & SEN_MOTOR_STUCK));
-        plotTrigMotorFrictionLeft.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_FRICTION_LEFT));
-        plotTrigMotorFrictionRight.addPlotData(Math.min(1,sensorTrigger & SEN_MOTOR_FRICTION_RIGHT));
-        plotTrigMotorFrictionMow.addPlotData(Math.min(1,sensorTrigger & SEN_MOTOR_FRICTION_MOW));
-        plotTrigMotorErrorLeft.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_ERROR_LEFT));
-        plotTrigMotorErrorRight.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_ERROR_RIGHT));
-        plotTrigMotorErrorMow.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_ERROR_MOW));
-        
+        angleRadSet = Float.parseFloat(list[32]);        
+        if (list.length >= 37){
+          sensorTrigger = Integer.parseInt(list[33]);
+          sonL = Integer.parseInt(list[34]);
+          sonC = Integer.parseInt(list[35]);
+          sonR = Integer.parseInt(list[36]);
+          plotSonarL.addPlotData(sonL);
+          plotSonarC.addPlotData(sonC);
+          plotSonarR.addPlotData(sonR);
+          //println("TRIG: " + sensorTrigger);
+          plotTrigBumperLeft.addPlotData(Math.min(1,sensorTrigger & SEN_BUMPER_LEFT));
+          plotTrigBumperRight.addPlotData(Math.min(1,sensorTrigger & SEN_BUMPER_RIGHT));
+          plotTrigSonarLeft.addPlotData(Math.min(1,sensorTrigger & SEN_SONAR_LEFT));
+          plotTrigSonarRight.addPlotData(Math.min(1,sensorTrigger & SEN_SONAR_RIGHT));
+          plotTrigSonarCenter.addPlotData(Math.min(1,sensorTrigger & SEN_SONAR_CENTER));
+          plotTrigPerimeterLeft.addPlotData(Math.min(1,sensorTrigger & SEN_PERIMETER_LEFT));
+          plotTrigPerimeterRight.addPlotData(Math.min(1,sensorTrigger & SEN_PERIMETER_RIGHT));
+          plotTrigMotorStuck.addPlotData(Math.min(1,sensorTrigger & SEN_MOTOR_STUCK));
+          plotTrigMotorFrictionLeft.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_FRICTION_LEFT));
+          plotTrigMotorFrictionRight.addPlotData(Math.min(1,sensorTrigger & SEN_MOTOR_FRICTION_RIGHT));
+          plotTrigMotorFrictionMow.addPlotData(Math.min(1,sensorTrigger & SEN_MOTOR_FRICTION_MOW));
+          plotTrigMotorErrorLeft.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_ERROR_LEFT));
+          plotTrigMotorErrorRight.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_ERROR_RIGHT));
+          plotTrigMotorErrorMow.addPlotData(Math.min(1, sensorTrigger & SEN_MOTOR_ERROR_MOW));
+        }  
         //map.run(yaw, 0, periLeft, periRight);
         
         String line =   time + "," + yaw + "," + pitch + "," + roll;                          

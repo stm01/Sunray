@@ -212,10 +212,11 @@ void IMUClass::initSensors(){
   // MPU9150/6050
   uint8_t data = 0;
   while (true){     
-     I2C_readFrom(0x68, 0x75, 1, &data, 1); // mpu6050/9150     
+     I2C_readFrom(0x69, 0x75, 1, &data, 1); // mpu6050/9150     
      DEBUG(F("MPU6050 ID="));
      DEBUGLN(data);
      if (data == 104) break;
+		 DEBUG(F("GY-88 not found - Did you connect G_AD0 to 3.3v?"));
      // (0b110100, 0x34)
      delay(1000);
   }

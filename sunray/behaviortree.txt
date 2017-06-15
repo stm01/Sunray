@@ -1,0 +1,47 @@
+
+
+
+
+--BehaviorTree--
+
+*BEHAVE(sel)
+	*STAY_HEALTHY(sel)
+		*CHECK_BATTERY_OK
+		*DOCK(seq)
+			*NAV_DOCK(seq)
+				*FIND_PERIMETER(sel)
+					*CHECK_NO_OBSTACLE
+					*AVOID_OBSTACLE(seq)
+						*ROTATE_RIGHT_45_DEG
+						*FORWARD_50cm
+						*ROTATE_LEFT_45_DEG
+				*TRACK_CLOCKWISE(sel)
+					*CHECK_NO_OBSTACLE
+					*AVOID_OBSTACLE(seq)
+						*ROTATE_RIGHT_45_DEG
+						*FORWARD_50cm
+						*ROTATE_LEFT_45_DEG					
+					*CHECK_PERI(sel) 
+					  *PERI_RIGHT_OUTSIDE
+						  *ROTATE_RIGHT
+						*PERI_LEFT_INSIDE
+						  *ROTATE_LEFT
+			*CHARGE
+	*MAPPING(seq)
+		*TRACK_COUNTER_CLOCKWISE(sel)
+			*CHECK_NO_OBSTACLE
+				*AVOID_OBSTACLE(seq)
+					*ROTATE_LEFT_45_DEG
+					*FORWARD_50cm
+					*ROTATE_RIGHT_45_DEG
+		*DOCK
+	*MOW_RANDOM(seq)	  
+		*STAY_AWAY_FROM_OBSTACLES(sel)
+			*CHECK_NO_OBSTACLE
+			*AVOID_OBSTACLE(seq)
+				*REVERSE
+				*ROTATE
+		*FORWARD
+		
+	
+	

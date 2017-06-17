@@ -97,21 +97,13 @@ class RobotClass
 	  unsigned long trackLineTimeout;
     unsigned long nextInfoTime;
     unsigned long nextIMUTime; 
-	  unsigned long nextControlTime; 
-    String content;
-    String receivedData;
-    int hdrLen;
+	  unsigned long nextControlTime;     
 	  void stateMachine();
 	  void track();
 	  void mow();	
     void receiveEEPROM_or_ERASE();
     void printSensorData();
-    void readRobotMessages();
-    void sendHTTPNotFound();
-    void initHTTP();
-    void finishHTTP();
-    void sendInfo();
-    void serveHTTP();
+    void readRobotMessages();    
 };    
 
 extern RobotClass Robot;

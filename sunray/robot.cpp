@@ -667,6 +667,16 @@ void RobotClass::mow(){
 }
 
 
+/*
+if outside:
+* if 'inside->outside' transition in forward motion => reverse until inside
+* if 'inside->outside' transition in reverse motion => forward until inside
+
+if inside:
+* if bumper in forward motion => slightly reverse
+* if bumper in reverse motion => slightly forward
+*/
+
 void RobotClass::stateMachine(){    
 		switch (state){
       case STAT_CAL_GYRO:	      

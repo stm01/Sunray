@@ -35,6 +35,8 @@ const char* robotStateNames[] = { "IDLE", "GYRO", "TRAK", "MAP ", "MOW ", "R/C "
 RobotClass::RobotClass(){
 }
 
+
+// robot start
 void RobotClass::begin(){      
   // keep battery switched ON
   pinMode(pinBatterySwitch, OUTPUT);    
@@ -101,6 +103,7 @@ void RobotClass::resetSensorTriggers(){
 	sensorTriggerStatus = 0;
 }
 
+// robot main loop
 void RobotClass::run(){
   if (millis() >= nextInfoTime){
     nextInfoTime = millis() + 1000;
@@ -398,7 +401,7 @@ if inside:
 
 void RobotClass::stateMachine(){    
 	 
-	 if (Bumper.changed()){
+	  if (Bumper.changed()){
 		  if (Bumper.pressed()){
 				if (Bumper.leftPressed) Robot.sensorTriggered(SEN_BUMPER_LEFT);
 				if (Bumper.rightPressed) Robot.sensorTriggered(SEN_BUMPER_RIGHT);	

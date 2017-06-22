@@ -1,5 +1,7 @@
-
 /* 
+
+robot main class (robot start, robot main loop, state machine)
+
 Particle filter:
 The robot mower uses odometry, an IMU (gyro+compass) and a perimeter to localize itself on the perimeter 
 and within the perimeter. A particle filter estimates the robot position based on moved distance 

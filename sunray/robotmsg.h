@@ -17,6 +17,7 @@ class RobotMsgClass {
 			void sendMap();
 			void sendParticles();
 			void sendPerimeterOutline();
+			void receiveEEPROM_or_ERASE();
 };
 
 extern RobotMsgClass RobotMsg;

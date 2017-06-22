@@ -65,7 +65,11 @@
 #include "bt.h"
 #include "battery.h"
 #include "sonar.h"
-#include "helper.h"cl
+#include "helper.h"
+#include "flashmem.h"
+#ifndef __AVR
+  #include <Reset.h>
+#endif
 
 
 RobotMsgClass RobotMsg;
@@ -74,6 +78,55 @@ RobotMsgClass RobotMsg;
 void RobotMsgClass::begin(){
 	nextInfoTime = 0;	
 }
+
+void RobotMsgClass::receiveEEPROM_or_ERASE(){
+  boolean received = false;
+  int addr;
+  byte data;
+  int cmd;
+  char ch;
+  
+  // wait for serial data (Arduino IDE ERASE command or PC EEPROM data) 
+  while (millis() < 1000);  
+  
+  Flash.verboseOutput=false;    
+  while (ROBOTMSG.available()){                           
+    char ch = ROBOTMSG.read();    
+    switch (ch){     
+      // Arduino Due IDE sends:  €€#N#w00000000,4#  ( https://sourceforge.net/p/lejos/wiki-nxt/SAM-BA%20Protocol/ )
+      case 'N': 
+        ch = ROBOTMSG.read();
+        if (ch == '#'){          
+            #ifndef __AVR__                       
+              initiateReset(1);   // Arduino Due ERASE trigger			  
+			  tickReset();  // https://forums.adafruit.com/viewtopic.php?f=19&t=47844&start=30
+            #endif
+            while(true);
+        }
+        break;
+      case '?':               
+        cmd = ROBOTMSG.parseInt();                
+        switch (cmd) {                    
+          case 76: addr  = ROBOTMSG.parseInt();
+                   data  = ROBOTMSG.parseInt();                   
+                   Flash.write(addr, data);                   
+                   /*DEBUG(addr);
+                   DEBUG(F("="));
+                   DEBUG(data);
+                   DEBUGLN(F(", "));*/
+                   received = true;
+                   break;          
+        }
+        break;      
+    }                 
+    if (!ROBOTMSG.available()) delay(200);
+  }
+  Flash.verboseOutput=true;
+  if (received) DEBUGLN(F("EEPROM received"));  
+    else DEBUGLN(F("ERROR receiving EEPROM"));  
+  //Flash.dump();
+}
+
 
 void RobotMsgClass::sendPerimeterOutline(){
   ROBOTMSG.print(F("!05"));        

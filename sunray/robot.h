@@ -100,8 +100,7 @@ class RobotClass
 	  unsigned long nextControlTime;     
 	  void stateMachine();
 	  void track();
-	  void mow();	
-    void receiveEEPROM_or_ERASE();
+	  void mow();	    
     void printSensorData();
     void readRobotMessages();    
 };    

@@ -15,6 +15,9 @@ example usage:
                              Map.transferOutlineToMap();
                              Map.distributeParticlesOutline();
   4) call this in main loop: Map.run();
+												     Serial.print(Map.robotState.x);
+														 Serial.print(",");
+														 Serial.print(Map.robotState.y);
 
 */
 

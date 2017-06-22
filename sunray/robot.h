@@ -59,7 +59,6 @@ typedef enum MowPattern MowPattern;
 class RobotClass
 {
   public:    
-    float batteryFactor;
     float mowingAngle;
     float rotateAngle;
     float trackAngle;

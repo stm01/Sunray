@@ -3,10 +3,10 @@
    * mapping & localization
  
    required hardware: 
-   * Ardumower PCB: Arduino Due, MC33926 motor drivers+protector board, two perimeter coils (left+right)
+   * Ardumower PCB 1.3: Arduino Due, MC33926 motor drivers, two perimeter coils (left+right)
    * Ardumower motors with odometry
    * perimeter wire (Perimeter sender v2)
-   * replaced IMU: GY-88  (requires to remove RTC module to work properly)
+   * replaced IMU: GY-88  
 */
 
 #include "robot.h"

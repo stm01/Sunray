@@ -82,6 +82,7 @@
 #define ROBOTMSG_BAUDRATE    115200       // baudrate used for console
 //#define ROBOTMSG_BAUDRATE    921600  // baudrate used for console
 #define PFODAPP_BAUDRATE  19200 
+#define RANGING_BAUDRATE  115200       // baudrate for ranging module (DW1000)
 #define BLUETOOTH_PIN       1234
 
 #define IMU_USE 1

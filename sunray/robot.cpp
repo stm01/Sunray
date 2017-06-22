@@ -36,6 +36,10 @@ RobotClass::RobotClass(){
 }
 
 void RobotClass::begin(){      
+  // keep battery switched ON
+  pinMode(pinBatterySwitch, OUTPUT);    
+  digitalWrite(pinBatterySwitch, HIGH);  
+
   Buzzer.begin();
   ROBOTMSG.begin(ROBOTMSG_BAUDRATE);    
 //  receiveEEPROM_or_ERASE(); 
@@ -48,12 +52,9 @@ void RobotClass::begin(){
   
   //while (!Console) ; // required if using Due native port
   DEBUGLN(F("SETUP")); 
-
-  // keep battery switched ON
+  
   Battery.begin();    
-
-  RANGING.begin(115200);
-
+  RANGING.begin(RANGING_BAUDRATE);
   Bumper.begin();	
   if (IMU_USE) IMU.begin();    
   Motor.begin();      

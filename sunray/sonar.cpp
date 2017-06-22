@@ -74,7 +74,11 @@ ISR(echoRight){
 }
 
 void SonarClass::run(){      
-  if (echoDuration != 0) {            
+  if (!enabled) {
+		distanceRight = distanceLeft = distanceCenter = 0;
+		return;
+	}
+	if (echoDuration != 0) {            
     added = true;
     unsigned long raw = echoDuration;    
     if (raw > MAX_DURATION) raw = MAX_DURATION;
@@ -101,16 +105,17 @@ void SonarClass::run(){
 		added = false;
   }
   if (millis() > nextEvalTime){
-    nextEvalTime = millis() + 200;        		
-    //sonar1Measurements.getAverage(avg);      
-    sonarLeftMeasurements.getLowest(distanceLeft);   
-    sonarRightMeasurements.getLowest(distanceRight);   
-    sonarCenterMeasurements.getLowest(distanceCenter);   		
+    nextEvalTime = millis() + 200;        				
+		//sonar1Measurements.getAverage(avg);      
+		sonarLeftMeasurements.getLowest(distanceLeft);   
+		sonarRightMeasurements.getLowest(distanceRight);   
+		sonarCenterMeasurements.getLowest(distanceCenter);   				
   }     
 }
 
 void SonarClass::begin()
 {
+	enabled = true;
 	pinMode(pinSonarLeftTrigger , OUTPUT);
   pinMode(pinSonarCenterTrigger , OUTPUT);  
   pinMode(pinSonarRightTrigger , OUTPUT);
@@ -133,7 +138,8 @@ void SonarClass::begin()
 
 bool SonarClass::obstacle()
 {
-  return ( (distanceLeft < OBSTACLE) || (distanceRight < OBSTACLE) ||(distanceCenter < OBSTACLE) );
+  if (!enabled) return false;
+	return ( (distanceLeft < OBSTACLE) || (distanceRight < OBSTACLE) ||(distanceCenter < OBSTACLE) );
 }
 
 

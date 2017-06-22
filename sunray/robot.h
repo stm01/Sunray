@@ -56,6 +56,7 @@ typedef enum MowPattern MowPattern;
 #define SEN_MOTOR_ERROR_MOW      (1L<<13)
 
 
+
 class RobotClass
 {
   public:    
@@ -91,6 +92,7 @@ class RobotClass
     void sendParticles();
     void sendPerimeterOutline();
 		void sensorTriggered(uint16_t sensorID);
+		void resetSensorTriggers();
   protected:    
     int lastPerimeterMag;
 	  unsigned long trackLineTimeout;

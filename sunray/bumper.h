@@ -5,12 +5,16 @@
 
 class BumperClass {
     public:
-      void begin();            
-      void run();
+		  bool enabled;
+      void begin();                  
+			void run();			
 	    bool pressed();
+			bool changed();
 	    bool leftPressed;
-	    bool rightPressed;      
-    protected:           
+	    bool rightPressed;      			
+			bool leftChanged;
+			bool rightChanged;
+    protected:           		
       unsigned long nextCheckTime;
 };
 

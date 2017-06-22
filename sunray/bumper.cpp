@@ -9,38 +9,32 @@
 BumperClass Bumper;
 
 
-ISR(BumperLeftInterruptRoutine) {
-  Bumper.leftPressed = true;	
+ISR(BumperLeftInterruptRoutine) {	  
+	if (!Bumper.enabled) return;	
+	if (digitalRead(pinBumperLeft) == LOW) Bumper.leftPressed = true;	
+    else Bumper.leftPressed = false;		
+	Bumper.leftChanged = true;
 }
 
 ISR(BumperRightInterruptRoutine) {
-  Bumper.rightPressed = true;	
+  if (!Bumper.enabled) return;
+	if (digitalRead(pinBumperRight) == LOW) Bumper.rightPressed = true;	
+	  else Bumper.rightPressed = false;	
+  Bumper.rightChanged = true;	
 }
 
-void BumperClass::run(){    
-  if (millis() >= nextCheckTime){    
-    if (pressed()){
-      nextCheckTime = millis() + 4000;
-      if (leftPressed) Robot.sensorTriggered(SEN_BUMPER_LEFT);
-			if (rightPressed) Robot.sensorTriggered(SEN_BUMPER_RIGHT);
-			DEBUGLN(F("BUMPER"));      
-      //Motor.stopMowerImmediately();
-      Motor.stopImmediately();
-      Buzzer.sound(SND_OVERCURRENT, true);			
-			leftPressed = false;
-			rightPressed = false;
-    }
-  }
-}
 
 void BumperClass::begin()
 {
-  leftPressed = false;
+  enabled = true;
+	leftPressed = false;
 	rightPressed = false;
+	leftChanged = false;
+	rightChanged = false;
 	pinMode(pinBumperLeft, INPUT_PULLUP);                   
   pinMode(pinBumperRight, INPUT_PULLUP);                   
-	attachInterrupt(pinBumperLeft, BumperLeftInterruptRoutine, LOW);
-	attachInterrupt(pinBumperRight, BumperRightInterruptRoutine, LOW);
+	attachInterrupt(pinBumperLeft, BumperLeftInterruptRoutine, CHANGE);
+	attachInterrupt(pinBumperRight, BumperRightInterruptRoutine, CHANGE);
 	
 	PinMan.setDebounce(pinBumperLeft, 100);  // reject spikes shorter than usecs on pin
 	PinMan.setDebounce(pinBumperRight, 100);  // reject spikes shorter than usecs on pin
@@ -53,4 +47,20 @@ bool BumperClass::pressed()
 {
   return (leftPressed || rightPressed);
 }
+
+bool BumperClass::changed()
+{
+  bool res = ((leftChanged) || (rightChanged));
+	leftChanged = false;
+  rightChanged = false;	
+  return res;	
+}
+
+void BumperClass::run()
+{
+
+}
+
+
+
 

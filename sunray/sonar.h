@@ -7,7 +7,8 @@
 
 class SonarClass {
     public:
-      void begin();            
+      bool enabled;
+			void begin();            
       void run();
 	    bool obstacle();	    
 			unsigned int distanceLeft;

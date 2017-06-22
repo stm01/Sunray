@@ -97,6 +97,10 @@ void RobotClass::configureBluetooth(){
   bt.setParams(F("Ardumower"), 1234, 115200, true);
 }
 
+void RobotClass::resetSensorTriggers(){
+	sensorTriggerStatus = 0;
+}
+
 void RobotClass::run(){
   if (millis() >= nextInfoTime){
     nextInfoTime = millis() + 1000;
@@ -109,7 +113,7 @@ void RobotClass::run(){
     //DEBUG("ADCconvs=");
     //DEBUGLN(ADCMan.getConvCounter());
         
-		sensorTriggerStatus = 0;
+		resetSensorTriggers();		
     
 	  if ( IMU_USE && (!RC.enable) && (IMU.needGyroCal()) ) {     
 	    Motor.setPaused(true);
@@ -223,6 +227,21 @@ void RobotClass::startTrackingForEver(){
   trackState = TRK_FIND;  
   Motor.travelLineDistance(10000, IMU.getYaw(), trackSpeedPerc);
 }
+
+
+
+String RobotClass::getStateName(){
+  return String(robotStateNames[state]);
+}
+
+
+
+void RobotClass::sensorTriggered(uint16_t sensorID){
+	sensorTriggerStatus |= sensorID;	
+}
+
+// -------------------------------- state machine --------------------------------
+
 
 void RobotClass::track(){
   float leftMag = Perimeter.getMagnitude(IDX_LEFT);
@@ -378,6 +397,20 @@ if inside:
 */
 
 void RobotClass::stateMachine(){    
+	 
+	 if (Bumper.changed()){
+		  if (Bumper.pressed()){
+				if (Bumper.leftPressed) Robot.sensorTriggered(SEN_BUMPER_LEFT);
+				if (Bumper.rightPressed) Robot.sensorTriggered(SEN_BUMPER_RIGHT);	
+				DEBUGLN(F("BUMPER PRESS"));      
+				//Motor.stopMowerImmediately();
+				Motor.stopImmediately();
+				Buzzer.sound(SND_OVERCURRENT, true);						    
+			} else {
+				DEBUGLN(F("BUMPER RELEASE"));      
+			}      
+		}		
+		
 		switch (state){
       case STAT_CAL_GYRO:	      
 	      break;
@@ -392,16 +425,4 @@ void RobotClass::stateMachine(){
         break;
     }
 }
-
-String RobotClass::getStateName(){
-  return String(robotStateNames[state]);
-}
-
-
-
-void RobotClass::sensorTriggered(uint16_t sensorID){
-	sensorTriggerStatus |= sensorID;	
-}
-
-
 

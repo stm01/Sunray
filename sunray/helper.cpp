@@ -189,4 +189,16 @@ float ADC2voltage(float ADCvalue){
 }  
 
 
+float parseFloatValue(String s, String key){
+  int idx = s.indexOf(key+"=");
+  if (idx == -1) return 0;
+  idx+=key.length()+1;
+  String n;
+  while ( (s[idx]=='-') || (isdigit(s.charAt(idx))) || (s[idx]=='.') ) {
+    n+= s[idx]; idx++;
+  }
+  return n.toFloat();
+}
+
+
   

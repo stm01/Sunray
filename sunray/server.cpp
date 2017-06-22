@@ -7,6 +7,7 @@
 #include "robot.h"
 #include "pinman.h"
 #include "RunningMedian.h"
+#include "helper.h"
 #include <Arduino.h>
 
 ServerClass Server;
@@ -110,17 +111,6 @@ void ServerClass::sendInfo(){
   content += Motor.angleRadSet;  
   content += "]);";  
   finishHTTP();
-}
-
-float parseFloatValue(String s, String key){
-  int idx = s.indexOf(key+"=");
-  if (idx == -1) return 0;
-  idx+=key.length()+1;
-  String n;
-  while ( (s[idx]=='-') || (isdigit(s.charAt(idx))) || (s[idx]=='.') ) {
-    n+= s[idx]; idx++;
-  }
-  return n.toFloat();
 }
 
 

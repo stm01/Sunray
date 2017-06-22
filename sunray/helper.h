@@ -31,6 +31,7 @@ void printInt(unsigned int v);
 uint32_t serialToLong(HardwareSerial *serial);
 float serialToFloat(HardwareSerial *serial);
 
+float parseFloatValue(String s, String key);
 
 int freeRam ();
 

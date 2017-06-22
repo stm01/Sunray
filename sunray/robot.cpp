@@ -1,58 +1,5 @@
 /*
- * robot messages
- *  01 : sensor data
- *  03 : map bitmap data  
- *  05 : perimeter outline data
- *  11 : tracking forever
- *  12 : start mapping
- *  13 : mowing lanes
- *  14 : mowing random
- *  15 : particles data
- *  16 : distribute particles on perimeter
- *  17 : robot motion data (distance, orientation) 
- *  70 : configure bluetooth  
- *  75 : erase microcontroller flash memory
- *  76 : eeprom data
- 
- * battery messages
- *  88 : battery data
- 
- * perimeter messages
- *  84 : perimeter settings
- 
- * sonar messages
- *  87 : sonar data (verbose)
- 
- * motor messages
- *  00 : stop immediately
- *  02 : set motor pwm (left, right)
- *  85 : travel angle distance (speed, distance, orientation)
- *  06 : travel line distance (speed, distance, orientation)
- *  07 : travel line time (speed, time, orientation) 
- *  08 : rotate angle (speed)
- *  09 : rotate time (speed) 
- *  74 : set mow motor pwm
- *  83 : motor settings 
- *  86 : motor controller data
- 
- * ADC messages
- *  71 : calibrate ADC
- 
- * IMU messages
- *  04 : IMU data (verbose)
- *  10 : calibrate gyro
- *  72 : calibrate compass 
- *  73 : toggle verbose
- *  78 : compass calibration data (centre X,Y,Z,radii X,Y,Z)
- *  79 : IMU self test
- *  80 : start compass calibration  
- *  81 : stop compass calibration  
- *  82 : IMU settings
- 
- * ranging messages
- *  77 : ranging data (time, address, distance, power)
- 
- 
+ robot state machine, tracking, mowing
  */
       
 #include "robot.h"

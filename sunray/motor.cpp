@@ -101,9 +101,14 @@ void MotorClass::begin() {
   motorRightPID.Kp       = motorLeftPID.Kp;
   motorRightPID.Ki       = motorLeftPID.Ki;
   motorRightPID.Kd       = motorLeftPID.Kd;
-  /*imuPID.Kp       = 0.7;
-  imuPID.Ki       = 0.1; 
-  imuPID.Kd       = 3.0;  */
+		
+  imuAnglePID_Kp       = 1.0;
+  imuAnglePID_Ki       = 0; 
+  imuAnglePID_Kd       = 0;  
+  
+  imuPID_Kp       = 0.7;
+  imuPID_Ki       = 0.1; 
+  imuPID_Kd       = 3.0;    
 
   motorLeftSense = 0;
   motorRightSense = 0;
@@ -197,14 +202,14 @@ void MotorClass::speedControlLine() {
   float angleToTargetRad = distancePI(angleRadCurr, angleRadSet); // w-x
   if (motion == MOT_ANGLE_DISTANCE) {
     imuPID.x = angleToTargetRad / PI * 180.0;
-    imuPID.Kp       = 1.0;
-    imuPID.Ki       = 0; 
-    imuPID.Kd       = 0;  
+    imuPID.Kp       = imuAnglePID_Kp;
+    imuPID.Ki       = imuAnglePID_Ki; 
+    imuPID.Kd       = imuAnglePID_Kd;  
   } else {
     imuPID.x = distToLine;
-    imuPID.Kp       = 0.7;
-    imuPID.Ki       = 0.1; 
-    imuPID.Kd       = 3.0;  
+    imuPID.Kp       = imuPID_Kp;
+    imuPID.Ki       = imuPID_Ki; 
+    imuPID.Kd       = imuPID_Kd;
   }   
   imuPID.w = 0;
   imuPID.y_min = -rpmMax;

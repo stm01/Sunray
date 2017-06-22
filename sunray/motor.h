@@ -36,6 +36,12 @@ class MotorClass {
     PID motorLeftPID;
     PID motorRightPID;
     PID imuPID;
+		float imuAnglePID_Kp;
+		float imuAnglePID_Ki;
+		float imuAnglePID_Kd;
+		float imuPID_Kp;
+		float imuPID_Ki;
+		float imuPID_Kd;
     MotorMotion motion;  // curren robot motion
 
 		bool verboseOutput; 

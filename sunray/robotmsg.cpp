@@ -379,9 +379,9 @@ void RobotMsgClass::readRobotMessages(){
 									 Motor.motorFrictionMin = ROBOTMSG.parseFloat();
 									 Motor.motorFrictionMax = ROBOTMSG.parseFloat();
 									 Motor.mowSenseMax = ROBOTMSG.parseFloat();
-									 Motor.imuPID.Kp = ROBOTMSG.parseFloat();
-                   Motor.imuPID.Ki = ROBOTMSG.parseFloat();
-                   Motor.imuPID.Kd = ROBOTMSG.parseFloat();
+									 Motor.imuPID_Kp = ROBOTMSG.parseFloat();
+                   Motor.imuPID_Ki = ROBOTMSG.parseFloat();
+                   Motor.imuPID_Kd = ROBOTMSG.parseFloat();
                    Motor.motorLeftPID.Kp = ROBOTMSG.parseFloat();
                    Motor.motorLeftPID.Ki = ROBOTMSG.parseFloat();
                    Motor.motorLeftPID.Kd = ROBOTMSG.parseFloat();

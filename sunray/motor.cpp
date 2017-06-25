@@ -647,7 +647,7 @@ void MotorClass::setPaused(bool flag) {
   } 
 }
 
-
+// handle motor errors
 void MotorClass::checkFault() {
   if (digitalRead(pinMotorLeftFault) == LOW) {
     DEBUGLN(F("Error: motor left fault"));

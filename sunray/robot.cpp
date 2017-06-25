@@ -71,6 +71,7 @@ void RobotClass::begin(){
   state = STAT_IDLE;
   lastState = state;
   mowState = MOW_LINE;
+	lastMowState = mowState;
   mowPattern = PATTERN_NONE;
   trackState = TRK_RUN;  
 	trackClockwise = true;
@@ -324,45 +325,106 @@ void RobotClass::track(){
 }
 
 
-void RobotClass::mow(){  
-  if (!Perimeter.isInside(IDX_LEFT)) sensorTriggered(SEN_PERIMETER_LEFT);
-  if (!Perimeter.isInside(IDX_RIGHT)) sensorTriggered(SEN_PERIMETER_RIGHT);
+// random mowing
+void RobotClass::mowRandom(){  	  
+	if (Bumper.pressed()){ 
+	  if (mowState != MOW_AVOID_OBSTACLE){
+			// avoid obstacle			
+			lastMowState = mowState;
+			if (Motor.speedRpmSet >= 0){			
+				obstacleSide = FRONT;
+			} else {
+				obstacleSide = BACK;
+			}			
+		}		
+	} else {
+		if (!Perimeter.isInside()){
+		  if (mowState != MOW_AVOID_ESCAPE){
+				// avoid escaping perimeter		  											
+				lastMowState = mowState;
+				mowState = MOW_AVOID_ESCAPE;		
+			}
+		}	
+	}
+	
 	switch (mowState){
-    case MOW_ROTATE:
-      if (Motor.motion == MOT_STOP){
-        if (mowPattern == PATTERN_LANES){
-          Motor.travelLineDistance(15, rotateAngle, 1.0);
-          mowState = MOW_ENTER_LINE;
-          //DEBUGLN(F("MOW_ENTER_LINE"));
-        } else {
-          mowState = MOW_LINE;
-          Motor.travelLineDistance(100000, mowingAngle, 1.0);
-          //DEBUGLN(F("MOW_LINE"));
-        }
+    case MOW_AVOID_OBSTACLE:
+		  if (Bumper.pressed()){ 
+				if (obstacleSide == FRONT){
+					Motor.travelLineTime(300, IMU.getYaw(), -0.5);
+				}	else {
+					Motor.travelLineTime(300, IMU.getYaw(), 0.5);
+				}
+			} else {				
+				mowState = MOW_REV;			
+			}
+			break;				
+		case MOW_AVOID_ESCAPE:
+			if (!Perimeter.isInside()){
+				//Motor.rotateTime(300, rotationSpeedPerc);								
+				//Motor.rotateAngle(IMU.getYaw()+PI/180.0*45, rotationSpeedPerc);
+				Motor.travelLineTime(300, IMU.getYaw(), -0.5);	
+			}	else {
+				mowState = MOW_REV;
+			}	
+			break;					
+		case MOW_ROTATE:
+      if (Motor.motion == MOT_STOP){        
+        mowState = MOW_LINE;
+        Motor.travelLineDistance(100000, mowingAngle, 1.0);
+        //DEBUGLN(F("MOW_LINE"));        
       }
       break;
     case MOW_REV:
       if (Motor.motion == MOT_STOP){
-        if (mowPattern == PATTERN_LANES){
-          unsigned long duration = millis()-lastStartLineTime;
-          DEBUG(F("duration="));
-          DEBUGLN(duration);
-          if (duration < 5000){
-            DEBUGLN(F("new lane direction"));
-            mowingAngle = scalePI( mowingDirection + PI );
-            mowingDirection = mowingAngle-PI/2;
-          } else {
-            mowingAngle = scalePI( mowingAngle + PI );
-          }
-          float enterDelta = PI/4;
-          float yaw = IMU.getYaw();
-          float deltaAngle = distancePI(mowingAngle, mowingDirection); // w-x
-          if (deltaAngle > 0) rotateAngle = mowingAngle + enterDelta;
-            else rotateAngle = mowingAngle - enterDelta;
-        } else {
-          mowingAngle = scalePI( mowingAngle + PI + ((float)random(-90, 90)/180.0*PI ));
-          rotateAngle = mowingAngle;
-        }
+        mowingAngle = scalePI( mowingAngle + PI + ((float)random(-90, 90)/180.0*PI ));
+        rotateAngle = mowingAngle;        
+        Motor.rotateAngle(rotateAngle, rotationSpeedPerc);
+        mowState = MOW_ROTATE;
+        //DEBUGLN(F("MOW_ROTATE"));
+      }
+      break;    
+    case MOW_LINE:
+      //if (!Perimeter.isInside()) Motor.stopSlowly();
+      if ( (!Perimeter.isInside()) || (Motor.motion == MOT_STOP)  ){              
+				Motor.stopImmediately();
+        Motor.travelLineDistance(50, mowingAngle, -reverseSpeedPerc);
+        mowState = MOW_REV;
+        //DEBUGLN(F("MOW_REV"));
+      }
+      break;
+  }
+}
+
+
+// lane-by-lane mowing
+void RobotClass::mowLanes(){  	  		
+	switch (mowState){
+		case MOW_ROTATE:
+      if (Motor.motion == MOT_STOP){        
+        Motor.travelLineDistance(15, rotateAngle, 1.0);
+        mowState = MOW_ENTER_LINE;
+        //DEBUGLN(F("MOW_ENTER_LINE"));        
+      }
+      break;
+    case MOW_REV:
+      if (Motor.motion == MOT_STOP){      
+				unsigned long duration = millis()-lastStartLineTime;
+				DEBUG(F("duration="));
+				DEBUGLN(duration);
+				if (duration < 5000){
+					DEBUGLN(F("new lane direction"));
+					mowingAngle = scalePI( mowingDirection + PI );
+					mowingDirection = mowingAngle-PI/2;
+				} else {
+					mowingAngle = scalePI( mowingAngle + PI );
+				}
+				float enterDelta = PI/4;
+				float yaw = IMU.getYaw();
+				float deltaAngle = distancePI(mowingAngle, mowingDirection); // w-x
+				if (deltaAngle > 0) rotateAngle = mowingAngle + enterDelta;
+					else rotateAngle = mowingAngle - enterDelta;
+        
         Motor.rotateAngle(rotateAngle, rotationSpeedPerc);
         mowState = MOW_ROTATE;
         //DEBUGLN(F("MOW_ROTATE"));
@@ -400,32 +462,26 @@ if inside:
 */
 
 void RobotClass::stateMachine(){    
-	 
-	  if (Bumper.changed()){
-		  if (Bumper.pressed()){
-				if (Bumper.leftPressed) Robot.sensorTriggered(SEN_BUMPER_LEFT);
-				if (Bumper.rightPressed) Robot.sensorTriggered(SEN_BUMPER_RIGHT);	
-				DEBUGLN(F("BUMPER PRESS"));      
-				//Motor.stopMowerImmediately();
-				Motor.stopImmediately();
-				Buzzer.sound(SND_OVERCURRENT, true);						    
-			} else {
-				DEBUGLN(F("BUMPER RELEASE"));      
-			}      
-		}		
-		
-		switch (state){
-      case STAT_CAL_GYRO:	      
-	      break;
-      case STAT_IDLE:
-        break;
-      case STAT_MOW:
-        mow();
-        break;      
-      case STAT_CREATE_MAP:
-	    case STAT_TRACK:
-        track();
-        break;
-    }
+	 		
+	switch (state){		
+		case STAT_CAL_GYRO:	      
+			break;
+		case STAT_IDLE:
+			break;
+		case STAT_MOW:						
+			switch (mowPattern){
+				case PATTERN_RANDOM: 
+					mowRandom();
+					break;
+				case PATTERN_LANES:
+					mowLanes();
+					break;				
+			}			
+			break;      
+		case STAT_CREATE_MAP:
+		case STAT_TRACK:
+			track();
+			break;
+	}
 }
 

@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <limits.h>
 #include "adcman.h"
+#include "robot.h"
 #include "config.h"
 
 //#define pinLED 13
@@ -93,6 +94,8 @@ void PerimeterClass::run(){
       matchedFilter(idx);
     }
   }
+	if (!isInside(IDX_LEFT)) Robot.sensorTriggered(SEN_PERIMETER_LEFT);
+  if (!isInside(IDX_RIGHT)) Robot.sensorTriggered(SEN_PERIMETER_RIGHT);
 }
 
 int PerimeterClass::getMagnitude(byte idx){  

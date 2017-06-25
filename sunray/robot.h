@@ -26,7 +26,7 @@ all motors are turned off and the gyro is corrected by the compass.
  
 
 // finate state machine states
-enum RobotState {  STAT_IDLE, STAT_CAL_GYRO, STAT_TRACK, STAT_CREATE_MAP, STAT_MOW, STAT_RC, STAT_CHG };
+enum RobotState {  STAT_IDLE, STAT_CAL_GYRO, STAT_TRACK, STAT_CREATE_MAP, STAT_MOW, STAT_RC, STAT_CHG};
 typedef enum RobotState RobotState;
 
 // tracking
@@ -34,12 +34,16 @@ enum TrackState {  TRK_RUN, TRK_FIND, TRK_ROTATE };
 typedef enum TrackState TrackState;
 
 // mowing
-enum MowState { MOW_ROTATE, MOW_REV, MOW_LINE, MOW_ENTER_LINE } ;
+enum MowState { MOW_ROTATE, MOW_REV, MOW_LINE, MOW_ENTER_LINE, MOW_AVOID_OBSTACLE, MOW_AVOID_ESCAPE } ;
 typedef enum MowState MowState;
 
 // mow pattern
 enum MowPattern { PATTERN_NONE, PATTERN_RANDOM, PATTERN_LANES } ;
 typedef enum MowPattern MowPattern;
+
+// obstacle side
+enum Side { FRONT, BACK };
+typedef enum Side Side;
 
 // sensor trigger IDs
 #define SEN_BUMPER_LEFT          (1L<<0)
@@ -78,7 +82,9 @@ class RobotClass
 	  TrackState trackState;
 		bool trackClockwise;
 	  MowState mowState;
+		MowState lastMowState;
 	  MowPattern mowPattern;
+		Side obstacleSide;
 	  byte loopsPerSec;
     RobotClass();
     void begin();
@@ -103,9 +109,10 @@ class RobotClass
 	  unsigned long nextControlTime;     
 	  void stateMachine();
 	  void track();
-	  void mow();	    
+	  void mowLanes();	    
+		void mowRandom();	    
     void printSensorData();
-    void readRobotMessages();    
+    void readRobotMessages();    		
 };    
 
 extern RobotClass Robot;

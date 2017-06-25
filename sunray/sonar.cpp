@@ -110,6 +110,10 @@ void SonarClass::run(){
 		sonarLeftMeasurements.getLowest(distanceLeft);   
 		sonarRightMeasurements.getLowest(distanceRight);   
 		sonarCenterMeasurements.getLowest(distanceCenter);   				
+		
+		if (distanceLeft < OBSTACLE) Robot.sensorTriggered(SEN_SON_LEFT);
+		if (distanceRight < OBSTACLE) Robot.sensorTriggered(SEN_SON_RIGHT);
+		if (distanceCenter < OBSTACLE) Robot.sensorTriggered(SEN_SON_CENTER);		
   }     
 }
 

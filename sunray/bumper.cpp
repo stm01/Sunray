@@ -58,9 +58,17 @@ bool BumperClass::changed()
 
 void BumperClass::run()
 {
-
+	if (Bumper.leftPressed) Robot.sensorTriggered(SEN_BUMPER_LEFT);
+	if (Bumper.rightPressed) Robot.sensorTriggered(SEN_BUMPER_RIGHT);							
+	if (Bumper.changed()){
+		if (Bumper.pressed()){
+			DEBUGLN(F("BUMPER PRESSED"));      						
+			//Motor.stopImmediately();
+			Buzzer.sound(SND_OVERCURRENT, true);						    			
+		} else {
+			DEBUGLN(F("BUMPER RELEASED"));      
+		} 		
+	}			
 }
-
-
 
 

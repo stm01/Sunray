@@ -1,6 +1,7 @@
 #include "sonar.h"
 #include "config.h"
 #include "motor.h"
+#include "robot.h"
 #include "buzzer.h"
 #include "robot.h"
 #include "pinman.h"
@@ -111,9 +112,9 @@ void SonarClass::run(){
 		sonarRightMeasurements.getLowest(distanceRight);   
 		sonarCenterMeasurements.getLowest(distanceCenter);   				
 		
-		if (distanceLeft < OBSTACLE) Robot.sensorTriggered(SEN_SON_LEFT);
-		if (distanceRight < OBSTACLE) Robot.sensorTriggered(SEN_SON_RIGHT);
-		if (distanceCenter < OBSTACLE) Robot.sensorTriggered(SEN_SON_CENTER);		
+		if (distanceLeft < OBSTACLE) Robot.sensorTriggered(SEN_SONAR_LEFT);
+		if (distanceRight < OBSTACLE) Robot.sensorTriggered(SEN_SONAR_RIGHT);
+		if (distanceCenter < OBSTACLE) Robot.sensorTriggered(SEN_SONAR_CENTER);		
   }     
 }
 

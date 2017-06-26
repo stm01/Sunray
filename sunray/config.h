@@ -79,7 +79,7 @@
 
 
 // ------- baudrates---------------------------------
-#define ROBOTMSG_BAUDRATE    115200       // baudrate used for console
+#define ROBOTMSG_BAUDRATE    9600       // baudrate used for console
 //#define ROBOTMSG_BAUDRATE    921600  // baudrate used for console
 #define PFODAPP_BAUDRATE  19200 
 #define RANGING_BAUDRATE  115200       // baudrate for ranging module (DW1000)
@@ -87,12 +87,12 @@
 
 #define IMU_USE 1
 
-#define ROBOTMSG Serial3
-#define DEBUG(x) Serial3.print(x)
-#define DEBUGLN(x) Serial3.println(x)
+#define ROBOTMSG Serial2
+#define DEBUG(x) Serial2.print(x)
+#define DEBUGLN(x) Serial2.println(x)
 
-#define PFODAPP Serial3
-#define BLUETOOTH Serial3
+#define PFODAPP Serial2
+#define BLUETOOTH Serial2
 
-#define RANGING Serial2
+#define RANGING Serial3
 

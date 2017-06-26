@@ -7,7 +7,7 @@ class Robot {
   
 // motor
 static final float robotMass = 1500;
-static final float rpmMax = 25;
+static final float rpmMax = 10;
 static final float reverseSpeedPerc = 0.3;
 static final float rotationSpeedPerc = 0.3;
 static final float trackSpeedPerc = 0.3;
@@ -27,7 +27,7 @@ static final float stuckMaxIMUerror = 50.0; // 5.0
 static final int timedOutIfBelowSmag = 10;
 static final int timeOutSecIfNotInside = 15;
 static final byte swapCoilPolarity = 1;
-static final boolean filterPerimeterSpikes = true; 
+static final boolean filterPerimeterSpikes = false; 
 // IMU
 static final byte useGyro = 1;
 static final float gyroBiasDpsMax = 0.01;
@@ -730,7 +730,7 @@ void processDataReceived(String data) {
         //map.robotState.x = Float.parseFloat(list[20]);
         //map.robotState.y = Float.parseFloat(list[21]);
         periLeft = Integer.parseInt(list[8]);
-        periRight = Integer.parseInt(list[9]);                        
+        periRight = Integer.parseInt(list[9]);        
         if ((filterPerimeterSpikes) && (plotPeriL.list.size() > 0)) {
           float lastPeriLeft = plotPeriL.list.get(plotPeriL.list.size()-1);
           float lastPeriRight = plotPeriR.list.get(plotPeriR.list.size()-1);

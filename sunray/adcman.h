@@ -48,10 +48,10 @@ typedef struct ADCStruct {
   int sampleCount;
   byte pin;  
   int8_t *samples;
-  uint16_t value;
-  uint16_t minValue;
-  uint16_t maxValue;  
-  uint16_t zeroOfs;
+  int16_t value;
+  int16_t minValue;
+  int16_t maxValue;  
+  int16_t zeroOfs;
   bool convComplete;
   bool autoCalibrate;    
 };
@@ -62,17 +62,19 @@ class ADCManager
   public:
     ADCManager();    
     int sampleRate;
+		bool calibrationAvail;
     virtual void begin();
     virtual void run();
     virtual void setupChannel(byte pin, int samplecount, bool autocalibrate);    
     virtual int8_t* getSamples(byte pin);
     virtual int getSampleCount(byte pin);
-    virtual uint16_t getValue(byte pin);    
+    virtual int16_t getValue(byte pin);    
     virtual float getVoltage(byte pin);
     virtual bool isConvComplete(byte pin);
     virtual void restartConv(byte pin);
     virtual void printInfo();
     virtual int getConvCounter();
+		virtual void calibrate();
   private:
     int convCounter;
     byte chCurr;
@@ -83,8 +85,7 @@ class ADCManager
     ADCStruct channels[ADC_CHANNEL_COUNT_MAX];
     boolean loadCalib();
     void loadSaveCalib(boolean readflag);
-    void saveCalib();    
-    void printCalib();
+    void saveCalib();        
 };
 
 extern ADCManager ADCMan;

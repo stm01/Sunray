@@ -10,15 +10,15 @@
 #include "buzzer.h"
 #include "flashmem.h"
 
-#define ADDR 0
-#define MAGIC 1
+#define ADDR 500
+#define MAGIC 2
 
 #define ADC_SAMPLE_COUNT_MAX 255
 #define INVALID_CHANNEL 99
 
 #define NO_CHANNEL 255
 
-uint16_t dmaData[ADC_SAMPLE_COUNT_MAX];
+int16_t dmaData[ADC_SAMPLE_COUNT_MAX];
 ADCManager ADCMan;
 
 
@@ -26,9 +26,11 @@ ADCManager::ADCManager(){
   convCounter = 0;  
   chNext = 0;
   chCurr = INVALID_CHANNEL;    
+	calibrationAvail = false;
   for (int i=0; i < ADC_CHANNEL_COUNT_MAX; i++){
     channels[i].sampleCount = 0;
     channels[i].zeroOfs =0;
+		//channels[i].zeroOfs = (1 << (ADC_BITS-1)); // default offset at VCC/2
     channels[i].value =0;
     channels[i].convComplete = false;
   }  
@@ -77,6 +79,7 @@ void ADCManager::begin(){
     run();
     delay(500);        
   }*/  
+	loadCalib();
 }
 
 void ADCManager::printInfo(){
@@ -95,10 +98,13 @@ void ADCManager::printInfo(){
       DEBUG(ch);
       DEBUG(F("\t"));    
       DEBUG(F("sampleCount="));    
-      DEBUGLN(channels[ch].sampleCount);      
+      DEBUG(channels[ch].sampleCount);      
       DEBUG(F("\t"));    
       DEBUG(F("autoCalibrate="));    
-      DEBUGLN(channels[ch].autoCalibrate);      
+      DEBUG(channels[ch].autoCalibrate);      
+			DEBUG(F("\t"));    
+			DEBUG(F("zeroOfs="));    
+			DEBUGLN(channels[ch].zeroOfs);      
     }
   }
 }
@@ -114,8 +120,8 @@ void ADCManager::setupChannel(byte pin, int samplecount, bool autocalibrate){
   pinMode(pin, INPUT);
   channels[ch].pin = pin; 
   channels[ch].autoCalibrate = autocalibrate;  
-  channels[ch].convComplete = false;
-  channels[ch].maxValue = 0;
+  channels[ch].convComplete = false;  
+	channels[ch].maxValue = 0;
   channels[ch].minValue = 0;
   setSampleCount(ch, samplecount);
 }
@@ -147,14 +153,14 @@ int ADCManager::getSampleCount(byte pin){
   return channels[ch].sampleCount;
 }
 
-uint16_t ADCManager::getValue(byte pin){
+int16_t ADCManager::getValue(byte pin){
   byte ch = pin-A0;  
   channels[ch].convComplete = false;
   return channels[ch].value;  
 }
 
 float ADCManager::getVoltage(byte pin){
-  uint16_t v = getValue(pin);
+  int16_t v = getValue(pin);
   return ((float)v) / ((float) ((1 << ADC_BITS)-1)) * ADC_REF;   
 }
 
@@ -199,7 +205,7 @@ void ADCManager::postProcess(byte ch){
   //DEBUG(ch);
   //DEBUG("=");
   //DEBUG(dmaData[0]);
-  uint16_t vmax = 0;
+  /*uint16_t vmax = 0;
   uint16_t vmin = 9999;   
   if (channels[ch].autoCalibrate) {  
     // determine zero point    
@@ -212,29 +218,77 @@ void ADCManager::postProcess(byte ch){
     channels[ch].maxValue = 0.9 * ((double)channels[ch].maxValue) + 0.1 * ((double)vmax);
     channels[ch].minValue = 0.9 * ((double)channels[ch].minValue) + 0.1 * ((double)vmin);
     channels[ch].zeroOfs = channels[ch].minValue + (channels[ch].maxValue - channels[ch].minValue)/2.0;
-  }  
+  } */ 
   // ------determine average value-------
   int32_t res = 0;
   int i;
   for (i=0; i < channels[ch].sampleCount; i++){
-    uint16_t value = dmaData[i];    
+    int16_t value = dmaData[i];    
     //DEBUG(" v1=");
     //DEBUG(value);    
     value -= channels[ch].zeroOfs;
     res += value;
   }
+	
   //DEBUG(" res=");
   //DEBUG(res);    
   channels[ch].value = ((float)res) / ((float)channels[ch].sampleCount);      
   // --------transfer DMA samples----------
   for (int i=0; i < channels[ch].sampleCount; i++){
-    uint16_t value = dmaData[i];
+    int16_t value = dmaData[i];
     value -= channels[ch].zeroOfs;
-    channels[ch].samples[i] = min(SCHAR_MAX,  max(SCHAR_MIN, ((int8_t) (value >> (ADC_BITS-8))) )); // convert to 8 bits
+    //channels[ch].samples[i] = min(SCHAR_MAX,  max(SCHAR_MIN, ((int8_t) (value >> (ADC_BITS-8))) )); // convert to 8 bits
+		channels[ch].samples[i] = min(SCHAR_MAX,  max(SCHAR_MIN, value / 16 )); // convert to 8 bits
   }
   //DEBUG(" val");
   //DEBUGLN(channels[ch].value);
 }
 
 
+void ADCManager::loadSaveCalib(boolean readflag){
+  int addr = ADDR;
+  short magic = MAGIC;
+  eereadwrite(readflag, addr, magic); // magic
+  for (int ch=0; ch <  ADC_CHANNEL_COUNT_MAX; ch++){
+    eereadwrite(readflag, addr, channels[ch].zeroOfs);
+  }  
+}
+
+boolean ADCManager::loadCalib(){
+  short magic = 0;
+  int addr = ADDR;
+  eeread(addr, magic);
+  if (magic != MAGIC) {
+    DEBUGLN(F("ADCMan error: no calib data"));
+    return false;   
+  }
+  calibrationAvail = true;
+  DEBUGLN(F("ADCMan: found calib data"));
+  loadSaveCalib(true);
+  return true;
+}
+
+void ADCManager::saveCalib(){
+  loadSaveCalib(false);
+}
+
+
+void ADCManager::calibrate(){
+  DEBUG(F("ADC calibration..."));
+	for (int ch=0; ch < ADC_CHANNEL_COUNT_MAX; ch++){        
+		if (channels[ch].autoCalibrate){
+			channels[ch].zeroOfs = 0;
+		}
+	}
+  for (int ch=0; ch < ADC_CHANNEL_COUNT_MAX; ch++){        
+		if (channels[ch].autoCalibrate){
+      while (!channels[ch].convComplete){
+				run();
+			}
+			channels[ch].zeroOfs = channels[ch].value;
+    }
+  }  
+  saveCalib();
+  calibrationAvail = true;	
+}
 

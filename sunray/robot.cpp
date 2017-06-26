@@ -90,8 +90,9 @@ void RobotClass::begin(){
 	trackRotationSpeedPerc = 0.3;
 	rotationSpeedPerc = 0.3;
 	reverseSpeedPerc = 0.3;
-
-  ADCMan.printInfo();
+  
+	if (!ADCMan.calibrationAvail) ADCMan.calibrate();
+	ADCMan.printInfo();
   Buzzer.sound(SND_READY, true);   
 }
 

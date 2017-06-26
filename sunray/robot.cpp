@@ -337,6 +337,7 @@ void RobotClass::mowRandom(){
 			} else {
 				obstacleSide = BACK;
 			}			
+			mowState = MOW_AVOID_OBSTACLE;		
 		}		
 	} else {
 		if (!Perimeter.isInside()){

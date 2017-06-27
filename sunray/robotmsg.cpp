@@ -317,7 +317,7 @@ void RobotMsgClass::readRobotMessages(){
                   Motor.rotateTime(duration, speed); 
                   break;                    
           case 10: IMU.startGyroCalibration(); break;
-          case 71: //ADCMan.calibrate(); 
+          case 71: ADCMan.calibrate(); 
                    break;
           //case 72: IMU.startCompassCalibration(); break;
           case 11: Robot.trackClockwise = ROBOTMSG.parseInt(); 

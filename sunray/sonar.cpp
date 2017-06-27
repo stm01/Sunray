@@ -13,9 +13,9 @@ SonarClass Sonar;
 #define MAX_DURATION 4000
 #define OBSTACLE 2000
 
-RunningMedian<unsigned int,20> sonarLeftMeasurements;
-RunningMedian<unsigned int,20> sonarRightMeasurements;
-RunningMedian<unsigned int,20> sonarCenterMeasurements;
+RunningMedian<unsigned int,10> sonarLeftMeasurements;
+RunningMedian<unsigned int,10> sonarRightMeasurements;
+RunningMedian<unsigned int,10> sonarCenterMeasurements;
 
 volatile unsigned long startTime = 0;
 volatile unsigned long echoTime = 0;
@@ -102,7 +102,7 @@ void SonarClass::run(){
 		if (idx == 0) startHCSR04(pinSonarLeftTrigger, pinSonarLeftEcho);        
       else if (idx == 1) startHCSR04(pinSonarCenterTrigger, pinSonarCenterEcho);        
       else startHCSR04(pinSonarRightTrigger, pinSonarRightEcho);        				  		
-		timeoutTime = millis() + 10;    			
+		timeoutTime = millis() + 50;    			 // 10
 		added = false;
   }
   if (millis() > nextEvalTime){
@@ -119,7 +119,7 @@ void SonarClass::run(){
 }
 
 void SonarClass::begin()
-{
+{	
 	enabled = true;
 	pinMode(pinSonarLeftTrigger , OUTPUT);
   pinMode(pinSonarCenterTrigger , OUTPUT);  
@@ -134,9 +134,9 @@ void SonarClass::begin()
   attachInterrupt(pinSonarRightEcho, echoRight, CHANGE);
   
 	
-	/*PinMan.setDebounce(pinSonarCenterEcho, 100);  // reject spikes shorter than usecs on pin
+	PinMan.setDebounce(pinSonarCenterEcho, 100);  // reject spikes shorter than usecs on pin
 	PinMan.setDebounce(pinSonarRightEcho, 100);  // reject spikes shorter than usecs on pin
-	PinMan.setDebounce(pinSonarLeftEcho, 100);  // reject spikes shorter than usecs on pin*/
+	PinMan.setDebounce(pinSonarLeftEcho, 100);  // reject spikes shorter than usecs on pin
 	verboseOutput = false;
 }
 

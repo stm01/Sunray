@@ -1,5 +1,5 @@
 /*
-Note: requires Arduino Due
+Note: requires Arduino Due (optimized for Due DMA)
 Problem: you have multiple analog inputs, some need only to be sampled once, other need
 a fixed sample rate. 
 

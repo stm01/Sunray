@@ -614,8 +614,8 @@ void MotorClass::setSpeedPWM(float leftPWMPerc, float rightPWMPerc) {
 
 // pwm: 1.0 is max
 void MotorClass::setMowerPWM(float pwmPerc) {
-  DEBUG(F("setMowerPWM: "));
-  DEBUGLN(pwmPerc);
+  //DEBUG(F("setMowerPWM: "));
+  //DEBUGLN(pwmPerc);
   if (pwmPerc < 0.05) mowerPWMCurr = 0; // stop immediately
   mowerPWMSet = 255.0f * pwmPerc;  
 }

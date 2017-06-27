@@ -6,7 +6,7 @@
    * Ardumower PCB 1.3: Arduino Due, MC33926 motor drivers, two perimeter coils (left+right)
    * Ardumower motors with odometry
    * perimeter wire (Perimeter sender v2)
-   * replaced IMU: GY-88  
+   * IMU: GY-88  
 */
 
 #include "robot.h"

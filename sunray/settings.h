@@ -1,4 +1,4 @@
-/* stores settings in DS1307 realtime clock module
+/* stores settings in DS1307 realtime clock module (56 bytes NV SRAM)
  */
 
 #ifndef SETTINGS_H

@@ -88,11 +88,9 @@
 #define IMU_USE 1
 
 #define ROBOTMSG Serial2
-#define DEBUG(x) Serial2.print(x)
-#define DEBUGLN(x) Serial2.println(x)
-
 #define PFODAPP Serial2
 #define BLUETOOTH Serial2
-
 #define RANGING Serial3
 
+#define DEBUG(x) ROBOTMSG.print(x)
+#define DEBUGLN(x) ROBOTMSG.println(x)

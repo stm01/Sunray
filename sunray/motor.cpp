@@ -20,18 +20,12 @@ volatile boolean oldOdoRight = false;
 
 
 // odometry signal change interrupt
-// mower motor speed sensor interrupt
-ISR(PCINT2_vect) {
-  boolean odoLeft = digitalRead(pinOdometryLeft);
-  boolean odoRight = digitalRead(pinOdometryRight);  
-  if (odoLeft != oldOdoLeft) {  
-    odoTicksLeft++;
-    oldOdoLeft=odoLeft;
-  }
-  if (odoRight != oldOdoRight) {
-    odoTicksRight++;
-    oldOdoRight=odoRight;
-  }
+void OdometryLeftInt(){			
+  odoTicksLeft++;
+}
+
+void OdometryRightInt(){			
+  odoTicksRight++;
 }
 
 
@@ -64,19 +58,17 @@ void MotorClass::begin() {
   pinMode(pinOdometryLeft2, INPUT_PULLUP);
   pinMode(pinOdometryRight, INPUT_PULLUP);
   pinMode(pinOdometryRight2, INPUT_PULLUP);
-
+	
   ADCMan.setupChannel(pinMotorMowSense, 1, false);
   ADCMan.setupChannel(pinMotorLeftSense, 1, false);
   ADCMan.setupChannel(pinMotorRightSense, 1, false);  
  
   // enable interrupts
-  attachInterrupt(pinOdometryLeft, PCINT2_vect, CHANGE);
-  //attachInterrupt(pinOdometryLeft2, PCINT2_vect, CHANGE);
-  attachInterrupt(pinOdometryRight, PCINT2_vect, CHANGE);
-  //attachInterrupt(pinOdometryRight2, PCINT2_vect, CHANGE);
+  attachInterrupt(pinOdometryLeft, OdometryLeftInt, RISING);  
+  attachInterrupt(pinOdometryRight, OdometryRightInt, RISING);  
 	
-	PinMan.setDebounce(pinOdometryLeft, 10);  // reject spikes shorter than usecs on pin
-	PinMan.setDebounce(pinOdometryRight, 10);  // reject spikes shorter than usecs on pin	
+	PinMan.setDebounce(pinOdometryLeft, 100);  // reject spikes shorter than usecs on pin
+	PinMan.setDebounce(pinOdometryRight, 100);  // reject spikes shorter than usecs on pin	
 
 	verboseOutput = false;
   lowPass = true;
@@ -88,7 +80,7 @@ void MotorClass::begin() {
   motorFrictionMax = 3400;
 	motorFrictionMin = 0.2;
 	robotMass = 10;  
-  ticksPerRevolution = 1060 * 2;
+  ticksPerRevolution = 1060/2;
 	wheelDiameter              = 250;        // wheel diameter (mm)
 	wheelBaseCm = 36;    // wheel-to-wheel distance (cm)
 	ticksPerCm         = ((float)ticksPerRevolution) / (((float)wheelDiameter)/10.0) / (2*3.1415);    // computes encoder ticks per cm (do not change)  

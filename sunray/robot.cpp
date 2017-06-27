@@ -137,6 +137,7 @@ void RobotClass::run(){
   if (millis() >= nextIMUTime){    
     nextIMUTime = millis() + 10; // 100 Hz
     IMU.run();
+		loopCounter++;
   }
 
   Buzzer.run();
@@ -187,7 +188,7 @@ void RobotClass::run(){
     ROBOTMSG.print(F(","));       
     ROBOTMSG.println(Map.robotState.orientation);  */
     
-    loopCounter++;
+    //loopCounter++;
   }
 	
 	RobotMsg.run();

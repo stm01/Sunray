@@ -5,7 +5,7 @@ import processing.net.*;
 //import processing.video.*;
 
 // configuration
-String comPort = "COM5";
+String comPort = "COM5"; // COM5 / COM7
 boolean useTcp = false;
 String tcpHost = "raspberrypi.local";
 String logFile = ""; //"outdoor_mow_rand.log";  // if file exists, playback mode, otherwise record mode

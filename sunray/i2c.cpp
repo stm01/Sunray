@@ -124,7 +124,7 @@ int I2C_readFrom(uint8_t device, uint8_t address, uint8_t num, uint8_t buff[], i
     i=0;
     Wire.beginTransmission(device); //start transmission to device 
     Wire.write(address);        //sends address to read from
-    Wire.endTransmission(); //end transmission
+    Wire.endTransmission(false); //end transmission
   
     //Wire.beginTransmission(device); //start transmission to device (initiate again)
     Wire.requestFrom(device, num);    // request 6 bytes from device

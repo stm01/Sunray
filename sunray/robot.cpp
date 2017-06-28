@@ -82,6 +82,7 @@ void RobotClass::begin(){
   nextIMUTime = 0;
   loopCounter = 0;
   loopsPerSec = 0;
+	loopsPerSecSmooth = 99;
   trackLineTimeout = 0;
   mowingAngle = 0;
   mowingDirection = 0;
@@ -110,6 +111,14 @@ void RobotClass::run(){
   if (millis() >= nextInfoTime){
     nextInfoTime = millis() + 1000;
     loopsPerSec = loopCounter;
+		loopsPerSecSmooth = 0.99 * loopsPerSecSmooth + 0.01 * loopsPerSec;
+		if (state != STAT_IDLE) {
+			if (loopsPerSecSmooth < 50){
+				setIdle();
+				DEBUGLN(F("MAIN LOOP ERROR (loopsPerSec) - check I2C cables"));            
+				Buzzer.sound(SND_TILT, true); 	   
+			}
+		}
     loopCounter=0;
 
     //DEBUG("DIST=");

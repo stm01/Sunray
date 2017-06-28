@@ -85,7 +85,8 @@ class RobotClass
 		MowState lastMowState;
 	  MowPattern mowPattern;
 		Side obstacleSide;
-	  byte loopsPerSec;
+	  int loopsPerSec;
+		float loopsPerSecSmooth;
     RobotClass();
     void begin();
     void run();    

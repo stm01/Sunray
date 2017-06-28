@@ -58,7 +58,7 @@ void RobotClass::begin(){
   Battery.begin();    
   RANGING.begin(RANGING_BAUDRATE);
   Bumper.begin();	
-  if (IMU_USE) IMU.begin();    
+  IMU.begin();    
   Motor.begin();      
   Perimeter.begin(pinPerimeterLeft, pinPerimeterRight);          
 	Sonar.begin();
@@ -120,7 +120,7 @@ void RobotClass::run(){
         
 		resetSensorTriggers();		
     
-	  if ( IMU_USE && (!RC.enable) && (IMU.needGyroCal()) ) {     
+	  if ( (!RC.enable) && (IMU.needGyroCal()) ) {     
 	    Motor.setPaused(true);
       lastState = state;
 	    IMU.startGyroCalibration();
@@ -155,7 +155,7 @@ void RobotClass::run(){
     RC.run();
     Motor.run();        
     Perimeter.run();
-    if (IMU_USE) IMU.run();
+    IMU.run();
 	  Map.run();
     //RemoteCtl.run();    
     Battery.run();    

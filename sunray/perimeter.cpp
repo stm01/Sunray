@@ -29,7 +29,8 @@ PerimeterClass Perimeter;
 
 
 PerimeterClass::PerimeterClass(){    
-  useDifferentialPerimeterSignal = true;
+  enabled = true;
+	useDifferentialPerimeterSignal = true;
   swapCoilPolarity = false;
   timedOutIfBelowSmag = 10;
   timeOutSecIfNotInside = 15;
@@ -85,7 +86,8 @@ const int8_t* PerimeterClass::getRawSignalSample(byte idx) {
 }
 
 void PerimeterClass::run(){
-  for (int idx=0; idx < 2; idx++){
+  if (!enabled) return;
+	for (int idx=0; idx < 2; idx++){
     if (ADCMan.isConvComplete(idxPin[idx])) {
      // Keep a sample of the raw signal
       //memset(rawSignalSample[0], 0, RAW_SIGNAL_SAMPLE_SIZE);

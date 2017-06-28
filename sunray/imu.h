@@ -84,7 +84,8 @@ class IMUClass {
    float accXmin;
    float accXmax;
    float gyroZlowpass;
-   bool isRotating;
+   bool enabled;
+	 bool isRotating;
    bool verboseOutput;
    bool useGyro;
    float gyroBiasDpsMax;

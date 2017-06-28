@@ -254,6 +254,7 @@ void IMUClass::begin()
   statsGyroCalibrationTimeMax = 0;
   statsYawMin = 10;
   statsYawMax = -10;   
+	enabled = true;
   useGyro = true;  
   int result;
   //struct int_param_s int_param;
@@ -610,7 +611,8 @@ void IMUClass::stopCompassCalibration(){
 
 
 void IMUClass::run(){
-  unsigned char more;
+  if (!enabled) return;
+	unsigned char more;
   long quat[4];       
   short gyroD[3], accel[3], sensors;
   unsigned long sensor_timestamp;  
@@ -699,7 +701,7 @@ void IMUClass::run(){
 
 
 bool IMUClass::needGyroCal(){
-  if (!useGyro) return false;
+  if ((!enabled) || (!useGyro)) return false;
   return ((state == IMU_RUN) && (millis() >= nextGyroCalTime));
 }
 

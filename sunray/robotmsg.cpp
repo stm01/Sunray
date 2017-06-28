@@ -23,6 +23,7 @@
  
  * sonar messages
  *  87 : sonar data (verbose)
+ *  89 : sonar settings
  
  * motor messages
  *  00 : stop immediately
@@ -365,7 +366,8 @@ void RobotMsgClass::readRobotMessages(){
           case 79: IMU.runSelfTest(); break;
           case 80: IMU.startCompassCalibration(); break;
           case 81: IMU.stopCompassCalibration(); break;
-          case 82: IMU.useGyro = ROBOTMSG.parseInt(); 
+          case 82: IMU.enabled = ROBOTMSG.parseInt(); 
+									 IMU.useGyro = ROBOTMSG.parseInt(); 
                    IMU.gyroBiasDpsMax = ROBOTMSG.parseFloat();
                    IMU.mode = ((IMUMode)ROBOTMSG.parseInt());
                    DEBUGLN(F("received IMU settings"));
@@ -392,12 +394,16 @@ void RobotMsgClass::readRobotMessages(){
 									 Motor.stuckMaxIMUerror = ROBOTMSG.parseFloat();
                    DEBUGLN(F("received motor settings"));
                    break;          
-		  case 84: Perimeter.timedOutIfBelowSmag = ROBOTMSG.parseInt();
-		           Perimeter.timeOutSecIfNotInside = ROBOTMSG.parseInt();
-				       Perimeter.swapCoilPolarity = ROBOTMSG.parseInt();
-				       DEBUGLN(F("received perimeter settings"));
-				       break;
-          case 85:  distance = ROBOTMSG.parseFloat();
+					case 89: Sonar.enabled = ROBOTMSG.parseInt();
+									 Sonar.triggerBelow = ROBOTMSG.parseInt();
+									 break;
+					case 84: Perimeter.enabled = ROBOTMSG.parseInt();
+									 Perimeter.timedOutIfBelowSmag = ROBOTMSG.parseInt();
+									 Perimeter.timeOutSecIfNotInside = ROBOTMSG.parseInt();
+									 Perimeter.swapCoilPolarity = ROBOTMSG.parseInt();
+									 DEBUGLN(F("received perimeter settings"));
+									 break;
+          case 85: distance = ROBOTMSG.parseFloat();
                    angle = ROBOTMSG.parseFloat();
                    speed = ROBOTMSG.parseFloat();
                    Motor.travelAngleDistance(distance, scalePI(Motor.angleRadCurr+angle), speed); 

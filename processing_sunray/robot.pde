@@ -23,12 +23,17 @@ static final float motorPID_Ki = 0.03;
 static final float motorPID_Kd = 0.03;
 static final float stuckMaxDiffOdometryIMU = 20; // 0.2
 static final float stuckMaxIMUerror = 50.0; // 5.0
+// sonar
+static final byte sonarEnable = 1;
+static final byte sonarTriggerBelow = 40;
 // perimeter
+static final byte perimeterEnable = 1;
 static final int timedOutIfBelowSmag = 10;
 static final int timeOutSecIfNotInside = 15;
 static final byte swapCoilPolarity = 1;
 static final boolean filterPerimeterSpikes = false; 
 // IMU
+static final byte imuEnable = 1;
 static final byte useGyro = 1;
 static final float gyroBiasDpsMax = 0.01;
 static final float imuMode = 0;
@@ -303,10 +308,12 @@ void setup(PApplet parent){
        + float2String(mowSenseMax) + "," + float2String(imuPID_Kp) + "," + float2String(imuPID_Ki) + "," + float2String(imuPID_Kd) + ","
        + float2String(motorPID_Kp) + "," + float2String(motorPID_Ki) + "," + float2String(motorPID_Kd) + "," 
        + float2String(stuckMaxDiffOdometryIMU) + "," + float2String(stuckMaxIMUerror) + "\n");
+    // sonar settings
+    sendPort("?89," + str(sonarEnable) + "," + str(sonarTriggerBelow) + "\n");
     // perimeter settings
-    sendPort("?84," + str(timedOutIfBelowSmag) + "," + str(timeOutSecIfNotInside) + "," + str(swapCoilPolarity) + "\n"); 
+    sendPort("?84," + str(perimeterEnable) +"," + str(timedOutIfBelowSmag) + "," + str(timeOutSecIfNotInside) + "," + str(swapCoilPolarity) + "\n"); 
     // IMU settings
-    sendPort("?82," + str(useGyro) +  "," + float2String(gyroBiasDpsMax) + "," + str(imuMode) + "\n");
+    sendPort("?82," + str(imuEnable) + "," + str(useGyro) +  "," + float2String(gyroBiasDpsMax) + "," + str(imuMode) + "\n");
     sendVerbose();
     
     //if (mySerial != null) mySerial.buffer(32);    

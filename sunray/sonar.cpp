@@ -11,7 +11,7 @@
 SonarClass Sonar;
 
 #define MAX_DURATION 4000
-#define OBSTACLE_CM 20
+#define OBSTACLE_CM 40
 #define ROUNDING_ENABLED false
 #define US_ROUNDTRIP_CM 57      // Microseconds (uS) it takes sound to travel round-trip 1cm (2cm total), uses integer to save compiled code space. Default=57
 
@@ -133,6 +133,7 @@ void SonarClass::run(){
 void SonarClass::begin()
 {	
 	enabled = true;
+	triggerBelow = OBSTACLE_CM;
 	pinMode(pinSonarLeftTrigger , OUTPUT);
   pinMode(pinSonarCenterTrigger , OUTPUT);  
   pinMode(pinSonarRightTrigger , OUTPUT);

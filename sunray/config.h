@@ -85,7 +85,6 @@
 #define RANGING_BAUDRATE  115200       // baudrate for ranging module (DW1000)
 #define BLUETOOTH_PIN       1234
 
-#define IMU_USE 1
 
 #define ROBOTMSG Serial2
 #define PFODAPP Serial2

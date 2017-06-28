@@ -6,8 +6,9 @@
 
 
 class SonarClass {
-    public:
-      bool enabled;
+    public:      
+			bool enabled;
+			int triggerBelow;
 			void begin();            
       void run();
 	    bool obstacle();	    

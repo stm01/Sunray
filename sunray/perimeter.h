@@ -23,7 +23,8 @@ class PerimeterClass
     // inside perimeter (true) or outside (false)?  
     boolean isInside();
     boolean isInside(byte idx);
-    // perimeter signal timed out? (e.g. due to broken wire)
+    bool enabled;
+		// perimeter signal timed out? (e.g. due to broken wire)
     bool signalTimedOut();
     void resetTimedOut();
     boolean signalTimedOut(byte idx);

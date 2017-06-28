@@ -11,11 +11,12 @@ class SonarClass {
 			void begin();            
       void run();
 	    bool obstacle();	    
-			unsigned int distanceLeft;
+			unsigned int distanceLeft; // cm
 			unsigned int distanceRight;
 			unsigned int distanceCenter;  		
 			bool verboseOutput; 
     protected:                 
+			unsigned int convertCm(unsigned int echoTime);
 };
 
 extern SonarClass Sonar;

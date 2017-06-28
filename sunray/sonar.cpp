@@ -11,7 +11,14 @@
 SonarClass Sonar;
 
 #define MAX_DURATION 4000
-#define OBSTACLE 2000
+#define OBSTACLE_CM 20
+#define ROUNDING_ENABLED false
+#define US_ROUNDTRIP_CM 57      // Microseconds (uS) it takes sound to travel round-trip 1cm (2cm total), uses integer to save compiled code space. Default=57
+
+// Conversion from uS to distance (round result to nearest cm or inch).
+#define NewPingConvert(echoTime, conversionFactor) (max(((unsigned int)echoTime + conversionFactor / 2) / conversionFactor, (echoTime ? 1 : 0)))
+
+
 
 RunningMedian<unsigned int,10> sonarLeftMeasurements;
 RunningMedian<unsigned int,10> sonarRightMeasurements;
@@ -109,12 +116,17 @@ void SonarClass::run(){
     nextEvalTime = millis() + 200;        				
 		//sonar1Measurements.getAverage(avg);      
 		sonarLeftMeasurements.getLowest(distanceLeft);   
-		sonarRightMeasurements.getLowest(distanceRight);   
-		sonarCenterMeasurements.getLowest(distanceCenter);   				
+		distanceLeft = convertCm(distanceLeft);
 		
-		if (distanceLeft < OBSTACLE) Robot.sensorTriggered(SEN_SONAR_LEFT);
-		if (distanceRight < OBSTACLE) Robot.sensorTriggered(SEN_SONAR_RIGHT);
-		if (distanceCenter < OBSTACLE) Robot.sensorTriggered(SEN_SONAR_CENTER);		
+		sonarRightMeasurements.getLowest(distanceRight);   
+		distanceRight = convertCm(distanceRight);
+		
+		sonarCenterMeasurements.getLowest(distanceCenter);   				
+		distanceCenter = convertCm(distanceCenter);
+		
+		if (distanceLeft < OBSTACLE_CM) Robot.sensorTriggered(SEN_SONAR_LEFT);
+		if (distanceRight < OBSTACLE_CM) Robot.sensorTriggered(SEN_SONAR_RIGHT);
+		if (distanceCenter < OBSTACLE_CM) Robot.sensorTriggered(SEN_SONAR_CENTER);		
   }     
 }
 
@@ -144,7 +156,15 @@ void SonarClass::begin()
 bool SonarClass::obstacle()
 {
   if (!enabled) return false;
-	return ( (distanceLeft < OBSTACLE) || (distanceRight < OBSTACLE) ||(distanceCenter < OBSTACLE) );
+	return ( (distanceLeft < OBSTACLE_CM) || (distanceRight < OBSTACLE_CM) ||(distanceCenter < OBSTACLE_CM) );
 }
 
+
+unsigned int SonarClass::convertCm(unsigned int echoTime) {
+#if ROUNDING_ENABLED == false
+	return (echoTime / US_ROUNDTRIP_CM);              // Convert uS to centimeters (no rounding).
+#else
+	return NewPingConvert(echoTime, US_ROUNDTRIP_CM); // Convert uS to centimeters.
+#endif
+}
 

@@ -384,9 +384,9 @@ void createPlots(){
   plotAccY = new Plot(sheetPlotMain,0, -1, 1, "accY",   x, y+7*ploth, plotw, ploth, 120, 120, 0);
   plotAccZ = new Plot(sheetPlotMain,1, -1, 1, "accZ",   x, y+7*ploth, plotw, ploth, 0, 0, 127);
   plotAccX = new Plot(sheetPlotMain,2, -1, 1, "accX",   x, y+7*ploth, plotw, ploth, 255, 0, 0);
-  plotSonarL = new Plot(sheetPlotMain,0, 0, 4000, "sonL",   x, y+8*ploth, plotw, ploth, 120, 120, 0);
-  plotSonarC = new Plot(sheetPlotMain,1, 0, 4000, "sonC",   x, y+8*ploth, plotw, ploth, 0, 0, 127);
-  plotSonarR = new Plot(sheetPlotMain,2, 0, 4000, "sonR",   x, y+8*ploth, plotw, ploth, 255, 0, 0);
+  plotSonarL = new Plot(sheetPlotMain,0, 0, 100, "sonL",   x, y+8*ploth, plotw, ploth, 120, 120, 0);
+  plotSonarC = new Plot(sheetPlotMain,1, 0, 100, "sonC",   x, y+8*ploth, plotw, ploth, 0, 0, 127);
+  plotSonarR = new Plot(sheetPlotMain,2, 0, 100, "sonR",   x, y+8*ploth, plotw, ploth, 255, 0, 0);
   plotBatteryVolt = new Plot(sheetPlotMain,0, 20, 32, "batV",   x, y+9*ploth, plotw, ploth, 120, 120, 0);
   plotChargerVolt = new Plot(sheetPlotMain,1, 20, 32, "chgV",   x, y+9*ploth, plotw, ploth, 0, 0, 127);
   plotChargerAmp = new Plot(sheetPlotMain,2, 0, 1.7, "chgA",   x, y+9*ploth, plotw, ploth, 255, 0, 0);  

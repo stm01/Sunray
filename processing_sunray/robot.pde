@@ -308,10 +308,13 @@ void setup(PApplet parent){
        + float2String(mowSenseMax) + "," + float2String(imuPID_Kp) + "," + float2String(imuPID_Ki) + "," + float2String(imuPID_Kd) + ","
        + float2String(motorPID_Kp) + "," + float2String(motorPID_Ki) + "," + float2String(motorPID_Kd) + "," 
        + float2String(stuckMaxDiffOdometryIMU) + "," + float2String(stuckMaxIMUerror) + "\n");
+    delay(200);
     // sonar settings
     sendPort("?89," + str(sonarEnable) + "," + str(sonarTriggerBelow) + "\n");
+    delay(200);
     // perimeter settings
     sendPort("?84," + str(perimeterEnable) +"," + str(timedOutIfBelowSmag) + "," + str(timeOutSecIfNotInside) + "," + str(swapCoilPolarity) + "\n"); 
+    delay(200);
     // IMU settings
     sendPort("?82," + str(imuEnable) + "," + str(useGyro) +  "," + float2String(gyroBiasDpsMax) + "," + str(imuMode) + "\n");
     sendVerbose();

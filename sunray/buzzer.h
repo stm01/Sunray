@@ -1,3 +1,5 @@
+// buzzer - play beep sounds (async)
+
 #ifndef BUZZER_H
 #define BUZZER_H
 

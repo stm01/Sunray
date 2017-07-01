@@ -1,3 +1,19 @@
+// MC33926 motor controller
+// integrated speed, angle and line controller (PID)
+
+// motor controller - controls motion of robot via simple commands (travel on line and angle, rotate to angle)
+
+// example usage:  
+	 
+//	 Motor.begin();	 
+//	 Motor.travelLineDistance(distanceCm, absoluteAngle, speedPercent);
+//	 while ( Motor.motion != MOT_STOP ){
+//		 if (obstacle) Motor.stopImmediately();
+//	   Motor.run();		 
+//	 }	
+
+
+
 #ifndef MOTOR_H
 #define MOTOR_H
 
@@ -13,18 +29,6 @@ enum MotorMotion {MOT_PWM, MOT_LINE_TIME, MOT_LINE_DISTANCE, MOT_ROTATE_TIME, MO
 typedef enum MotorMotion MotorMotion;
 
 
-/* motor controller - controls motion of robot via simple commands (travel on line and angle, rotate to angle)
-
-   example usage:  
-	 
-	 Motor.begin();	 
-	 Motor.travelLineDistance(distanceCm, absoluteAngle, speedPercent);
-	 while ( Motor.motion != MOT_STOP ){
-		 if (obstacle) Motor.stopImmediately();
-	   Motor.run();		 
-	 }	
-
-*/
 
 // PWM speed:
 //    0..255  forward

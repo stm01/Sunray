@@ -1,4 +1,4 @@
-// HTTP server
+// HTTP server for socket-based client
 
 #ifndef SERVER_H
 #define SERVER_H

@@ -1,10 +1,3 @@
-
-#ifndef BT_H
-#define BT_H
-
-#include <Arduino.h>
-
-
 /*
   BT automatic programmer
    *linvor
@@ -15,6 +8,11 @@
  NOTE for HC06/linvor:    Do NOT pair/connect (LED must be blinking)
  NOTE for FBT06/MBTV4:    First you have to solder the PIO11 pin to VCC (PIN 12) which is 3.3 Volts using a thin wire.
 */
+
+#ifndef BT_H
+#define BT_H
+
+#include <Arduino.h>
 
 class BluetoothConfig
 {

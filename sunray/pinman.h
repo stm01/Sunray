@@ -1,5 +1,6 @@
 // pin manager
 // replacement for Arduino wiring, allowing us to change PWM frequency
+// and fixes Arduino built-in Due analogWrite to work properly on all pins
 
 #ifndef PINMAN_H
 #define PINMAN_H

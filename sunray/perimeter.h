@@ -1,3 +1,6 @@
+// Ardumower perimeter receiver (in/out detection and magnitude)
+// for 2 coils, using PRN signal code correlation
+
 #ifndef PERIMETER_H
 #define PERIMETER_H
 

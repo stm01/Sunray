@@ -13,15 +13,27 @@ Arduino ADC manager (ADC0-ADC9)
   2) ordinary ADC sampling (one-time sampling) (10 bit unsigned)
 - WARNING: never use any 'analogRead()' in your code when using this class!
 
-How to use it (example):
-1. Initialize ADC:  ADCMan.init();
-2. Set ADC pin:     ADCMan.setCapture(pinMotorMowSense, 1, 1);
+How to use it: 
+------example for one sampling-------
+1. Initialize ADC:  ADCMan.begin();
+2. Set ADC pin:     ADCMan.setupChannel(pinMotorMowSense, 1, true);
 3. Program loop:    while (true){
                       ADCMan.run();
-                      if (ADCMan.isCaptureComplete(pinMotorMowSense)){
-                        int value = ADCMan.read(pinMotorMowSense);
+                      if (ADCMan.isConvComplete(pinMotorMowSense)){
+                        int value = ADCMan.getValue(pinMotorMowSense);
                       }
-                    }
+                    }										
+------example for multiple samplings-------
+1. Initialize ADC:  ADCMan.begin();
+2. Set ADC pin:     ADCMan.setupChannel(pinPerimeterLeft, 255, true);
+3. Program loop:    while (true){
+                      ADCMan.run();
+                      if (ADCMan.isConvComplete(pinPerimeterLeft)){                        
+												  int16_t sampleCount = ADCMan.getSampleCount(pinPerimeterLeft);
+													int8_t *samples = ADCMan.getSamples(pinPerimeterLeft);    
+                      }
+                    }										
+
 */
 
 

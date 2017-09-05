@@ -86,7 +86,7 @@
 #define BLUETOOTH_PIN       1234
 
 
-#define ROBOTMSG Serial2
+#define ROBOTMSG Serial
 #define PFODAPP Serial2
 #define BLUETOOTH Serial2
 #define RANGING Serial3

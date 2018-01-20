@@ -33,7 +33,6 @@ Private-use only! (you need to ask for a commercial-use)
 #include "robot.h"
 
 void watchdogSetup(){}
-
 void setup(){
   Robot.begin();
 } 

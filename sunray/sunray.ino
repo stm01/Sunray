@@ -12,7 +12,7 @@ License
 Copyright (c) 2013-2017 by Alexander Grau
 
 Private-use only! (you need to ask for a commercial-use)
- 
+
 The code is open: you can modify it under the terms of the 
 GNU General Public License as published by the Free Software Foundation, 
 either version 3 of the License, or (at your option) any later version.
@@ -32,6 +32,7 @@ Private-use only! (you need to ask for a commercial-use)
 
 #include "robot.h"
 
+void watchdogSetup(){}
 
 void setup(){
   Robot.begin();
@@ -40,6 +41,3 @@ void setup(){
 void loop(){  
   Robot.run();
 }
-
-
-

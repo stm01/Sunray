@@ -37,7 +37,10 @@ RobotClass::RobotClass(){
 
 
 // robot start
-void RobotClass::begin(){      
+void RobotClass::begin(){
+  watchdogSetup();
+  watchdogEnable(10000); // 10 Seconds
+ 
   // keep battery switched ON
   pinMode(pinBatterySwitch, OUTPUT);    
   digitalWrite(pinBatterySwitch, HIGH);  
@@ -53,19 +56,22 @@ void RobotClass::begin(){
   //RemoteCtl.begin();      
   
   //while (!Console) ; // required if using Due native port
-  DEBUGLN(F("SETUP")); 
+  DEBUGLN(F("SETUP done!"));
+  DEBUGLN(F("WD Reset in 10 Seconds"));
+    
+  //dameda, deaktivieren zum testen
   
   Battery.begin();    
   RANGING.begin(RANGING_BAUDRATE);
   Bumper.begin();	
-  IMU.begin();    
+  IMU.begin(); 
   Motor.begin();      
-  Perimeter.begin(pinPerimeterLeft, pinPerimeterRight);          
+  Perimeter.begin(pinPerimeterLeft, pinPerimeterRight);
 	Sonar.begin();
-    
   Map.begin();
   DEBUG(F("freeRam="));
   DEBUGLN(freeRam());
+  
   RC.begin();
   
   state = STAT_IDLE;
@@ -94,7 +100,8 @@ void RobotClass::begin(){
   
 	if (!ADCMan.calibrationAvail) ADCMan.calibrate();
 	ADCMan.printInfo();
-  Buzzer.sound(SND_READY, true);   
+  Buzzer.sound(SND_READY, true);
+  DEBUGLN(F("Begin done!"));   
 }
 
 void RobotClass::configureBluetooth(){
@@ -108,6 +115,11 @@ void RobotClass::resetSensorTriggers(){
 
 // robot main loop
 void RobotClass::run(){
+  DEBUG(F("MILLIS:"));
+  DEBUG(F(millis()));
+  watchdogReset();
+  DEBUGLN(F("WD Reset!"));
+  
   if (millis() >= nextInfoTime){
     nextInfoTime = millis() + 1000;
     loopsPerSec = loopCounter;
@@ -496,4 +508,3 @@ void RobotClass::stateMachine(){
 			break;
 	}
 }
-
